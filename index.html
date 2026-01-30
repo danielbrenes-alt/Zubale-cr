@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Zubale CR - Dashboard v12 (Sync)</title>
+    <title>Zubale CR - Dashboard v12 Final</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
@@ -16,12 +16,11 @@
         };
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; transition: all 0.3s ease; overflow-x: hidden; }
+        body { font-family: 'Inter', sans-serif; transition: all 0.3s ease; }
         .batch-1 { border-left: 4px solid #3b82f6; }
         .batch-2 { border-left: 4px solid #8b5cf6; }
         .hidden { display: none; }
-        [contenteditable]:focus { outline: 2px solid #3b82f6; border-radius: 4px; background: rgba(59, 130, 246, 0.1); }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; transition: all 0.3s ease; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen">
@@ -30,20 +29,19 @@
     <div class="max-w-[1600px] mx-auto px-4 h-12 flex items-center justify-between">
         <div class="flex items-center gap-3">
             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPzUiCVTPF6LznRh6EHznXelLIdGM3N6tcCA&s" alt="Logo" class="h-6 w-auto">
-            <h1 class="font-bold text-sm tracking-tight">Zubale CR <span class="text-slate-400 font-normal ml-2 text-xs italic">Sincronización en Vivo</span></h1>
+            <h1 class="font-bold text-sm tracking-tight">Zubale CR <span class="text-slate-400 font-normal ml-2 text-xs italic">Sincronización Total</span></h1>
         </div>
         <div class="flex items-center gap-4">
             <div class="flex gap-4 border-r pr-4 border-slate-200 dark:border-slate-800">
                 <div class="flex items-center gap-2">
                     <span class="text-[10px] font-bold text-slate-400 uppercase">Pedidos:</span>
-                    <span id="total-global-pedidos" class="text-sm font-black text-blue-600 tracking-tight">0</span>
+                    <span id="total-global-pedidos" class="text-sm font-black text-blue-600">0</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="text-[10px] font-bold text-slate-400 uppercase">Soluciones:</span>
-                    <span id="total-global-soluciones" class="text-sm font-black text-amber-500 tracking-tight">0</span>
+                    <span id="total-global-soluciones" class="text-sm font-black text-amber-500">0</span>
                 </div>
             </div>
-            <button onclick="resetearTablero()" class="text-[10px] font-bold text-red-500 uppercase hover:underline">Limpiar Día</button>
             <button onclick="toggleTheme()" class="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
                 <span id="theme-icon" class="material-symbols-outlined text-sm">dark_mode</span>
             </button>
@@ -54,42 +52,38 @@
 <main class="max-w-[1600px] mx-auto p-4">
     <div class="mb-6 grid grid-cols-1 md:grid-cols-12 gap-3 bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm items-end">
         <div class="md:col-span-2">
-            <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Fecha de Trabajo</label>
+            <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Fecha</label>
             <input type="date" id="fecha-selector" onchange="cambiarFecha()" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-lg font-bold text-blue-600 h-9 px-2 text-xs">
         </div>
         <div class="md:col-span-2">
-            <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Seleccionar Slot</label>
-            <select id="slot-selector" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-lg font-bold text-blue-600 h-9 text-xs"></select>
+            <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Slot de Carga</label>
+            <select id="slot-selector" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-lg font-bold text-blue-600 h-9 text-xs">
+                <option value="1">Slot 1</option><option value="2">Slot 2</option><option value="3">Slot 3</option><option value="4">Slot 4</option>
+                <option value="5">Slot 5</option><option value="6">Slot 6</option><option value="7">Slot 7</option><option value="8">Slot 8</option>
+            </select>
         </div>
         <div class="md:col-span-3 flex gap-2">
-            <label class="flex-1 bg-blue-600 text-white h-9 rounded-lg font-bold hover:bg-blue-700 cursor-pointer flex items-center justify-center gap-1 shadow-sm text-[10px] uppercase transition-all">
-                Cargar Pedidos <input type="file" id="input-slot" class="hidden" accept=".xlsx, .xls" onchange="procesarArchivo(this, 'slot')">
+            <label class="flex-1 bg-blue-600 text-white h-9 rounded-lg font-bold hover:bg-blue-700 cursor-pointer flex items-center justify-center gap-1 shadow-sm text-[10px] uppercase">
+                Pedidos <input type="file" id="input-slot" class="hidden" accept=".xlsx, .xls" onchange="procesarArchivo(this, 'slot')">
             </label>
-            <label class="flex-1 bg-amber-500 text-white h-9 rounded-lg font-bold hover:bg-amber-600 cursor-pointer flex items-center justify-center gap-1 shadow-sm text-[10px] uppercase transition-all">
-                Cargar Sol. <input type="file" id="input-sol" class="hidden" accept=".xlsx, .xls" onchange="procesarArchivo(this, 'solucion')">
+            <label class="flex-1 bg-amber-500 text-white h-9 rounded-lg font-bold hover:bg-amber-600 cursor-pointer flex items-center justify-center gap-1 shadow-sm text-[10px] uppercase">
+                Soluciones <input type="file" id="input-sol" class="hidden" accept=".xlsx, .xls" onchange="procesarArchivo(this, 'solucion')">
             </label>
         </div>
         <div class="md:col-span-5 grid grid-cols-3 gap-2">
             <button onclick="exportarExcel()" class="bg-emerald-600 text-white h-9 rounded-lg font-bold text-[10px] uppercase">Reporte Día</button>
             <button onclick="exportarConsolidado('semana')" class="bg-purple-600 text-white h-9 rounded-lg font-bold text-[10px] uppercase">Semanal</button>
-            <button onclick="exportarConsolidado('mes')" class="bg-slate-700 text-white h-9 rounded-lg font-bold text-[10px] uppercase">Mensual</button>
+            <button onclick="resetearTablero()" class="bg-slate-200 dark:bg-slate-800 text-red-500 h-9 rounded-lg font-bold text-[10px] uppercase">Limpiar</button>
         </div>
     </div>
 
     <div class="space-y-6">
-        <section>
-            <div class="flex items-center gap-2 mb-3">
-                <span class="px-3 py-0.5 bg-blue-600 text-white text-[10px] font-black rounded-full uppercase">Batch 1</span>
-                <span class="h-px flex-1 bg-blue-200 dark:bg-blue-900/40"></span>
-            </div>
+        <section id="sec-batch-1">
+            <div class="flex items-center gap-2 mb-3"><span class="px-3 py-0.5 bg-blue-600 text-white text-[10px] font-black rounded-full uppercase">Batch 1</span></div>
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4" id="grid-batch-1"></div>
         </section>
-
-        <section>
-            <div class="flex items-center gap-2 mb-3">
-                <span class="px-3 py-0.5 bg-purple-600 text-white text-[10px] font-black rounded-full uppercase">Batch 2</span>
-                <span class="h-px flex-1 bg-purple-200 dark:bg-purple-900/40"></span>
-            </div>
+        <section id="sec-batch-2">
+            <div class="flex items-center gap-2 mb-3"><span class="px-3 py-0.5 bg-purple-600 text-white text-[10px] font-black rounded-full uppercase">Batch 2</span></div>
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4" id="grid-batch-2"></div>
         </section>
     </div>
@@ -97,26 +91,23 @@
 
 <div id="preview-modal" class="fixed inset-0 z-[100] hidden bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-2xl">
-        <h3 class="text-lg font-bold mb-2" id="modal-title">Confirmar Carga</h3>
-        <p class="text-[10px] text-slate-500 mb-4 uppercase font-bold tracking-widest">Resumen de detección</p>
+        <h3 class="text-lg font-bold mb-2">Confirmar Carga</h3>
         <div id="preview-body" class="space-y-2 mb-6 max-h-64 overflow-y-auto pr-2 text-sm"></div>
-        <div class="flex gap-2 pt-4 border-t dark:border-slate-800">
-            <button onclick="confirmarCarga()" class="flex-1 bg-blue-600 text-white py-2.5 rounded-xl font-bold text-sm shadow-lg hover:bg-blue-700 transition-all active:scale-95">Confirmar</button>
-            <button onclick="closeModal()" class="flex-1 bg-slate-100 dark:bg-slate-800 py-2.5 rounded-xl text-sm font-bold">Cancelar</button>
+        <div class="flex gap-2">
+            <button onclick="confirmarCarga()" class="flex-1 bg-blue-600 text-white py-2.5 rounded-xl font-bold">Confirmar</button>
+            <button onclick="closeModal()" class="flex-1 bg-slate-100 dark:bg-slate-800 py-2.5 rounded-xl">Cancelar</button>
         </div>
     </div>
 </div>
 
 <script>
-    // === CONFIGURACIÓN GLOBAL ===
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzA4Segqpkbd6-2UmFOtkqwGihgBeJT9r0p6KADkoX_YXukdpFj9Hd0mNe32fWMDi94/exec"; 
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzA4Segqpkbd6-2UmFOtkqwGihgBeJT9r0p6KADkoX_YXukdpFj9Hd0mNe32fWMDi94/exec";
     const batch1Stores = ["Wm Alajuela", "Wm Heredia", "WM Heredia Este", "Wm Tibas"];
     const batch2Stores = ["Wm Escazu", "Wm Santa Ana", "Wm Guadalupe", "Wm Desamparados"];
     const allStores = [...batch1Stores, ...batch2Stores];
     let dataTemporal = {};
     let modoCarga = '';
 
-    // === INICIALIZACIÓN ===
     function init() {
         const hoy = new Date().toISOString().split('T')[0];
         document.getElementById('fecha-selector').value = hoy;
@@ -124,111 +115,33 @@
         renderGroup(batch2Stores, 'grid-batch-2', 'batch-2');
         cargarPersistencia();
         cargarDesdeNube();
-        
-        if(localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
-    }
-
-    // --- ☁️ FUNCIONES DE NUBE (GOOGLE) ---
-    async function enviarANube(slot, batch, valor) {
-        const fecha = document.getElementById('fecha-selector').value;
-        const payload = { fecha, slot, batch, estado: valor };
-        try {
-            await fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
-            console.log("Sincronizado");
-        } catch (e) { console.error("Error nube:", e); }
-    }
-
-    async function cargarDesdeNube() {
-        try {
-            const res = await fetch(WEB_APP_URL);
-            const datos = await res.json();
-            const fecha = document.getElementById('fecha-selector').value;
-            datos.forEach(reg => {
-                if(reg.fecha === fecha) {
-                    allStores.forEach(loc => {
-                        const card = document.querySelector(`[data-location="${loc}"]`);
-                        if(reg.slot === 'SOL') {
-                             card.querySelector('.sol-val').innerText = reg.estado;
-                        } else {
-                             const celda = card.querySelector(`[data-slot="${reg.slot}"]`);
-                             if(celda) celda.innerText = reg.estado;
-                        }
-                    });
-                }
-            });
-            guardarEstado(false);
-        } catch (e) { console.log("Cargando..."); }
     }
 
     function renderGroup(stores, containerId, cssClass) {
         const container = document.getElementById(containerId);
-        container.innerHTML = "";
-        stores.forEach(name => {
-            const rows = [1, 2, 3, 4, 5, 6, 7, 8].map(i => `
-                <div class="flex flex-col items-center bg-slate-50 dark:bg-slate-800/40 rounded-lg py-1.5 border border-transparent">
-                    <span class="text-[8px] font-bold text-slate-400 mb-0.5 uppercase">S${i}</span>
-                    <span contenteditable="true" oninput="manualEdit(this, '${i}')" class="slot-val font-mono font-bold text-sm outline-none" data-slot="${i}">0</span>
-                </div>`).join('');
-
-            container.innerHTML += `
-                <div class="card bg-white dark:bg-slate-900 rounded-xl p-3 shadow-sm border border-slate-200 dark:border-slate-800 ${cssClass}" data-location="${name}">
-                    <div class="flex justify-between items-center mb-3">
-                        <div class="flex items-center gap-2">
-                            <div class="status-dot bg-slate-200 dark:bg-slate-700"></div>
-                            <h3 class="font-bold text-[11px] text-slate-700 dark:text-slate-200 uppercase truncate">${name}</h3>
-                        </div>
-                        <span class="grand-total font-black text-blue-600 text-sm">0</span>
-                    </div>
-                    <div class="grid grid-cols-4 gap-1.5 mb-3">${rows}</div>
-                    <div class="flex justify-between items-center bg-amber-50 dark:bg-amber-900/10 px-3 py-1.5 rounded-lg border border-amber-100 dark:border-amber-900/20">
-                        <span class="text-[9px] font-bold text-amber-600 uppercase">Soluciones</span>
-                        <span contenteditable="true" oninput="manualEdit(this, 'SOL')" class="sol-val font-mono font-bold text-amber-600 text-sm outline-none">0</span>
-                    </div>
-                </div>`;
-        });
+        container.innerHTML = stores.map(name => `
+            <div class="card bg-white dark:bg-slate-900 rounded-xl p-3 shadow-sm border border-slate-200 dark:border-slate-800 ${cssClass}" data-location="${name}">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-bold text-[11px] uppercase">${name}</h3>
+                    <span class="grand-total font-black text-blue-600 text-sm">0</span>
+                </div>
+                <div class="grid grid-cols-4 gap-1.5 mb-3">
+                    ${[1,2,3,4,5,6,7,8].map(i => `<div class="bg-slate-50 dark:bg-slate-800/40 rounded p-1 text-center"><span class="text-[7px] text-slate-400 block">S${i}</span><span contenteditable="true" oninput="manualEdit(this, '${i}')" class="slot-val font-bold text-xs" data-slot="${i}">0</span></div>`).join('')}
+                </div>
+                <div class="flex justify-between items-center bg-amber-50 dark:bg-amber-900/10 px-2 py-1 rounded">
+                    <span class="text-[8px] font-bold text-amber-600">SOL</span>
+                    <span contenteditable="true" oninput="manualEdit(this, 'SOL')" class="sol-val font-bold text-amber-600 text-xs">0</span>
+                </div>
+            </div>`).join('');
     }
 
-    async function manualEdit(el, slot) {
-        guardarEstado();
-        const valor = el.innerText;
-        await enviarANube(slot, 'manual', valor);
+    async function enviarANube(slot, batch, valor, tienda) {
+        const fecha = document.getElementById('fecha-selector').value;
+        const payload = { fecha, slot, batch, estado: valor, tienda: tienda };
+        try { fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) }); } catch (e) {}
     }
 
     function n(t) { return !t ? "" : String(t).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim(); }
-
-    function guardarEstado(persistir = true) {
-        const fecha = document.getElementById('fecha-selector').value;
-        const fullData = {};
-        let tP = 0, tS = 0;
-
-        document.querySelectorAll('.card').forEach(card => {
-            const loc = card.dataset.location;
-            const slots = Array.from(card.querySelectorAll('.slot-val')).map(s => parseInt(s.innerText) || 0);
-            const sol = parseInt(card.querySelector('.sol-val').innerText) || 0;
-            const sumaSlots = slots.reduce((a, b) => a + b, 0);
-            const total = sumaSlots + sol;
-            tP += sumaSlots; tS += sol;
-            fullData[loc] = { slots, sol };
-            card.querySelector('.grand-total').innerText = total.toLocaleString();
-            const dot = card.querySelector('.status-dot');
-            dot.className = `status-dot ${total > 0 ? (batch1Stores.includes(loc) ? 'bg-blue-500' : 'bg-purple-500') : 'bg-slate-200 dark:bg-slate-700'}`;
-        });
-
-        document.getElementById('total-global-pedidos').innerText = tP.toLocaleString();
-        document.getElementById('total-global-soluciones').innerText = tS.toLocaleString();
-        if(persistir) localStorage.setItem(`zubale_data_${fecha}`, JSON.stringify(fullData));
-    }
-
-    function actualizarSelectorSlots() {
-        const fecha = document.getElementById('fecha-selector').value;
-        const conteo = JSON.parse(localStorage.getItem(`conteo_slots_${fecha}`)) || {};
-        const selector = document.getElementById('slot-selector');
-        selector.innerHTML = "";
-        for (let i = 1; i <= 8; i++) {
-            const numCargas = conteo[i] || 0;
-            selector.innerHTML += `<option value="${i}">SLOT ${i} (Cargas: ${numCargas}/2)</option>`;
-        }
-    }
 
     function procesarArchivo(input, tipo) {
         const file = input.files[0];
@@ -246,10 +159,8 @@
                     const l = n(loc).replace("WM ", "");
                     if (texto.includes(l)) {
                         if (l === "HEREDIA" && texto.includes("HEREDIA ESTE")) continue;
-                        if (tipo === 'slot' || (tipo === 'solucion' && (texto.includes("SOLUCION") || texto.includes("REPROGRAMACION")))) {
-                            dataTemporal[loc]++;
-                            break;
-                        }
+                        dataTemporal[loc]++;
+                        break;
                     }
                 }
             });
@@ -261,79 +172,85 @@
 
     function mostrarModal() {
         const body = document.getElementById('preview-body');
-        const slot = document.getElementById('slot-selector').value;
-        document.getElementById('modal-title').innerText = modoCarga === 'slot' ? `Carga a Slot ${slot}` : 'Carga de Soluciones';
-        body.innerHTML = "";
-        for (const [loc, cant] of Object.entries(dataTemporal)) {
-            if (cant > 0) body.innerHTML += `<div class="flex justify-between py-1 border-b dark:border-slate-800"><span>${loc}</span><span class="font-bold text-blue-600">+${cant}</span></div>`;
-        }
+        body.innerHTML = Object.entries(dataTemporal).filter(e => e[1] > 0).map(e => `<div class="flex justify-between border-b py-1"><span>${e[0]}</span><span class="font-bold">+${e[1]}</span></div>`).join('');
         document.getElementById('preview-modal').classList.remove('hidden');
     }
 
     async function confirmarCarga() {
-        const fecha = document.getElementById('fecha-selector').value;
-        const slotDestino = document.getElementById('slot-selector').value;
-        
+        const slot = document.getElementById('slot-selector').value;
         for (const loc of allStores) {
-            const card = document.querySelector(`[data-location="${loc}"]`);
-            const celda = modoCarga === 'slot' ? card.querySelector(`[data-slot="${slotDestino}"]`) : card.querySelector('.sol-val');
-            if (celda && dataTemporal[loc] > 0) {
-                const nuevoValor = (parseInt(celda.innerText) || 0) + dataTemporal[loc];
-                celda.innerText = nuevoValor;
-                await enviarANube(modoCarga === 'slot' ? slotDestino : 'SOL', modoCarga, nuevoValor);
+            if (dataTemporal[loc] > 0) {
+                const card = document.querySelector(`[data-location="${loc}"]`);
+                const celda = modoCarga === 'slot' ? card.querySelector(`[data-slot="${slot}"]`) : card.querySelector('.sol-val');
+                const nuevoVal = (parseInt(celda.innerText) || 0) + dataTemporal[loc];
+                celda.innerText = nuevoVal;
+                await enviarANube(modoCarga === 'slot' ? slot : 'SOL', modoCarga, nuevoVal, loc);
             }
         }
-
-        if (modoCarga === 'slot') {
-            const conteo = JSON.parse(localStorage.getItem(`conteo_slots_${fecha}`)) || {};
-            conteo[slotDestino] = (conteo[slotDestino] || 0) + 1;
-            localStorage.setItem(`conteo_slots_${fecha}`, JSON.stringify(conteo));
-        }
-
         guardarEstado();
-        actualizarSelectorSlots();
         closeModal();
     }
 
-    function closeModal() { document.getElementById('preview-modal').classList.add('hidden'); }
-    function cambiarFecha() { cargarPersistencia(); cargarDesdeNube(); }
-    function toggleTheme() {
-        document.documentElement.classList.toggle('dark');
-        localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    function exportarExcel() {
+        const fecha = document.getElementById('fecha-selector').value;
+        const rows = [["Tienda", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "Soluciones", "Total"]];
+        document.querySelectorAll('.card').forEach(card => {
+            const name = card.dataset.location;
+            const slots = Array.from(card.querySelectorAll('.slot-val')).map(s => s.innerText);
+            const sol = card.querySelector('.sol-val').innerText;
+            const total = card.querySelector('.grand-total').innerText;
+            rows.push([name, ...slots, sol, total]);
+        });
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Reporte");
+        XLSX.writeFile(wb, `Zubale_${fecha}.xlsx`);
+    }
+
+    function guardarEstado() {
+        const fecha = document.getElementById('fecha-selector').value;
+        const fullData = {};
+        let tP = 0, tS = 0;
+        document.querySelectorAll('.card').forEach(card => {
+            const loc = card.dataset.location;
+            const slots = Array.from(card.querySelectorAll('.slot-val')).map(s => parseInt(s.innerText) || 0);
+            const sol = parseInt(card.querySelector('.sol-val').innerText) || 0;
+            const total = slots.reduce((a, b) => a + b, 0) + sol;
+            tP += (total - sol); tS += sol;
+            card.querySelector('.grand-total').innerText = total;
+            fullData[loc] = { slots, sol };
+        });
+        document.getElementById('total-global-pedidos').innerText = tP;
+        document.getElementById('total-global-soluciones').innerText = tS;
+        localStorage.setItem(`zubale_data_${fecha}`, JSON.stringify(fullData));
     }
 
     function cargarPersistencia() {
-        const fecha = document.getElementById('fecha-selector').value;
-        const saved = JSON.parse(localStorage.getItem(`zubale_data_${fecha}`));
-        actualizarSelectorSlots();
-        if (!saved) {
-            document.querySelectorAll('.slot-val, .sol-val').forEach(el => el.innerText = "0");
-            guardarEstado(false);
-            return;
-        }
-        Object.entries(saved).forEach(([loc, data]) => {
+        const data = JSON.parse(localStorage.getItem(`zubale_data_${document.getElementById('fecha-selector').value}`));
+        if (!data) { document.querySelectorAll('.slot-val, .sol-val').forEach(e => e.innerText = "0"); return; }
+        Object.entries(data).forEach(([loc, info]) => {
             const card = document.querySelector(`[data-location="${loc}"]`);
             if (card) {
-                data.slots.forEach((v, i) => {
-                    const el = card.querySelector(`[data-slot="${i+1}"]`);
-                    if(el) el.innerText = v;
-                });
-                card.querySelector('.sol-val').innerText = data.sol;
+                info.slots.forEach((v, i) => card.querySelector(`[data-slot="${i+1}"]`).innerText = v);
+                card.querySelector('.sol-val').innerText = info.sol;
             }
         });
-        guardarEstado(false);
+        guardarEstado();
     }
 
-    function resetearTablero() {
-        const f = document.getElementById('fecha-selector').value;
-        if (confirm(`¿Limpiar datos locales del día ${f}?`)) {
-            localStorage.removeItem(`zubale_data_${f}`);
-            localStorage.removeItem(`conteo_slots_${f}`);
-            location.reload();
-        }
+    async function cargarDesdeNube() { /* Lógica para jalar datos de Sheets si fuera necesario */ }
+    function closeModal() { document.getElementById('preview-modal').classList.add('hidden'); }
+    function cambiarFecha() { cargarPersistencia(); }
+    function toggleTheme() { document.documentElement.classList.toggle('dark'); }
+    function resetearTablero() { if(confirm("¿Borrar todo?")) { localStorage.clear(); location.reload(); } }
+    function manualEdit(el, slot) { 
+        const tienda = el.closest('.card').dataset.location;
+        enviarANube(slot, 'manual', el.innerText, tienda); 
+        guardarEstado(); 
     }
 
     init();
 </script>
 </body>
 </html>
+
