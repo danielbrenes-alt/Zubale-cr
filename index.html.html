@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Zubale CR - Dashboard Consolidado v6</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: { extend: { colors: { primary: "#0f172a" } } },
+        };
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; transition: all 0.3s ease; }
+        .batch-1 { border-top: 4px solid #3b82f6; }
+        .batch-2 { border-top: 4px solid #8b5cf6; }
+        .hidden { display: none; }
+        [contenteditable]:focus { outline: 2px solid #3b82f6; border-radius: 4px; background: rgba(59, 130, 246, 0.1); }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen">
+
+<div id="preview-modal" class="fixed inset-0 z-[100] hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
+        <div class="p-6 border-b dark:border-slate-800 flex justify-between items-center">
+            <div>
+                <h3 class="text-xl font-bold" id="modal-title">Confirmar Carga</h3>
+                <p class="text-xs text-slate-500">Datos detectados con búsqueda flexible (sin tildes).</p>
+            </div>
+            <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><span class="material-symbols-outlined">close</span></button>
+        </div>
+        <div class="p-6 max-h-[40vh] overflow-y-auto">
+            <table class="w-full text-sm">
+                <thead><tr class="text-left text-slate-400 border-b dark:border-slate-800"><th class="pb-2">Tienda</th><th class="pb-2 text-right">Cant. Detectada</th></tr></thead>
+                <tbody id="preview-body" class="divide-y dark:divide-slate-800"></tbody>
+            </table>
+        </div>
+        <div class="p-6 bg-slate-50 dark:bg-slate-800/50 flex gap-3">
+            <button onclick="confirmarCarga()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg transition-transform active:scale-95">Confirmar y Sumar</button>
+            <button onclick="closeModal()" class="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 py-3 rounded-xl font-bold">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<nav class="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
+    <div class="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <div class="flex items-center justify-center">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPzUiCVTPF6LznRh6EHznXelLIdGM3N6tcCA&s" 
+                     alt="Logo Zubale" 
+                     class="h-10 w-auto rounded-md object-contain">
+            </div>
+            <div>
+                <h1 class="font-bold text-lg leading-none">Operaciones Zubale</h1>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Consolidado Batch 1 & 2</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="resetearTablero()" class="text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 px-3 py-2 rounded-lg transition-colors">Limpiar Datos</button>
+            <button onclick="toggleTheme()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                <span id="theme-icon" class="material-symbols-outlined">dark_mode</span>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-[1600px] mx-auto p-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 flex justify-between items-center shadow-sm">
+            <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Pedidos (Slots)</p>
+                <p id="total-global-pedidos" class="text-4xl font-black text-blue-600">0</p>
+            </div>
+            <div class="w-14 h-14 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center text-blue-600"><span class="material-symbols-outlined text-3xl">inventory_2</span></div>
+        </div>
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 flex justify-between items-center shadow-sm">
+            <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Soluciones</p>
+                <p id="total-global-soluciones" class="text-4xl font-black text-amber-500">0</p>
+            </div>
+            <div class="w-14 h-14 bg-amber-50 dark:bg-amber-900/20 rounded-2xl flex items-center justify-center text-amber-500"><span class="material-symbols-outlined text-3xl">task_alt</span></div>
+        </div>
+    </div>
+
+    <div class="mb-10 grid grid-cols-1 lg:grid-cols-3 gap-6 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-md">
+        <div class="flex flex-col">
+            <label class="text-[10px] font-bold text-slate-400 uppercase mb-2 ml-1">1. Slot Destino</label>
+            <select id="slot-selector" class="bg-slate-100 dark:bg-slate-800 border-none rounded-xl font-bold text-blue-600 h-12 cursor-pointer">
+                <option value="1">SLOT 1</option><option value="2">SLOT 2</option><option value="3">SLOT 3</option><option value="4">SLOT 4</option>
+                <option value="5">SLOT 5</option><option value="6">SLOT 6</option><option value="7">SLOT 7</option><option value="8">SLOT 8</option>
+            </select>
+        </div>
+        <div class="flex flex-col">
+            <label class="text-[10px] font-bold text-slate-400 uppercase mb-2 ml-1">2. Cargar Excel de Slot</label>
+            <label class="bg-blue-600 text-white h-12 rounded-xl font-bold hover:bg-blue-700 cursor-pointer flex items-center justify-center gap-2 transition-all shadow-md active:scale-95">
+                <span class="material-symbols-outlined">upload_file</span> Seleccionar Slot 
+                <input type="file" id="input-slot" class="hidden" accept=".xlsx, .xls" onchange="procesarArchivo(this, 'slot')">
+            </label>
+        </div>
+        <div class="flex flex-col">
+            <label class="text-[10px] font-bold text-slate-400 uppercase mb-2 ml-1">3. Cargar Excel de Soluciones</label>
+            <div class="flex gap-2">
+                <label class="flex-1 bg-amber-500 text-white h-12 rounded-xl font-bold hover:bg-amber-600 cursor-pointer flex items-center justify-center gap-2 shadow-md active:scale-95">
+                    <span class="material-symbols-outlined">assignment</span> Subir Soluciones 
+                    <input type="file" id="input-sol" class="hidden" accept=".xlsx, .xls" onchange="procesarArchivo(this, 'solucion')">
+                </label>
+                <button onclick="exportarExcel()" class="flex-1 bg-emerald-600 text-white h-12 rounded-xl font-bold hover:bg-emerald-700 shadow-md flex items-center justify-center gap-2 active:scale-95">
+                    <span class="material-symbols-outlined">download</span> Descargar Reporte
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div>
+            <div class="flex items-center gap-2 mb-4 border-b dark:border-slate-800 pb-2">
+                <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900/40 text-blue-600 text-[10px] font-black rounded uppercase">Batch 1</span>
+                <h2 class="font-bold text-slate-500 text-xs italic">Alajuela, Heredia, Tibás</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="grid-batch-1"></div>
+        </div>
+        <div>
+            <div class="flex items-center gap-2 mb-4 border-b dark:border-slate-800 pb-2">
+                <span class="px-2 py-1 bg-purple-100 dark:bg-purple-900/40 text-purple-600 text-[10px] font-black rounded uppercase">Batch 2</span>
+                <h2 class="font-bold text-slate-500 text-xs italic">Escazú, Santa Ana, Guadalupe, Desamparados</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="grid-batch-2"></div>
+        </div>
+    </div>
+</main>
+
+<script>
+    const batch1Stores = ["Wm Alajuela", "Wm Heredia", "WM Heredia Este", "Wm Tibas"];
+    const batch2Stores = ["Wm Escazu", "Wm Santa Ana", "Wm Guadalupe", "Wm Desamparados"];
+    const allStores = [...batch1Stores, ...batch2Stores];
+    let dataTemporal = {};
+    let modoCarga = '';
+
+    function n(t) { 
+        if (!t) return "";
+        return String(t).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim(); 
+    }
+
+    function init() {
+        renderGroup(batch1Stores, 'grid-batch-1', 'batch-1');
+        renderGroup(batch2Stores, 'grid-batch-2', 'batch-2');
+        cargarPersistencia();
+        if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+        actualizarIcono();
+    }
+
+    function renderGroup(stores, containerId, cssClass) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = "";
+        stores.forEach(name => {
+            const rows = [1, 2, 3, 4, 5, 6, 7, 8].map(i => `
+                <div class="flex justify-between items-center py-1.5 border-b border-slate-50 dark:border-slate-800/50">
+                    <span class="text-[9px] font-bold text-slate-400">SLOT ${i}</span>
+                    <span contenteditable="true" oninput="guardarEstado()" class="slot-val font-mono font-bold text-sm outline-none dark:text-slate-200" data-slot="${i}">0</span>
+                </div>
+            `).join('');
+
+            container.innerHTML += `
+                <div class="card bg-white dark:bg-slate-900 rounded-2xl p-4 shadow-sm border border-slate-200 dark:border-slate-800 ${cssClass}" data-location="${name}">
+                    <h3 class="font-bold text-xs mb-3 text-slate-700 dark:text-slate-300 uppercase">${name}</h3>
+                    <div class="space-y-0.5 mb-3">${rows}</div>
+                    <div class="flex justify-between items-center bg-amber-50 dark:bg-amber-900/10 p-2 rounded-lg mb-2">
+                        <span class="text-[9px] font-bold text-amber-600 uppercase">Soluciones</span>
+                        <span contenteditable="true" oninput="guardarEstado()" class="sol-val font-mono font-bold text-amber-600 outline-none">0</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t border-slate-100 dark:border-slate-800">
+                        <span class="text-[9px] font-bold text-slate-400 uppercase">Total</span>
+                        <span class="grand-total font-black text-blue-600 text-sm">0</span>
+                    </div>
+                </div>`;
+        });
+    }
+
+    function procesarArchivo(input, tipo) {
+        const file = input.files[0];
+        if (!file) return;
+        modoCarga = tipo;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
+            const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+            dataTemporal = {};
+            allStores.forEach(loc => dataTemporal[loc] = 0);
+
+            json.forEach(fila => {
+                const contenidoFilaCompleta = n(Object.values(fila).join(" "));
+                for (const loc of allStores) {
+                    const nombreLimpio = n(loc).replace("WM ", "");
+                    if (contenidoFilaCompleta.includes(nombreLimpio)) {
+                        if (nombreLimpio === "HEREDIA" && contenidoFilaCompleta.includes("HEREDIA ESTE")) continue;
+                        if (tipo === 'slot') {
+                            dataTemporal[loc]++;
+                        } else if (tipo === 'solucion') {
+                            if (contenidoFilaCompleta.includes("SOLUCION") || contenidoFilaCompleta.includes("REPROGRAMACION")) {
+                                dataTemporal[loc]++;
+                            }
+                        }
+                        break;
+                    }
+                }
+            });
+            mostrarModal();
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    function mostrarModal() {
+        const body = document.getElementById('preview-body');
+        const slot = document.getElementById('slot-selector').value;
+        document.getElementById('modal-title').innerText = modoCarga === 'slot' ? `Añadir a Slot ${slot}` : 'Añadir Soluciones';
+        body.innerHTML = "";
+        let count = 0;
+        for (const [loc, cant] of Object.entries(dataTemporal)) {
+            if (cant > 0) {
+                count++;
+                body.innerHTML += `<tr><td class="py-2 font-semibold text-xs">${loc}</td><td class="py-2 text-right font-mono text-blue-600 font-bold">+ ${cant}</td></tr>`;
+            }
+        }
+        if (count === 0) body.innerHTML = "<tr><td colspan='2' class='py-8 text-center text-slate-400 italic text-xs'>No se detectaron datos.</td></tr>";
+        document.getElementById('preview-modal').classList.remove('hidden');
+    }
+
+    function confirmarCarga() {
+        const slotDestino = document.getElementById('slot-selector').value;
+        allStores.forEach(loc => {
+            const card = document.querySelector(`[data-location="${loc}"]`);
+            const celda = modoCarga === 'slot' ? card.querySelector(`[data-slot="${slotDestino}"]`) : card.querySelector('.sol-val');
+            if (celda && dataTemporal[loc] > 0) {
+                celda.innerText = (parseInt(celda.innerText) || 0) + dataTemporal[loc];
+            }
+        });
+        guardarEstado();
+        closeModal();
+    }
+
+    function closeModal() {
+        document.getElementById('preview-modal').classList.add('hidden');
+        document.getElementById('input-slot').value = "";
+        document.getElementById('input-sol').value = "";
+    }
+
+    function guardarEstado() {
+        const fullData = {};
+        let tP = 0, tS = 0;
+        document.querySelectorAll('.card').forEach(card => {
+            const loc = card.dataset.location;
+            const slots = Array.from(card.querySelectorAll('.slot-val')).map(s => parseInt(s.innerText) || 0);
+            const sol = parseInt(card.querySelector('.sol-val').innerText) || 0;
+            const sumaSlots = slots.reduce((a, b) => a + b, 0);
+            tP += sumaSlots; tS += sol;
+            fullData[loc] = { slots, sol };
+            card.querySelector('.grand-total').innerText = (sumaSlots + sol).toLocaleString();
+        });
+        document.getElementById('total-global-pedidos').innerText = tP.toLocaleString();
+        document.getElementById('total-global-soluciones').innerText = tS.toLocaleString();
+        localStorage.setItem('zubale_v6_final', JSON.stringify(fullData));
+    }
+
+    function cargarPersistencia() {
+        const saved = JSON.parse(localStorage.getItem('zubale_v6_final'));
+        if (!saved) return;
+        Object.entries(saved).forEach(([loc, data]) => {
+            const card = document.querySelector(`[data-location="${loc}"]`);
+            if (card) {
+                data.slots.forEach((v, i) => card.querySelector(`[data-slot="${i+1}"]`).innerText = v);
+                card.querySelector('.sol-val').innerText = data.sol;
+            }
+        });
+        guardarEstado();
+    }
+
+    function toggleTheme() {
+        const dark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+        actualizarIcono();
+    }
+
+    function actualizarIcono() {
+        const icon = document.getElementById('theme-icon');
+        icon.innerText = document.documentElement.classList.contains('dark') ? 'light_mode' : 'dark_mode';
+        icon.className = document.documentElement.classList.contains('dark') ? 'material-symbols-outlined text-amber-400' : 'material-symbols-outlined';
+    }
+
+    function resetearTablero() { if (confirm("¿Limpiar todo el reporte acumulado?")) { localStorage.clear(); location.reload(); } }
+
+    function exportarExcel() {
+        const excelData = allStores.map(loc => {
+            const card = document.querySelector(`[data-location="${loc}"]`);
+            const row = { "TIENDA": loc, "BATCH": batch1Stores.includes(loc) ? "Batch 1" : "Batch 2" };
+            card.querySelectorAll('.slot-val').forEach((s, i) => row[`SLOT ${i+1}`] = parseInt(s.innerText));
+            row["SOLUCIONES"] = parseInt(card.querySelector('.sol-val').innerText);
+            row["TOTAL"] = parseInt(card.querySelector('.grand-total').innerText.replace(/\D/g,''));
+            return row;
+        });
+        const ws = XLSX.utils.json_to_sheet(excelData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Consolidado");
+        XLSX.writeFile(wb, `Consolidado_Retail_${new Date().toLocaleDateString()}.xlsx`);
+    }
+
+    init();
+</script>
+</body>
+</html>
