@@ -59,20 +59,21 @@
                 <option value="5">Slot 5</option><option value="6">Slot 6</option><option value="7">Slot 7</option><option value="8">Slot 8</option>
             </select>
         </div>
-        <div class="lg:col-span-4 flex gap-2">
-            <label class="flex-1 bg-blue-600 text-white h-10 rounded-lg flex items-center justify-center gap-2 cursor-pointer font-bold text-xs uppercase hover:bg-blue-700 transition-all">
+        <div class="lg:col-span-3 flex gap-2">
+            <label class="flex-1 bg-blue-600 text-white h-10 rounded-lg flex items-center justify-center gap-2 cursor-pointer font-bold text-[10px] uppercase hover:bg-blue-700 transition-all">
                 <span class="material-symbols-outlined text-sm">upload_file</span> Pedidos
                 <input type="file" class="hidden" accept=".xlsx, .xls" onchange="procesarArchivo(this, 'slot')">
             </label>
-            <label class="flex-1 bg-amber-500 text-white h-10 rounded-lg flex items-center justify-center gap-2 cursor-pointer font-bold text-xs uppercase hover:bg-amber-600 transition-all">
+            <label class="flex-1 bg-amber-500 text-white h-10 rounded-lg flex items-center justify-center gap-2 cursor-pointer font-bold text-[10px] uppercase hover:bg-amber-600 transition-all">
                 <span class="material-symbols-outlined text-sm">done_all</span> Sols
                 <input type="file" class="hidden" accept=".xlsx, .xls" onchange="procesarArchivo(this, 'solucion')">
             </label>
         </div>
-        <div class="lg:col-span-4 flex gap-2">
-            <button onclick="cargarDesdeNube()" class="h-10 px-4 border rounded-lg hover:bg-slate-50 transition-colors dark:border-slate-700"><span class="material-symbols-outlined text-sm">sync</span></button>
-            <button onclick="exportarExcel()" class="flex-1 bg-emerald-600 text-white h-10 rounded-lg font-bold text-xs uppercase hover:bg-emerald-700">Excel</button>
-            <button onclick="exportarHistorico('semana')" class="flex-1 bg-red-600 text-white h-10 rounded-lg font-bold text-xs uppercase hover:bg-red-700 italic">Historico</button>
+        <div class="lg:col-span-5 flex gap-1">
+            <button onclick="exportarExcel()" class="flex-1 bg-emerald-600 text-white h-10 rounded-lg font-bold text-[10px] uppercase hover:bg-emerald-700">Día</button>
+            <button onclick="exportarHistorico('semana')" class="flex-1 bg-indigo-600 text-white h-10 rounded-lg font-bold text-[10px] uppercase hover:bg-indigo-700">Semana</button>
+            <button onclick="exportarHistorico('mes')" class="flex-1 bg-purple-600 text-white h-10 rounded-lg font-bold text-[10px] uppercase hover:bg-purple-700">Mes</button>
+            <button onclick="cargarDesdeNube()" class="h-10 px-3 border rounded-lg hover:bg-slate-50 transition-colors dark:border-slate-700"><span class="material-symbols-outlined text-sm">sync</span></button>
         </div>
     </div>
 
@@ -83,7 +84,6 @@
         const batch1Stores = ["Wm Alajuela", "Wm Heredia", "WM Heredia Este", "Wm Tibas"];
         const batch2Stores = ["Wm Escazu", "Wm Santa Ana", "Wm Guadalupe", "Wm Desamparados"];
         const allStores = [...batch1Stores, ...batch2Stores];
-        let registroCargas = JSON.parse(localStorage.getItem('zubale_cargas_log')) || {};
 
         function init() {
             if(!document.getElementById('fecha-selector').value) document.getElementById('fecha-selector').value = new Date().toISOString().split('T')[0];
@@ -91,6 +91,62 @@
             cargarPersistencia();
             cargarDesdeNube();
             setInterval(cargarDesdeNube, 7000);
+        }
+
+        // Exportación Local (Día actual en pantalla)
+        function exportarExcel() {
+            const fecha = document.getElementById('fecha-selector').value;
+            const rows = [["TIENDA", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "SOLS", "TOTAL"]];
+            allStores.forEach(loc => {
+                const card = document.querySelector(`[data-location="${loc}"]`);
+                const slots = Array.from(card.querySelectorAll('.slot-val')).map(s => parseInt(s.innerText) || 0);
+                const sol = parseInt(card.querySelector('.sol-val').innerText) || 0;
+                rows.push([loc, ...slots, sol, slots.reduce((a,b)=>a+b,0)+sol]);
+            });
+            const ws = XLSX.utils.aoa_to_sheet(rows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Reporte_Dia");
+            XLSX.writeFile(wb, `Zubale_Día_${fecha}.xlsx`);
+        }
+
+        // Exportación Histórica (Semana/Mes desde la Nube)
+        async function exportarHistorico(rango) {
+            const fecha = document.getElementById('fecha-selector').value;
+            const btn = event.currentTarget;
+            const originalText = btn.innerText;
+            btn.innerText = "Cargando...";
+            
+            try {
+                // Se envía el parámetro 'rango' a tu script de Google para que filtre
+                const res = await fetch(`${WEB_APP_URL}?fecha=${fecha}&rango=${rango}`);
+                const data = await res.json();
+                
+                if (!data || data.length === 0) {
+                    alert("No hay datos históricos para este periodo.");
+                } else {
+                    const ws = XLSX.utils.json_to_sheet(data);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "Historico");
+                    XLSX.writeFile(wb, `Zubale_Historico_${rango}_${fecha}.xlsx`);
+                }
+            } catch (e) {
+                alert("Error al obtener datos de la nube. Verifica la conexión.");
+            } finally {
+                btn.innerText = originalText;
+            }
+        }
+
+        // --- Funciones de lógica base (Sin cambios para mantener estabilidad) ---
+        function renderTiendas() {
+            const container = document.getElementById('tiendas-container');
+            container.innerHTML = allStores.map(name => {
+                const isB1 = batch1Stores.includes(name);
+                return `<div class="card bg-white dark:bg-slate-900 p-5 ${isB1 ? 'batch-1' : 'batch-2'}" data-location="${name}">
+                    <div class="flex justify-between items-center mb-4"><h3 class="text-sm font-black dark:text-slate-100 uppercase">${name}</h3><span class="grand-total text-2xl font-black text-blue-600">0</span></div>
+                    <div class="space-y-1">${[1,2,3,4,5,6,7,8].map(i => `<div class="slot-row flex justify-between text-[11px] items-center dark:border-slate-800"><span class="text-slate-400 font-bold italic">Entrega ${i}</span><span contenteditable="true" oninput="manualEdit(this, '${i}')" class="slot-val font-black dark:text-slate-200" data-slot="${i}">0</span></div>`).join('')}</div>
+                    <div class="mt-4 p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg flex justify-between items-center text-xs"><span class="font-black text-amber-700 uppercase">Sols</span><span contenteditable="true" oninput="manualEdit(this, 'SOL')" class="sol-val font-black text-amber-600">0</span></div>
+                </div>`;
+            }).join('');
         }
 
         async function cargarDesdeNube() {
@@ -116,18 +172,6 @@
             } catch (e) { console.log("Sincronizando..."); }
         }
 
-        function renderTiendas() {
-            const container = document.getElementById('tiendas-container');
-            container.innerHTML = allStores.map(name => {
-                const isB1 = batch1Stores.includes(name);
-                return `<div class="card bg-white dark:bg-slate-900 p-5 ${isB1 ? 'batch-1' : 'batch-2'}" data-location="${name}">
-                    <div class="flex justify-between items-center mb-4"><h3 class="text-sm font-black dark:text-slate-100 uppercase">${name}</h3><span class="grand-total text-2xl font-black text-blue-600">0</span></div>
-                    <div class="space-y-1">${[1,2,3,4,5,6,7,8].map(i => `<div class="slot-row flex justify-between text-[11px] items-center dark:border-slate-800"><span class="text-slate-400 font-bold italic">Entrega ${i}</span><span contenteditable="true" oninput="manualEdit(this, '${i}')" class="slot-val font-black dark:text-slate-200" data-slot="${i}">0</span></div>`).join('')}</div>
-                    <div class="mt-4 p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg flex justify-between items-center text-xs"><span class="font-black text-amber-700 uppercase">Sols</span><span contenteditable="true" oninput="manualEdit(this, 'SOL')" class="sol-val font-black text-amber-600">0</span></div>
-                </div>`;
-            }).join('');
-        }
-
         function guardarEstado(actualizarLocal = true) {
             const fecha = document.getElementById('fecha-selector').value;
             const fullData = {}; let tP = 0, tB1 = 0, tB2 = 0, tS = 0;
@@ -146,27 +190,6 @@
             document.getElementById('total-b2').innerText = tB2;
             document.getElementById('total-soluciones').innerText = tS;
             if(actualizarLocal) localStorage.setItem(`zubale_data_${fecha}`, JSON.stringify(fullData));
-        }
-
-        // FUNCIÓN DE EXPORTACIÓN A EXCEL
-        function exportarExcel() {
-            const fecha = document.getElementById('fecha-selector').value;
-            const rows = [];
-            // Encabezados
-            rows.push(["TIENDA", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "SOLS", "TOTAL"]);
-
-            allStores.forEach(loc => {
-                const card = document.querySelector(`[data-location="${loc}"]`);
-                const slots = Array.from(card.querySelectorAll('.slot-val')).map(s => parseInt(s.innerText) || 0);
-                const sol = parseInt(card.querySelector('.sol-val').innerText) || 0;
-                const total = slots.reduce((a, b) => a + b, 0) + sol;
-                rows.push([loc, ...slots, sol, total]);
-            });
-
-            const ws = XLSX.utils.aoa_to_sheet(rows);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Reporte");
-            XLSX.writeFile(wb, `Zubale_Reporte_${fecha}.xlsx`);
         }
 
         function procesarArchivo(input, tipo) {
