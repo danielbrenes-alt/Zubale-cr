@@ -20,13 +20,8 @@
         .slot-row { border-bottom: 1px solid #f1f5f9; padding: 6px 0; }
         .dark .slot-row { border-bottom-color: #1e293b; }
         [contenteditable]:focus { outline: none; background: #eff6ff; color: #1e40af; border-radius: 4px; padding: 0 4px; }
-        
-        /* Animación para cambios en tiempo real */
         .update-flash { animation: flash 1s ease; }
-        @keyframes flash { 
-            0% { background-color: rgba(16, 185, 129, 0.2); color: #10b981; transform: scale(1.1); } 
-            100% { background-color: transparent; } 
-        }
+        @keyframes flash { 0% { background-color: rgba(16, 185, 129, 0.2); transform: scale(1.02); } 100% { background-color: transparent; } }
     </style>
 </head>
 <body class="p-6 bg-slate-50 text-slate-700">
@@ -37,75 +32,48 @@
             <div>
                 <h1 class="text-lg font-black uppercase tracking-tighter text-blue-600 dark:text-blue-400">ZUBALE CONTROL</h1>
                 <span id="sync-status" class="text-[9px] font-bold text-green-500 flex items-center gap-1">
-                    <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                    </span>
+                    <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span></span>
                     LIVE 7s
                 </span>
             </div>
         </div>
-        <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 rounded-full bg-slate-100 dark:bg-slate-800">
-            <span class="material-symbols-outlined text-amber-500">contrast</span>
-        </button>
+        <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 rounded-full bg-slate-100 dark:bg-slate-800"><span class="material-symbols-outlined text-amber-500">contrast</span></button>
     </header>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div class="preview-card bg-white p-4 rounded-xl border border-blue-100 shadow-sm">
-            <p class="text-[10px] font-black text-blue-500 uppercase">Total Batch 1</p>
-            <p id="total-b1" class="text-2xl font-black">0</p>
-        </div>
-        <div class="preview-card bg-white p-4 rounded-xl border border-purple-100 shadow-sm">
-            <p class="text-[10px] font-black text-purple-500 uppercase">Total Batch 2</p>
-            <p id="total-b2" class="text-2xl font-black">0</p>
-        </div>
-        <div class="preview-card bg-white p-4 rounded-xl border border-amber-100 shadow-sm">
-            <p class="text-[10px] font-black text-amber-500 uppercase">Total Soluciones</p>
-            <p id="total-soluciones" class="text-2xl font-black text-amber-600">0</p>
-        </div>
-        <div class="preview-card bg-blue-600 p-4 rounded-xl border shadow-md">
-            <p class="text-[10px] font-black text-blue-100 uppercase">Gran Total Pedidos</p>
-            <p id="total-global-pedidos" class="text-2xl font-black text-white">0</p>
-        </div>
+        <div class="preview-card bg-white p-4 rounded-xl border border-blue-100 shadow-sm"><p class="text-[10px] font-black text-blue-500 uppercase">Total Batch 1</p><p id="total-b1" class="text-2xl font-black">0</p></div>
+        <div class="preview-card bg-white p-4 rounded-xl border border-purple-100 shadow-sm"><p class="text-[10px] font-black text-purple-500 uppercase">Total Batch 2</p><p id="total-b2" class="text-2xl font-black">0</p></div>
+        <div class="preview-card bg-white p-4 rounded-xl border border-amber-100 shadow-sm"><p class="text-[10px] font-black text-amber-500 uppercase">Total Soluciones</p><p id="total-soluciones" class="text-2xl font-black text-amber-600">0</p></div>
+        <div class="preview-card bg-blue-600 p-4 rounded-xl border shadow-md"><p class="text-[10px] font-black text-blue-100 uppercase">Gran Total</p><p id="total-global-pedidos" class="text-2xl font-black text-white">0</p></div>
     </div>
 
     <div class="control-panel w-full mb-8 grid grid-cols-1 lg:grid-cols-12 gap-4 bg-white p-5 rounded-xl border shadow-sm items-end">
         <div class="lg:col-span-2">
-            <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Fecha y Limpieza</label>
+            <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Fecha</label>
             <div class="flex gap-1">
                 <input type="date" id="fecha-selector" onchange="cambiarFecha()" class="w-full h-10 border rounded-lg px-2 font-bold dark:bg-slate-800 text-xs">
-                <button onclick="limpiarTodo()" class="h-10 px-2 bg-slate-100 dark:bg-slate-800 border rounded-lg text-red-500 hover:bg-red-500 hover:text-white transition-all">
-                    <span class="material-symbols-outlined text-sm">delete_sweep</span>
-                </button>
+                <button onclick="limpiarTodo()" class="h-10 px-2 bg-slate-100 border rounded-lg text-red-500 hover:bg-red-500 hover:text-white transition-all"><span class="material-symbols-outlined text-sm">delete_sweep</span></button>
             </div>
         </div>
         <div class="lg:col-span-2">
-            <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Slot Activo</label>
+            <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Slot a Cargar</label>
             <select id="slot-selector" class="w-full h-10 border rounded-lg px-3 font-bold dark:bg-slate-800">
-                <option value="1"> Slot 1</option>
-                <option value="2"> Slot 2</option>
-                <option value="3"> Slot 3</option>
-                <option value="4"> Slot 4</option>
-                <option value="5"> Slot 5</option>
-                <option value="6"> Slot 6</option>
-                <option value="7"> Slot 7</option>
-                <option value="8"> Slot 8</option>
+                <option value="1">Slot 1</option><option value="2">Slot 2</option><option value="3">Slot 3</option><option value="4">Slot 4</option>
+                <option value="5">Slot 5</option><option value="6">Slot 6</option><option value="7">Slot 7</option><option value="8">Slot 8</option>
             </select>
         </div>
         <div class="lg:col-span-4 flex gap-2">
-            <label class="flex-1 bg-blue-600 text-white h-10 rounded-lg flex items-center justify-center gap-2 cursor-pointer font-bold text-xs uppercase hover:shadow-lg hover:shadow-blue-500/30 transition-all active:scale-95">
+            <label class="flex-1 bg-blue-600 text-white h-10 rounded-lg flex items-center justify-center gap-2 cursor-pointer font-bold text-xs uppercase hover:bg-blue-700 transition-all">
                 <span class="material-symbols-outlined text-sm">upload_file</span> Pedidos
                 <input type="file" class="hidden" accept=".xlsx, .xls" onchange="procesarArchivo(this, 'slot')">
             </label>
-            <label class="flex-1 bg-amber-500 text-white h-10 rounded-lg flex items-center justify-center gap-2 cursor-pointer font-bold text-xs uppercase hover:shadow-lg hover:shadow-amber-500/30 transition-all active:scale-95">
+            <label class="flex-1 bg-amber-500 text-white h-10 rounded-lg flex items-center justify-center gap-2 cursor-pointer font-bold text-xs uppercase hover:bg-amber-600 transition-all">
                 <span class="material-symbols-outlined text-sm">done_all</span> Sols
                 <input type="file" class="hidden" accept=".xlsx, .xls" onchange="procesarArchivo(this, 'solucion')">
             </label>
         </div>
         <div class="lg:col-span-4 flex gap-2">
-            <button onclick="cargarDesdeNube()" class="h-10 px-4 border rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" title="Sincronizar">
-                <span class="material-symbols-outlined text-sm">sync</span>
-            </button>
+            <button onclick="cargarDesdeNube()" class="h-10 px-4 border rounded-lg hover:bg-slate-50 transition-colors"><span class="material-symbols-outlined text-sm">sync</span></button>
             <button onclick="exportarExcel()" class="flex-1 bg-emerald-600 text-white h-10 rounded-lg font-bold text-xs uppercase hover:bg-emerald-700">Excel</button>
             <button onclick="exportarHistorico('semana')" class="flex-1 bg-red-600 text-white h-10 rounded-lg font-bold text-xs uppercase hover:bg-red-700">Semana</button>
         </div>
@@ -121,37 +89,24 @@
         let registroCargas = JSON.parse(localStorage.getItem('zubale_cargas_log')) || {};
 
         function init() {
-            if(!document.getElementById('fecha-selector').value) {
-                document.getElementById('fecha-selector').value = new Date().toISOString().split('T')[0];
-            }
+            if(!document.getElementById('fecha-selector').value) document.getElementById('fecha-selector').value = new Date().toISOString().split('T')[0];
             renderTiendas();
             cargarPersistencia();
-
-            // Sincronización inicial
             cargarDesdeNube();
-
-            // MOTOR LIVE 7s: Sincroniza cada 7 segundos
-            setInterval(() => {
-                cargarDesdeNube();
-            }, 7000);
+            setInterval(cargarDesdeNube, 7000);
         }
 
         async function cargarDesdeNube() {
             const fecha = document.getElementById('fecha-selector').value;
-            
-            // Si el usuario está escribiendo, pausamos la actualización para no borrar su avance
             if (document.activeElement.getAttribute('contenteditable') === 'true') return;
-
             try {
                 const res = await fetch(`${WEB_APP_URL}?fecha=${fecha}`);
                 const data = await res.json();
-                
                 if (data && Array.isArray(data)) {
                     data.forEach(r => {
                         const card = document.querySelector(`[data-location="${r.tienda}"]`);
                         if (card) {
                             const el = r.slot === "SOL" ? card.querySelector('.sol-val') : card.querySelector(`[data-slot="${r.slot}"]`);
-                            // Solo actualizamos si el dato es distinto para ahorrar recursos y activar el destello
                             if (el && el.innerText !== String(r.estado)) {
                                 el.innerText = r.estado;
                                 el.classList.add('update-flash');
@@ -159,19 +114,9 @@
                             }
                         }
                     });
-                    guardarEstado(false); // Guardamos internamente pero no re-enviamos a la nube
+                    guardarEstado(false);
                 }
-            } catch (e) { console.log("Reintentando conexión..."); }
-        }
-
-        function limpiarTodo() {
-            if(confirm("¿Limpiar datos locales y contadores de hoy?")) {
-                const fecha = document.getElementById('fecha-selector').value;
-                localStorage.removeItem(`zubale_data_${fecha}`);
-                for (let i = 1; i <= 8; i++) delete registroCargas[`${fecha}_SLOT_${i}`];
-                localStorage.setItem('zubale_cargas_log', JSON.stringify(registroCargas));
-                location.reload(); // Recarga para resetear todo limpiamente
-            }
+            } catch (e) { console.log("Sincronizando..."); }
         }
 
         function renderTiendas() {
@@ -204,72 +149,56 @@
             if (!file) return;
             const slot = document.getElementById('slot-selector').value;
             const fecha = document.getElementById('fecha-selector').value;
-            const claveSlot = `${fecha}_SLOT_${slot}`;
-
             if (tipo === 'slot') {
-                const cargasActuales = registroCargas[claveSlot] || 0;
-                if (cargasActuales >= 2) {
-                    alert(`🚫 Slot ${slot} bloqueado (Límite de 2 archivos)`);
-                    input.value = ""; return;
-                }
-                registroCargas[claveSlot] = cargasActuales + 1;
+                const cargas = registroCargas[`${fecha}_SLOT_${slot}`] || 0;
+                if (cargas >= 2) { alert(`Slot ${slot} Bloqueado`); input.value=""; return; }
+                registroCargas[`${fecha}_SLOT_${slot}`] = cargas + 1;
                 localStorage.setItem('zubale_cargas_log', JSON.stringify(registroCargas));
             }
-
             const reader = new FileReader();
             reader.onload = (e) => {
-                try {
-                    const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-                    const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                    allStores.forEach(loc => {
-                        const shortName = loc.replace("Wm ", "").toUpperCase().replace("WM ", "");
-                        let count = 0;
-                        json.forEach(row => { if (JSON.stringify(row).toUpperCase().includes(shortName)) count++; });
-                        if (count > 0) {
-                            const card = document.querySelector(`[data-location="${loc}"]`);
-                            const el = tipo === 'slot' ? card.querySelector(`[data-slot="${slot}"]`) : card.querySelector('.sol-val');
-                            el.innerText = (parseInt(el.innerText) || 0) + count;
-                            enviarANube(tipo === 'slot' ? slot : 'SOL', 'auto', el.innerText, loc);
-                        }
-                    });
-                    guardarEstado();
-                    input.value = "";
-                } catch (err) { alert("Error de formato"); }
+                const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                allStores.forEach(loc => {
+                    const shortName = loc.replace("Wm ", "").toUpperCase().replace("WM ", "");
+                    let count = 0;
+                    json.forEach(row => { if (JSON.stringify(row).toUpperCase().includes(shortName)) count++; });
+                    if (count > 0) {
+                        const card = document.querySelector(`[data-location="${loc}"]`);
+                        const el = tipo === 'slot' ? card.querySelector(`[data-slot="${slot}"]`) : card.querySelector('.sol-val');
+                        el.innerText = (parseInt(el.innerText) || 0) + count;
+                        enviarANube(tipo === 'slot' ? slot : 'SOL', el.innerText, loc);
+                    }
+                });
+                guardarEstado();
+                input.value = "";
             };
             reader.readAsArrayBuffer(file);
         }
 
-        async function enviarANube(slot, batch, valor, tienda) {
-            const payload = { fecha: document.getElementById('fecha-selector').value, slot, batch, estado: valor, tienda };
+        async function enviarANube(slot, valor, tienda) {
+            const payload = { fecha: document.getElementById('fecha-selector').value, slot: slot, estado: valor, tienda: tienda };
             fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
         }
 
         function guardarEstado(actualizarLocal = true) {
             const fecha = document.getElementById('fecha-selector').value;
             const fullData = {}; 
-            let tP = 0, tB1 = 0, tB2 = 0, tSoluciones = 0;
-
+            let tP = 0, tB1 = 0, tB2 = 0, tS = 0;
             document.querySelectorAll('.card').forEach(card => {
                 const loc = card.dataset.location;
-                const isB1 = batch1Stores.includes(loc);
                 const slots = Array.from(card.querySelectorAll('.slot-val')).map(s => parseInt(s.innerText) || 0);
                 const sol = parseInt(card.querySelector('.sol-val').innerText) || 0;
-                const total = slots.reduce((a, b) => a + b, 0) + sol;
-                const subP = total - sol;
-                
-                tP += subP;
-                tSoluciones += sol;
-                if(isB1) tB1 += subP; else tB2 += subP;
-                
-                card.querySelector('.grand-total').innerText = total;
+                const subP = slots.reduce((a, b) => a + b, 0);
+                tP += subP; tS += sol;
+                if(batch1Stores.includes(loc)) tB1 += subP; else tB2 += subP;
+                card.querySelector('.grand-total').innerText = subP + sol;
                 fullData[loc] = { slots, sol };
             });
-
             document.getElementById('total-global-pedidos').innerText = tP;
             document.getElementById('total-b1').innerText = tB1;
             document.getElementById('total-b2').innerText = tB2;
-            document.getElementById('total-soluciones').innerText = tSoluciones;
-            
+            document.getElementById('total-soluciones').innerText = tS;
             if(actualizarLocal) localStorage.setItem(`zubale_data_${fecha}`, JSON.stringify(fullData));
         }
 
@@ -287,13 +216,10 @@
             }
         }
 
-        function manualEdit(el, slot) { 
-            guardarEstado(true); 
-            enviarANube(slot, 'manual', el.innerText, el.closest('.card').dataset.location); 
-        }
-
+        function manualEdit(el, slot) { guardarEstado(true); enviarANube(slot, el.innerText, el.closest('.card').dataset.location); }
         function cambiarFecha() { renderTiendas(); cargarPersistencia(); cargarDesdeNube(); }
-        
+        function limpiarTodo() { if(confirm("¿Limpiar hoy?")) { localStorage.removeItem(`zubale_data_${document.getElementById('fecha-selector').value}`); location.reload(); } }
+
         init();
     </script>
 </body>
