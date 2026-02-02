@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Zubale Pro CR - Master LIVE</title>
+    <title>Zubale Pro CR - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
@@ -38,42 +38,69 @@
     </header>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div class="preview-card bg-white p-4 rounded-xl border border-blue-100 shadow-sm dark:bg-slate-900 dark:border-slate-800"><p class="text-[10px] font-black text-blue-500 uppercase">B1 Pedidos</p><p id="total-b1" class="text-2xl font-black">0</p></div>
-        <div class="preview-card bg-white p-4 rounded-xl border border-purple-100 shadow-sm dark:bg-slate-900 dark:border-slate-800"><p class="text-[10px] font-black text-purple-500 uppercase">B2 Pedidos</p><p id="total-b2" class="text-2xl font-black">0</p></div>
-        <div class="preview-card bg-white p-4 rounded-xl border border-amber-100 shadow-sm dark:bg-slate-900 dark:border-slate-800"><p class="text-[10px] font-black text-amber-500 uppercase">Total Soluciones</p><p id="total-soluciones" class="text-2xl font-black text-amber-600">0</p></div>
-        <div class="preview-card bg-blue-600 p-4 rounded-xl border shadow-md"><p class="text-[10px] font-black text-blue-100 uppercase">Gran Total</p><p id="total-global-pedidos" class="text-2xl font-black text-white">0</p></div>
+        <div class="preview-card bg-white p-4 rounded-xl border border-blue-100 dark:bg-slate-900 dark:border-slate-800"><p class="text-[10px] font-black text-blue-500 uppercase">B1 Pedidos</p><p id="total-b1" class="text-2xl font-black">0</p></div>
+        <div class="preview-card bg-white p-4 rounded-xl border border-purple-100 dark:bg-slate-900 dark:border-slate-800"><p class="text-[10px] font-black text-purple-500 uppercase">B2 Pedidos</p><p id="total-b2" class="text-2xl font-black">0</p></div>
+        <div class="preview-card bg-white p-4 rounded-xl border border-amber-100 dark:bg-slate-900 dark:border-slate-800"><p class="text-[10px] font-black text-amber-500 uppercase">Soluciones</p><p id="total-soluciones" class="text-2xl font-black text-amber-600">0</p></div>
+        <div class="preview-card bg-blue-600 p-4 rounded-xl shadow-md"><p class="text-[10px] font-black text-blue-100 uppercase">Gran Total</p><p id="total-global-pedidos" class="text-2xl font-black text-white">0</p></div>
     </div>
 
-    <div class="control-panel w-full mb-8 grid grid-cols-1 lg:grid-cols-12 gap-4 bg-white p-5 rounded-xl border shadow-sm items-end dark:bg-slate-900 dark:border-slate-800">
-        <div class="lg:col-span-2">
-            <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Fecha</label>
-            <div class="flex gap-1">
-                <input type="date" id="fecha-selector" onchange="cambiarFecha()" class="w-full h-10 border rounded-lg px-2 font-bold dark:bg-slate-800 text-xs">
-                <button onclick="limpiarTodo()" class="h-10 px-2 bg-slate-100 border rounded-lg text-red-500 hover:bg-red-500 hover:text-white transition-all"><span class="material-symbols-outlined text-sm">delete_sweep</span></button>
+    <div class="bg-white p-6 rounded-2xl border shadow-sm dark:bg-slate-900 dark:border-slate-800 mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <div class="lg:col-span-6 space-y-4">
+                <h2 class="text-[11px] font-black text-slate-400 uppercase tracking-widest border-b pb-2">Entradas (Subir Archivos)</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label class="flex flex-col items-center justify-center h-20 border-2 border-dashed border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer transition-all dark:border-slate-700 dark:hover:bg-slate-800">
+                        <span class="material-symbols-outlined text-slate-400 mb-1">history</span>
+                        <span class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-300 text-center">Archivo Turno Anterior</span>
+                        <input type="file" class="hidden" accept=".xlsx, .xls" onchange="cargarReporteCompleto(this)">
+                    </label>
+
+                    <div class="space-y-2">
+                        <div class="flex gap-1">
+                            <select id="slot-selector" class="w-20 h-10 border rounded-lg px-2 font-bold text-xs dark:bg-slate-800">
+                                <option value="1">Slot 1</option><option value="2">Slot 2</option><option value="3">Slot 3</option><option value="4">Slot 4</option>
+                                <option value="5">Slot 5</option><option value="6">Slot 6</option><option value="7">Slot 7</option><option value="8">Slot 8</option>
+                            </select>
+                            <label class="flex-1 bg-blue-600 text-white h-10 rounded-lg flex items-center justify-center gap-2 cursor-pointer font-bold text-[10px] uppercase hover:bg-blue-700">
+                                <span class="material-symbols-outlined text-sm">upload</span> Subir Slot
+                                <input type="file" class="hidden" accept=".xlsx, .xls" onchange="procesarArchivo(this, 'slot')">
+                            </label>
+                        </div>
+                        <label class="w-full bg-amber-500 text-white h-10 rounded-lg flex items-center justify-center gap-2 cursor-pointer font-bold text-[10px] uppercase hover:bg-amber-600">
+                            <span class="material-symbols-outlined text-sm">task_alt</span> Subir Soluciones
+                            <input type="file" class="hidden" accept=".xlsx, .xls" onchange="procesarArchivo(this, 'solucion')">
+                        </label>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="lg:col-span-2">
-            <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Slot Activo</label>
-            <select id="slot-selector" class="w-full h-10 border rounded-lg px-3 font-bold dark:bg-slate-800">
-                <option value="1">Slot 1</option><option value="2">Slot 2</option><option value="3">Slot 3</option><option value="4">Slot 4</option>
-                <option value="5">Slot 5</option><option value="6">Slot 6</option><option value="7">Slot 7</option><option value="8">Slot 8</option>
-            </select>
-        </div>
-        <div class="lg:col-span-3 flex gap-2">
-            <label class="flex-1 bg-blue-600 text-white h-10 rounded-lg flex items-center justify-center gap-2 cursor-pointer font-bold text-[10px] uppercase hover:bg-blue-700 transition-all">
-                <span class="material-symbols-outlined text-sm">upload_file</span> Pedidos
-                <input type="file" class="hidden" accept=".xlsx, .xls" onchange="procesarArchivo(this, 'slot')">
-            </label>
-            <label class="flex-1 bg-amber-500 text-white h-10 rounded-lg flex items-center justify-center gap-2 cursor-pointer font-bold text-[10px] uppercase hover:bg-amber-600 transition-all">
-                <span class="material-symbols-outlined text-sm">done_all</span> Sols
-                <input type="file" class="hidden" accept=".xlsx, .xls" onchange="procesarArchivo(this, 'solucion')">
-            </label>
-        </div>
-        <div class="lg:col-span-5 flex gap-1">
-            <button onclick="exportarExcel()" class="flex-1 bg-emerald-600 text-white h-10 rounded-lg font-bold text-[10px] uppercase hover:bg-emerald-700">Día</button>
-            <button onclick="exportarHistorico('semana')" class="flex-1 bg-indigo-600 text-white h-10 rounded-lg font-bold text-[10px] uppercase hover:bg-indigo-700">Semana</button>
-            <button onclick="exportarHistorico('mes')" class="flex-1 bg-purple-600 text-white h-10 rounded-lg font-bold text-[10px] uppercase hover:bg-purple-700">Mes</button>
-            <button onclick="cargarDesdeNube()" class="h-10 px-3 border rounded-lg hover:bg-slate-50 transition-colors dark:border-slate-700"><span class="material-symbols-outlined text-sm">sync</span></button>
+
+            <div class="lg:col-span-4 space-y-4">
+                <h2 class="text-[11px] font-black text-slate-400 uppercase tracking-widest border-b pb-2">Salidas (Descargar Reportes)</h2>
+                <div class="flex flex-col gap-2">
+                    <button onclick="exportarExcel()" class="h-10 bg-emerald-600 text-white rounded-lg font-bold text-[10px] uppercase flex items-center justify-center gap-2 hover:bg-emerald-700">
+                        <span class="material-symbols-outlined text-sm">description</span> Reporte Diario
+                    </button>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="exportarHistorico('semana')" class="h-10 bg-indigo-600 text-white rounded-lg font-bold text-[10px] uppercase flex items-center justify-center gap-2 hover:bg-indigo-700">
+                            <span class="material-symbols-outlined text-sm">calendar_view_week</span> Semanal
+                        </button>
+                        <button onclick="exportarHistorico('mes')" class="h-10 bg-purple-600 text-white rounded-lg font-bold text-[10px] uppercase flex items-center justify-center gap-2 hover:bg-purple-700">
+                            <span class="material-symbols-outlined text-sm">calendar_month</span> Mensual
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 space-y-4">
+                <h2 class="text-[11px] font-black text-slate-400 uppercase tracking-widest border-b pb-2">Config</h2>
+                <div class="space-y-2">
+                    <input type="date" id="fecha-selector" onchange="cambiarFecha()" class="w-full h-10 border rounded-lg px-2 font-bold dark:bg-slate-800 text-xs text-center">
+                    <button onclick="limpiarTodo()" class="w-full h-10 bg-red-50 text-red-600 rounded-lg font-bold text-[10px] uppercase hover:bg-red-600 hover:text-white transition-all flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-sm">delete_forever</span> Limpiar Hoy
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -81,8 +108,6 @@
 
     <script>
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzA4Segqpkbd6-2UmFOtkqwGihgBeJT9r0p6KADkoX_YXukdpFj9Hd0mNe32fWMDi94/exec";
-        
-        // Estandarización de nombres para evitar errores de búsqueda
         const batch1Stores = ["Wm Alajuela", "Wm Heredia", "Wm Heredia Este", "Wm Tibas"];
         const batch2Stores = ["Wm Escazu", "Wm Santa Ana", "Wm Guadalupe", "Wm Desamparados"];
         const allStores = [...batch1Stores, ...batch2Stores];
@@ -101,76 +126,75 @@
                 const isB1 = batch1Stores.includes(name);
                 return `<div class="card bg-white dark:bg-slate-900 p-5 ${isB1 ? 'batch-1' : 'batch-2'}" data-location="${name}">
                     <div class="flex justify-between items-center mb-4"><h3 class="text-sm font-black dark:text-slate-100 uppercase">${name}</h3><span class="grand-total text-2xl font-black text-blue-600">0</span></div>
-                    <div class="space-y-1">${[1,2,3,4,5,6,7,8].map(i => `<div class="slot-row flex justify-between text-[11px] items-center dark:border-slate-800"><span class="text-slate-400 font-bold italic">Entrega ${i}</span><span contenteditable="true" oninput="manualEdit(this, '${i}')" class="slot-val font-black dark:text-slate-200" data-slot="${i}">0</span></div>`).join('')}</div>
+                    <div class="space-y-1">${[1,2,3,4,5,6,7,8].map(i => `<div class="slot-row flex justify-between text-[11px] items-center"><span class="text-slate-400 font-bold italic">Slot ${i}</span><span contenteditable="true" oninput="manualEdit(this, '${i}')" class="slot-val font-black dark:text-slate-200" data-slot="${i}">0</span></div>`).join('')}</div>
                     <div class="mt-4 p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg flex justify-between items-center text-xs"><span class="font-black text-amber-700 uppercase">Sols</span><span contenteditable="true" oninput="manualEdit(this, 'SOL')" class="sol-val font-black text-amber-600">0</span></div>
                 </div>`;
             }).join('');
+        }
+
+        function cargarReporteCompleto(input) {
+            const file = input.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                json.forEach(row => {
+                    const tiendaNombre = row["TIENDA"];
+                    if (tiendaNombre && allStores.includes(tiendaNombre)) {
+                        const card = document.querySelector(`[data-location="${tiendaNombre}"]`);
+                        for (let i = 1; i <= 8; i++) {
+                            const val = row[`S${i}`] || 0;
+                            card.querySelector(`[data-slot="${i}"]`).innerText = val;
+                            enviarANube(i, val, tiendaNombre);
+                        }
+                        const solVal = row["SOLS"] || 0;
+                        card.querySelector('.sol-val').innerText = solVal;
+                        enviarANube('SOL', solVal, tiendaNombre);
+                    }
+                });
+                guardarEstado();
+                alert("Reporte de turno anterior cargado.");
+                input.value = "";
+            };
+            reader.readAsArrayBuffer(file);
         }
 
         function procesarArchivo(input, tipo) {
             const file = input.files[0]; if (!file) return;
             const slot = document.getElementById('slot-selector').value;
             const reader = new FileReader();
-
             reader.onload = (e) => {
                 const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
                 const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                
-                const conteosNuevos = {};
-                allStores.forEach(loc => conteosNuevos[loc] = 0);
-
+                const conteos = {};
+                allStores.forEach(l => conteos[l] = 0);
                 json.forEach(row => {
-                    const rowString = JSON.stringify(row).toUpperCase();
-                    
-                    // Prioridad 1: Heredia Este (por ser nombre compuesto)
-                    if (rowString.includes("HEREDIA ESTE")) {
-                        conteosNuevos["Wm Heredia Este"]++;
-                    } 
-                    // Prioridad 2: Heredia Normal
-                    else if (rowString.includes("HEREDIA")) {
-                        conteosNuevos["Wm Heredia"]++;
-                    }
-                    // Resto de tiendas
+                    const rs = JSON.stringify(row).toUpperCase();
+                    if (rs.includes("HEREDIA ESTE")) conteos["Wm Heredia Este"]++;
+                    else if (rs.includes("HEREDIA")) conteos["Wm Heredia"]++;
                     else {
-                        allStores.forEach(loc => {
-                            if (loc === "Wm Heredia" || loc === "Wm Heredia Este") return;
-                            const cleanLoc = loc.replace("Wm ", "").toUpperCase();
-                            if (rowString.includes(cleanLoc)) {
-                                conteosNuevos[loc]++;
-                            }
+                        allStores.forEach(l => {
+                            if (l.includes("Heredia")) return;
+                            if (rs.includes(l.replace("Wm ", "").toUpperCase())) conteos[l]++;
                         });
                     }
                 });
-
-                // Actualizar interfaz y Nube
-                Object.entries(conteosNuevos).forEach(([loc, count]) => {
+                Object.entries(conteos).forEach(([loc, count]) => {
                     if (count > 0) {
                         const card = document.querySelector(`[data-location="${loc}"]`);
-                        if (card) {
-                            const el = tipo === 'slot' ? card.querySelector(`[data-slot="${slot}"]`) : card.querySelector('.sol-val');
-                            el.innerText = (parseInt(el.innerText) || 0) + count;
-                            enviarANube(tipo === 'slot' ? slot : 'SOL', el.innerText, loc);
-                        }
+                        const el = tipo === 'slot' ? card.querySelector(`[data-slot="${slot}"]`) : card.querySelector('.sol-val');
+                        el.innerText = (parseInt(el.innerText) || 0) + count;
+                        enviarANube(tipo === 'slot' ? slot : 'SOL', el.innerText, loc);
                     }
                 });
-
-                guardarEstado(); 
+                guardarEstado();
                 input.value = "";
             };
             reader.readAsArrayBuffer(file);
         }
 
         async function enviarANube(slot, valor, tienda) {
-            fetch(WEB_APP_URL, { 
-                method: "POST", 
-                mode: "no-cors", 
-                body: JSON.stringify({ 
-                    fecha: document.getElementById('fecha-selector').value, 
-                    slot, 
-                    estado: valor, 
-                    tienda 
-                }) 
-            });
+            fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ fecha: document.getElementById('fecha-selector').value, slot, estado: valor, tienda }) });
         }
 
         async function cargarDesdeNube() {
@@ -193,7 +217,7 @@
                     });
                     guardarEstado(false);
                 }
-            } catch (e) { console.log("Sincronizando..."); }
+            } catch (e) { }
         }
 
         function guardarEstado(actualizarLocal = true) {
@@ -233,22 +257,16 @@
 
         async function exportarHistorico(rango) {
             const fecha = document.getElementById('fecha-selector').value;
-            const btn = event.currentTarget;
-            const originalText = btn.innerText;
-            btn.innerText = "Cargando...";
             try {
                 const res = await fetch(`${WEB_APP_URL}?fecha=${fecha}&rango=${rango}`);
                 const data = await res.json();
-                if (!data || data.length === 0) {
-                    alert("No hay datos históricos.");
-                } else {
+                if (data && data.length > 0) {
                     const ws = XLSX.utils.json_to_sheet(data);
                     const wb = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(wb, ws, "Historico");
-                    XLSX.writeFile(wb, `Zubale_Historico_${rango}_${fecha}.xlsx`);
-                }
-            } catch (e) { alert("Error en la nube."); }
-            finally { btn.innerText = originalText; }
+                    XLSX.writeFile(wb, `Zubale_${rango}_${fecha}.xlsx`);
+                } else alert("No hay datos para este periodo.");
+            } catch (e) { alert("Error al conectar con la nube."); }
         }
 
         function cargarPersistencia() {
@@ -267,7 +285,7 @@
 
         function manualEdit(el, slot) { guardarEstado(true); enviarANube(slot, el.innerText, el.closest('.card').dataset.location); }
         function cambiarFecha() { renderTiendas(); cargarPersistencia(); cargarDesdeNube(); }
-        function limpiarTodo() { if(confirm("¿Limpiar hoy?")) { localStorage.removeItem(`zubale_data_${document.getElementById('fecha-selector').value}`); location.reload(); } }
+        function limpiarTodo() { if(confirm("¿Limpiar datos de hoy?")) { localStorage.removeItem(`zubale_data_${document.getElementById('fecha-selector').value}`); location.reload(); } }
 
         init();
     </script>
