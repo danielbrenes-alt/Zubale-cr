@@ -18,7 +18,7 @@
         .dark .card { background-color: #0f172a; border-color: #1e293b; }
         [contenteditable]:focus { outline: none; background: #eff6ff; color: #1e40af; border-radius: 4px; padding: 0 4px; }
         .update-flash { animation: flash 1s ease; }
-        @keyframes flash { 0% { background-color: rgba(16, 185, 129, 0.2); } 100% { background-color: transparent; } }
+        .slot-full { background-color: #ef4444 !important; cursor: not-allowed !important; opacity: 0.6; }
     </style>
 </head>
 <body class="p-6 bg-slate-50 text-slate-700">
@@ -28,10 +28,7 @@
             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPzUiCVTPF6LznRh6EHznXelLIdGM3N6tcCA&s" class="h-8 rounded">
             <div>
                 <h1 class="text-lg font-black text-blue-600 dark:text-blue-400">ZUBALE CONTROL</h1>
-                <span id="sync-status" class="text-[9px] font-bold text-green-500 flex items-center gap-1">
-                    <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span></span>
-                    LIVE 7s
-                </span>
+                <span id="sync-status" class="text-[9px] font-bold text-green-500 flex items-center gap-1">LIVE 7s</span>
             </div>
         </div>
         <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 rounded-full bg-slate-100 dark:bg-slate-800"><span class="material-symbols-outlined text-amber-500">contrast</span></button>
@@ -58,13 +55,13 @@
 
                     <div class="space-y-2">
                         <div class="flex gap-1">
-                            <select id="slot-selector" class="w-20 h-10 border rounded-lg px-2 font-bold text-xs dark:bg-slate-800">
+                            <select id="slot-selector" onchange="verificarBloqueoSlot()" class="w-20 h-10 border rounded-lg px-2 font-bold text-xs dark:bg-slate-800">
                                 <option value="1">Slot 1</option><option value="2">Slot 2</option><option value="3">Slot 3</option><option value="4">Slot 4</option>
                                 <option value="5">Slot 5</option><option value="6">Slot 6</option><option value="7">Slot 7</option><option value="8">Slot 8</option>
                             </select>
-                            <label class="flex-1 bg-blue-600 text-white h-10 rounded-lg flex items-center justify-center gap-2 cursor-pointer font-bold text-[10px] uppercase hover:bg-blue-700">
-                                <span class="material-symbols-outlined text-sm">upload</span> Subir Slot
-                                <input type="file" class="hidden" accept=".xlsx, .xls" onchange="procesarArchivo(this, 'slot')">
+                            <label id="btn-subir-slot" class="flex-1 bg-blue-600 text-white h-10 rounded-lg flex items-center justify-center gap-2 cursor-pointer font-bold text-[10px] uppercase hover:bg-blue-700">
+                                <span class="material-symbols-outlined text-sm">upload</span> <span id="text-subir">Subir Slot</span>
+                                <input type="file" id="input-slot" class="hidden" accept=".xlsx, .xls" onchange="procesarArchivo(this, 'slot')">
                             </label>
                         </div>
                         <label class="w-full bg-amber-500 text-white h-10 rounded-lg flex items-center justify-center gap-2 cursor-pointer font-bold text-[10px] uppercase hover:bg-amber-600">
@@ -78,16 +75,10 @@
             <div class="lg:col-span-4 space-y-4">
                 <h2 class="text-[11px] font-black text-slate-400 uppercase tracking-widest border-b pb-2">Salidas (Descargar Reportes)</h2>
                 <div class="flex flex-col gap-2">
-                    <button onclick="exportarExcel()" class="h-10 bg-emerald-600 text-white rounded-lg font-bold text-[10px] uppercase flex items-center justify-center gap-2 hover:bg-emerald-700">
-                        <span class="material-symbols-outlined text-sm">description</span> Reporte Diario
-                    </button>
+                    <button onclick="exportarExcel()" class="h-10 bg-emerald-600 text-white rounded-lg font-bold text-[10px] uppercase flex items-center justify-center gap-2 hover:bg-emerald-700">Reporte Diario</button>
                     <div class="grid grid-cols-2 gap-2">
-                        <button onclick="exportarHistorico('semana')" class="h-10 bg-indigo-600 text-white rounded-lg font-bold text-[10px] uppercase flex items-center justify-center gap-2 hover:bg-indigo-700">
-                            <span class="material-symbols-outlined text-sm">calendar_view_week</span> Semanal
-                        </button>
-                        <button onclick="exportarHistorico('mes')" class="h-10 bg-purple-600 text-white rounded-lg font-bold text-[10px] uppercase flex items-center justify-center gap-2 hover:bg-purple-700">
-                            <span class="material-symbols-outlined text-sm">calendar_month</span> Mensual
-                        </button>
+                        <button onclick="exportarHistorico('semana')" class="h-10 bg-indigo-600 text-white rounded-lg font-bold text-[10px] uppercase hover:bg-indigo-700 text-[9px]">Semanal</button>
+                        <button onclick="exportarHistorico('mes')" class="h-10 bg-purple-600 text-white rounded-lg font-bold text-[10px] uppercase hover:bg-purple-700 text-[9px]">Mensual</button>
                     </div>
                 </div>
             </div>
@@ -111,63 +102,61 @@
         const batch1Stores = ["Wm Alajuela", "Wm Heredia", "Wm Heredia Este", "Wm Tibas"];
         const batch2Stores = ["Wm Escazu", "Wm Santa Ana", "Wm Guadalupe", "Wm Desamparados"];
         const allStores = [...batch1Stores, ...batch2Stores];
+        
+        let slotCounters = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0};
 
         function init() {
             if(!document.getElementById('fecha-selector').value) document.getElementById('fecha-selector').value = new Date().toISOString().split('T')[0];
             renderTiendas();
             cargarPersistencia();
-            cargarDesdeNube();
-            setInterval(cargarDesdeNube, 7000);
+            verificarBloqueoSlot();
         }
 
-        function renderTiendas() {
-            const container = document.getElementById('tiendas-container');
-            container.innerHTML = allStores.map(name => {
-                const isB1 = batch1Stores.includes(name);
-                return `<div class="card bg-white dark:bg-slate-900 p-5 ${isB1 ? 'batch-1' : 'batch-2'}" data-location="${name}">
-                    <div class="flex justify-between items-center mb-4"><h3 class="text-sm font-black dark:text-slate-100 uppercase">${name}</h3><span class="grand-total text-2xl font-black text-blue-600">0</span></div>
-                    <div class="space-y-1">${[1,2,3,4,5,6,7,8].map(i => `<div class="slot-row flex justify-between text-[11px] items-center"><span class="text-slate-400 font-bold italic">Slot ${i}</span><span contenteditable="true" oninput="manualEdit(this, '${i}')" class="slot-val font-black dark:text-slate-200" data-slot="${i}">0</span></div>`).join('')}</div>
-                    <div class="mt-4 p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg flex justify-between items-center text-xs"><span class="font-black text-amber-700 uppercase">Sols</span><span contenteditable="true" oninput="manualEdit(this, 'SOL')" class="sol-val font-black text-amber-600">0</span></div>
-                </div>`;
-            }).join('');
+        function verificarBloqueoSlot() {
+            const slot = document.getElementById('slot-selector').value;
+            const btn = document.getElementById('btn-subir-slot');
+            const txt = document.getElementById('text-subir');
+            const input = document.getElementById('input-slot');
+
+            if (slotCounters[slot] >= 2) {
+                btn.classList.add('slot-full');
+                txt.innerText = "SLOT COMPLETO";
+                input.disabled = true;
+            } else {
+                btn.classList.remove('slot-full');
+                txt.innerText = "SUBIR SLOT";
+                input.disabled = false;
+            }
         }
 
-        function cargarReporteCompleto(input) {
-            const file = input.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-                const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                json.forEach(row => {
-                    const tiendaNombre = row["TIENDA"];
-                    if (tiendaNombre && allStores.includes(tiendaNombre)) {
-                        const card = document.querySelector(`[data-location="${tiendaNombre}"]`);
-                        for (let i = 1; i <= 8; i++) {
-                            const val = row[`S${i}`] || 0;
-                            card.querySelector(`[data-slot="${i}"]`).innerText = val;
-                            enviarANube(i, val, tiendaNombre);
-                        }
-                        const solVal = row["SOLS"] || 0;
-                        card.querySelector('.sol-val').innerText = solVal;
-                        enviarANube('SOL', solVal, tiendaNombre);
-                    }
-                });
+        function limpiarTodo() {
+            if(confirm("¿Estás seguro de limpiar los datos y reiniciar los slots de hoy?")) {
+                const fecha = document.getElementById('fecha-selector').value;
+                localStorage.removeItem(`zubale_v3_${fecha}`);
+                slotCounters = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0};
+                renderTiendas();
+                verificarBloqueoSlot();
                 guardarEstado();
-                alert("Reporte de turno anterior cargado.");
-                input.value = "";
-            };
-            reader.readAsArrayBuffer(file);
+                alert("Datos reiniciados.");
+            }
         }
 
         function procesarArchivo(input, tipo) {
-            const file = input.files[0]; if (!file) return;
             const slot = document.getElementById('slot-selector').value;
+            if (tipo === 'slot' && slotCounters[slot] >= 2) {
+                alert(`El Slot ${slot} ya está completo.`);
+                input.value = "";
+                return;
+            }
+
+            const file = input.files[0]; if (!file) return;
             const reader = new FileReader();
             reader.onload = (e) => {
                 const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
                 const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
                 const conteos = {};
                 allStores.forEach(l => conteos[l] = 0);
+
                 json.forEach(row => {
                     const rs = JSON.stringify(row).toUpperCase();
                     if (rs.includes("HEREDIA ESTE")) conteos["Wm Heredia Este"]++;
@@ -179,113 +168,83 @@
                         });
                     }
                 });
+
                 Object.entries(conteos).forEach(([loc, count]) => {
                     if (count > 0) {
                         const card = document.querySelector(`[data-location="${loc}"]`);
                         const el = tipo === 'slot' ? card.querySelector(`[data-slot="${slot}"]`) : card.querySelector('.sol-val');
                         el.innerText = (parseInt(el.innerText) || 0) + count;
-                        enviarANube(tipo === 'slot' ? slot : 'SOL', el.innerText, loc);
                     }
                 });
+
+                if (tipo === 'slot') {
+                    slotCounters[slot]++;
+                    verificarBloqueoSlot();
+                }
+
                 guardarEstado();
                 input.value = "";
             };
             reader.readAsArrayBuffer(file);
         }
 
-        async function enviarANube(slot, valor, tienda) {
-            fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ fecha: document.getElementById('fecha-selector').value, slot, estado: valor, tienda }) });
+        function renderTiendas() {
+            const container = document.getElementById('tiendas-container');
+            container.innerHTML = allStores.map(name => {
+                const isB1 = batch1Stores.includes(name);
+                return `<div class="card bg-white dark:bg-slate-900 p-5 ${isB1 ? 'batch-1' : 'batch-2'}" data-location="${name}">
+                    <div class="flex justify-between items-center mb-4"><h3 class="text-sm font-black dark:text-slate-100 uppercase">${name}</h3><span class="grand-total text-2xl font-black text-blue-600">0</span></div>
+                    <div class="space-y-1">${[1,2,3,4,5,6,7,8].map(i => `<div class="flex justify-between text-[11px] items-center"><span class="text-slate-400 font-bold italic">Slot ${i}</span><span contenteditable="true" oninput="manualEdit(this, '${i}')" class="slot-val font-black" data-slot="${i}">0</span></div>`).join('')}</div>
+                    <div class="mt-4 p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg flex justify-between items-center text-xs"><span class="font-black text-amber-700 uppercase">Sols</span><span contenteditable="true" oninput="manualEdit(this, 'SOL')" class="sol-val font-black text-amber-600">0</span></div>
+                </div>`;
+            }).join('');
         }
 
-        async function cargarDesdeNube() {
+        function guardarEstado() {
             const fecha = document.getElementById('fecha-selector').value;
-            if (document.activeElement.getAttribute('contenteditable') === 'true') return;
-            try {
-                const res = await fetch(`${WEB_APP_URL}?fecha=${fecha}`);
-                const data = await res.json();
-                if (data && Array.isArray(data)) {
-                    data.forEach(r => {
-                        const card = document.querySelector(`[data-location="${r.tienda}"]`);
-                        if (card) {
-                            const el = r.slot === "SOL" ? card.querySelector('.sol-val') : card.querySelector(`[data-slot="${r.slot}"]`);
-                            if (el && el.innerText !== String(r.estado)) {
-                                el.innerText = r.estado;
-                                el.classList.add('update-flash');
-                                setTimeout(() => el.classList.remove('update-flash'), 1000);
-                            }
-                        }
-                    });
-                    guardarEstado(false);
-                }
-            } catch (e) { }
-        }
-
-        function guardarEstado(actualizarLocal = true) {
-            const fecha = document.getElementById('fecha-selector').value;
-            const fullData = {}; let tP = 0, tB1 = 0, tB2 = 0, tS = 0;
+            const fullData = { stores: {}, counters: slotCounters };
             document.querySelectorAll('.card').forEach(card => {
                 const loc = card.dataset.location;
                 const slots = Array.from(card.querySelectorAll('.slot-val')).map(s => parseInt(s.innerText) || 0);
                 const sol = parseInt(card.querySelector('.sol-val').innerText) || 0;
-                const subP = slots.reduce((a, b) => a + b, 0);
-                tP += subP; tS += sol;
-                if(batch1Stores.includes(loc)) tB1 += subP; else tB2 += subP;
-                card.querySelector('.grand-total').innerText = subP + sol;
-                fullData[loc] = { slots, sol };
+                card.querySelector('.grand-total').innerText = slots.reduce((a, b) => a + b, 0) + sol;
+                fullData.stores[loc] = { slots, sol };
+            });
+            localStorage.setItem(`zubale_v3_${fecha}`, JSON.stringify(fullData));
+            actualizarTotales();
+        }
+
+        function actualizarTotales() {
+            let tP = 0, tB1 = 0, tB2 = 0, tS = 0;
+            document.querySelectorAll('.card').forEach(card => {
+                const slots = Array.from(card.querySelectorAll('.slot-val')).map(s => parseInt(s.innerText) || 0);
+                const sub = slots.reduce((a, b) => a + b, 0);
+                tP += sub; tS += parseInt(card.querySelector('.sol-val').innerText) || 0;
+                if (batch1Stores.includes(card.dataset.location)) tB1 += sub; else tB2 += sub;
             });
             document.getElementById('total-global-pedidos').innerText = tP;
             document.getElementById('total-b1').innerText = tB1;
             document.getElementById('total-b2').innerText = tB2;
             document.getElementById('total-soluciones').innerText = tS;
-            if(actualizarLocal) localStorage.setItem(`zubale_data_${fecha}`, JSON.stringify(fullData));
-        }
-
-        function exportarExcel() {
-            const fecha = document.getElementById('fecha-selector').value;
-            const rows = [["TIENDA", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "SOLS", "TOTAL"]];
-            allStores.forEach(loc => {
-                const card = document.querySelector(`[data-location="${loc}"]`);
-                const slots = Array.from(card.querySelectorAll('.slot-val')).map(s => parseInt(s.innerText) || 0);
-                const sol = parseInt(card.querySelector('.sol-val').innerText) || 0;
-                rows.push([loc, ...slots, sol, slots.reduce((a,b)=>a+b,0)+sol]);
-            });
-            const ws = XLSX.utils.aoa_to_sheet(rows);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Reporte_Dia");
-            XLSX.writeFile(wb, `Zubale_Día_${fecha}.xlsx`);
-        }
-
-        async function exportarHistorico(rango) {
-            const fecha = document.getElementById('fecha-selector').value;
-            try {
-                const res = await fetch(`${WEB_APP_URL}?fecha=${fecha}&rango=${rango}`);
-                const data = await res.json();
-                if (data && data.length > 0) {
-                    const ws = XLSX.utils.json_to_sheet(data);
-                    const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, "Historico");
-                    XLSX.writeFile(wb, `Zubale_${rango}_${fecha}.xlsx`);
-                } else alert("No hay datos para este periodo.");
-            } catch (e) { alert("Error al conectar con la nube."); }
         }
 
         function cargarPersistencia() {
-            const data = JSON.parse(localStorage.getItem(`zubale_data_${document.getElementById('fecha-selector').value}`));
+            const data = JSON.parse(localStorage.getItem(`zubale_v3_${document.getElementById('fecha-selector').value}`));
             if (data) {
-                Object.entries(data).forEach(([loc, info]) => {
+                slotCounters = data.counters || {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0};
+                Object.entries(data.stores).forEach(([loc, info]) => {
                     const card = document.querySelector(`[data-location="${loc}"]`);
                     if (card) {
                         info.slots.forEach((v, i) => { card.querySelector(`[data-slot="${i+1}"]`).innerText = v; });
                         card.querySelector('.sol-val').innerText = info.sol;
                     }
                 });
-                guardarEstado(false);
+                guardarEstado();
             }
         }
 
-        function manualEdit(el, slot) { guardarEstado(true); enviarANube(slot, el.innerText, el.closest('.card').dataset.location); }
-        function cambiarFecha() { renderTiendas(); cargarPersistencia(); cargarDesdeNube(); }
-        function limpiarTodo() { if(confirm("¿Limpiar datos de hoy?")) { localStorage.removeItem(`zubale_data_${document.getElementById('fecha-selector').value}`); location.reload(); } }
+        function manualEdit(el, slot) { guardarEstado(); }
+        function cambiarFecha() { renderTiendas(); cargarPersistencia(); verificarBloqueoSlot(); }
 
         init();
     </script>
