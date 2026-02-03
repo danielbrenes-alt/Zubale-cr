@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Zubale Control - V6 Blindada Pro</title>
+    <title>Zubale Control - V7 Contadores Activos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -12,7 +12,6 @@
         .stat-card { background: white; border-radius: 12px; padding: 1.2rem; border: 1px solid #e2e8f0; height: 100%; transition: all 0.3s ease; }
         .stat-card:hover { border-color: #3b82f6; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.05); }
         
-        /* HOVER PARA TODOS LOS BOTONES */
         .btn-base { 
             padding: 12px; border-radius: 8px; font-weight: 800; font-size: 0.7rem; 
             text-transform: uppercase; cursor: pointer; text-align: center; 
@@ -20,8 +19,7 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .btn-base:hover { transform: translateY(-2px); filter: brightness(110%); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .btn-base:active { transform: translateY(0); }
-
+        
         .btn-blue { background: #2563eb; color: white; }
         .btn-black { background: #1e293b; color: white; }
         .btn-amber { background: #f59e0b; color: white; }
@@ -29,15 +27,14 @@
         .btn-indigo { background: #4f46e5; color: white; }
         .btn-purple { background: #9333ea; color: white; }
         .btn-red-light { background: #fef2f2; color: #ef4444; border: 1px solid #fee2e2; }
-        .btn-red-light:hover { background: #fee2e2; }
 
         .btn-disabled { background: #94a3b8 !important; cursor: not-allowed !important; transform: none !important; opacity: 0.7; }
-        
-        select.hover-style { transition: all 0.2s; cursor: pointer; border: 2px solid #f1f5f9; }
-        select.hover-style:hover { border-color: #3b82f6; background-color: #fff; }
+        .hover-style { transition: all 0.2s; cursor: pointer; border: 2px solid #f1f5f9; }
+        .hover-style:hover { border-color: #3b82f6; }
         
         input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
         .slot-row { display: flex; justify-content: space-between; font-size: 0.75rem; padding: 4px 0; border-bottom: 1px solid #f8fafc; }
+        .counter-badge { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 900; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -47,38 +44,48 @@
             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPzUiCVTPF6LznRh6EHznXelLIdGM3N6tcCA&s" class="h-12 rounded-lg">
             <div>
                 <h1 class="text-3xl font-black text-blue-600 uppercase tracking-tighter leading-none">Zubale Control</h1>
-                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Costa Rica Operations • V6 Hover Pro</p>
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Costa Rica • Dashboard de Órdenes</p>
             </div>
         </div>
-        <div>
-            <input type="date" id="fecha-selector" onchange="cambiarFecha()" class="hover-style border-2 rounded-xl p-3 font-black text-blue-600 outline-none">
-        </div>
+        <input type="date" id="fecha-selector" onchange="cambiarFecha()" class="hover-style border-2 rounded-xl p-3 font-black text-blue-600 outline-none">
     </header>
 
+    <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="stat-card border-l-4 border-blue-500">
+            <h3 class="text-[10px] font-black text-blue-500 uppercase">Total Batch 1</h3>
+            <p id="total-b1" class="text-3xl font-black text-slate-800">0</p>
+        </div>
+        <div class="stat-card border-l-4 border-purple-500">
+            <h3 class="text-[10px] font-black text-purple-500 uppercase">Total Batch 2</h3>
+            <p id="total-b2" class="text-3xl font-black text-slate-800">0</p>
+        </div>
+        <div class="stat-card border-l-4 border-amber-500">
+            <h3 class="text-[10px] font-black text-amber-500 uppercase">Soluciones</h3>
+            <p id="total-sols" class="text-3xl font-black text-slate-800">0</p>
+        </div>
+        <div class="stat-card bg-blue-600 shadow-lg">
+            <h3 class="text-[10px] font-black text-white uppercase opacity-80">Gran Total</h3>
+            <p id="gran-total" class="text-3xl font-black text-white">0</p>
+        </div>
+    </div>
+
     <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
-        
         <div class="lg:col-span-5 space-y-4">
             <div class="stat-card">
-                <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Entrada de Datos</h3>
-                
+                <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Cargas de Turno</h3>
                 <div class="relative mb-4">
-                    <div class="btn-base btn-black">Cargar Turno Anterior (Auto-Relleno)</div>
+                    <div class="btn-base btn-black">Cargar Turno Anterior</div>
                     <input type="file" onchange="procesarArchivo(this, 'anterior')" accept=".xlsx, .xls, .csv">
                 </div>
-
                 <div class="flex gap-3 mb-4">
                     <select id="slot-selector" onchange="verificarBloqueo()" class="hover-style w-1/3 rounded-xl px-3 font-black text-xs bg-slate-50 outline-none">
-                        <option value="1">SLOT 1</option><option value="2">SLOT 2</option>
-                        <option value="3">SLOT 3</option><option value="4">SLOT 4</option>
-                        <option value="5">SLOT 5</option><option value="6">SLOT 6</option>
-                        <option value="7">SLOT 7</option><option value="8">SLOT 8</option>
+                        ${[1,2,3,4,5,6,7,8].map(i => `<option value="${i}">SLOT ${i}</option>`).join('')}
                     </select>
-                    <div id="btn-container-slot" class="flex-1 relative">
+                    <div class="flex-1 relative">
                         <div id="btn-label-slot" class="btn-base btn-blue">Subir Slot Actual</div>
                         <input type="file" id="file-input-slot" onchange="procesarArchivo(this, 'slot')" accept=".xlsx, .xls, .csv">
                     </div>
                 </div>
-
                 <div class="relative">
                     <div class="btn-base btn-amber">Cargar Soluciones</div>
                     <input type="file" onchange="procesarArchivo(this, 'solucion')" accept=".xlsx, .xls, .csv">
@@ -91,16 +98,16 @@
                 <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Centro de Reportes</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                     <div>
-                        <label class="block text-[9px] font-black text-blue-500 uppercase mb-1">Fecha de Consulta</label>
+                        <label class="block text-[9px] font-black text-blue-500 uppercase mb-1">Fecha de Reporte</label>
                         <input type="date" id="fecha-reporte" class="hover-style w-full p-2.5 rounded-xl font-bold border-2">
                     </div>
                     <div class="md:col-span-2 grid grid-cols-2 gap-3">
-                        <button onclick="solicitarReporteNube('SEMANAL')" class="btn-base btn-indigo">Descargar Semanal</button>
-                        <button onclick="solicitarReporteNube('MENSUAL')" class="btn-base btn-purple">Descargar Mensual</button>
+                        <button onclick="solicitarReporteNube('SEMANAL')" class="btn-base btn-indigo">Semanal</button>
+                        <button onclick="solicitarReporteNube('MENSUAL')" class="btn-base btn-purple">Mensual</button>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3 mt-6 pt-6 border-t border-dashed">
-                    <button onclick="descargarExcelLocal()" class="btn-base btn-emerald">Descargar Diario (Excel)</button>
+                    <button onclick="descargarExcelLocal()" class="btn-base btn-emerald">Excel Diario</button>
                     <button onclick="limpiarDatosDia()" class="btn-base btn-red-light">Limpiar Hoy</button>
                 </div>
             </div>
@@ -132,31 +139,40 @@
             try {
                 const res = await fetch(`${WEB_APP_URL}?fecha=${fecha}`);
                 const data = await res.json();
-                if (data) {
-                    localData = data.tiendas || localData;
+                if (data && data.tiendas) {
+                    localData = data.tiendas;
                     slotCounters = data.counters || slotCounters;
                     localStorage.setItem('zubale_cache', JSON.stringify(localData));
                     localStorage.setItem('zubale_counters', JSON.stringify(slotCounters));
                     actualizarUI();
                 }
-            } catch (e) { }
+            } catch (e) { console.log("Cloud sync..."); }
         }
 
         function actualizarUI() {
             let b1Tot = 0, b2Tot = 0, solTot = 0;
             allStores.forEach(loc => {
-                const info = localData[loc] || { slots: Array(8).fill(0), sol: 0 };
+                if (!localData[loc]) localData[loc] = { slots: Array(8).fill(0), sol: 0 };
+                const info = localData[loc];
                 const sSum = info.slots.reduce((a,b)=>a+b,0);
+                
                 if(batch1.includes(loc)) b1Tot += sSum; else b2Tot += sSum;
                 solTot += info.sol;
+
                 const card = document.querySelector(`[data-location="${loc}"]`);
                 if(card) {
                     card.querySelector('.store-total-val').innerText = sSum + info.sol;
-                    info.slots.forEach((val, i) => { const cell = card.querySelector(`.s${i+1}-val`); if(cell) cell.innerText = val; });
+                    info.slots.forEach((val, i) => { 
+                        const cell = card.querySelector(`.s${i+1}-val`); 
+                        if(cell) cell.innerText = val; 
+                    });
                     card.querySelector('.s-sol-val').innerText = info.sol;
                 }
             });
-            document.getElementById('total-b1')?.innerText || b1Tot; // Placeholder for future summary stats
+            document.getElementById('total-b1').innerText = b1Tot;
+            document.getElementById('total-b2').innerText = b2Tot;
+            document.getElementById('total-sols').innerText = solTot;
+            document.getElementById('gran-total').innerText = b1Tot + b2Tot + solTot;
             verificarBloqueo();
         }
 
@@ -178,8 +194,7 @@
         function procesarArchivo(input, tipo) {
             const file = input.files[0]; if (!file) return;
             const slotSel = parseInt(document.getElementById('slot-selector').value);
-            
-            if(tipo === 'slot' && slotCounters[slotSel] >= 2) { alert("Límite de 2 cargas para este Slot."); return; }
+            if(tipo === 'slot' && slotCounters[slotSel] >= 2) { alert("Máximo 2 cargas por Slot."); return; }
 
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -196,15 +211,9 @@
 
                     if (tEncontrada) {
                         if (!localData[tEncontrada]) localData[tEncontrada] = { slots: Array(8).fill(0), sol: 0 };
-                        if (tipo === 'anterior') {
-                            // Lógica inteligente: Si el archivo trae info de slots, se rellena.
-                            // Por defecto lo mapeamos al slot 1 para este ejemplo o sumamos.
-                            localData[tEncontrada].slots[0]++; 
-                        } else if (tipo === 'slot') {
-                            localData[tEncontrada].slots[slotSel-1]++;
-                        } else {
-                            localData[tEncontrada].sol++;
-                        }
+                        if (tipo === 'solucion') localData[tEncontrada].sol++;
+                        else localData[tEncontrada].slots[slotSel-1]++;
+                        
                         enviarANube(tEncontrada, (tipo === 'solucion' ? 'SOL' : slotSel), (tipo === 'solucion' ? localData[tEncontrada].sol : localData[tEncontrada].slots[slotSel-1]));
                     }
                 });
@@ -214,7 +223,7 @@
                 localStorage.setItem('zubale_counters', JSON.stringify(slotCounters));
                 actualizarUI();
                 input.value = "";
-                alert("Datos procesados correctamente.");
+                alert("Carga finalizada con éxito.");
             };
             reader.readAsArrayBuffer(file);
         }
@@ -228,16 +237,12 @@
             const btn = document.getElementById('btn-label-slot');
             const fileInput = document.getElementById('file-input-slot');
             if (slotCounters[slot] >= 2) { 
-                btn.classList.add('btn-disabled'); btn.innerText = "Slot Completo (2/2)"; 
+                btn.classList.add('btn-disabled'); btn.innerText = "Slot Lleno"; 
                 fileInput.disabled = true; 
             } else { 
                 btn.classList.remove('btn-disabled'); btn.innerText = "Subir Slot Actual"; 
                 fileInput.disabled = false; 
             }
-        }
-
-        function solicitarReporteNube(tipo) {
-            window.open(`${WEB_APP_URL}?action=REPORT&type=${tipo}&fecha=${document.getElementById('fecha-reporte').value}`, '_blank');
         }
 
         function descargarExcelLocal() {
@@ -247,12 +252,13 @@
             });
             const ws = XLSX.utils.json_to_sheet(rows);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Reporte");
-            XLSX.writeFile(wb, `Zubale_CR_${document.getElementById('fecha-selector').value}.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, "Diario");
+            XLSX.writeFile(wb, `Zubale_Control_${document.getElementById('fecha-selector').value}.xlsx`);
         }
 
-        function cambiarFecha() { localStorage.clear(); location.reload(); }
-        function limpiarDatosDia() { if(confirm("¿Seguro que deseas borrar los datos de hoy?")){ localStorage.clear(); location.reload(); } }
+        function cambiarFecha() { localStorage.removeItem('zubale_cache'); location.reload(); }
+        function limpiarDatosDia() { if(confirm("¿Borrar datos de hoy?")){ localStorage.clear(); location.reload(); } }
+        function solicitarReporteNube(tipo) { window.open(`${WEB_APP_URL}?action=REPORT&type=${tipo}&fecha=${document.getElementById('fecha-reporte').value}`, '_blank'); }
 
         init();
     </script>
