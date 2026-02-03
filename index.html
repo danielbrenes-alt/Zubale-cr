@@ -3,66 +3,89 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Zubale Control - V7.10 Integración Final</title>
+    <title>Zubale Control - V9.8 Conteo Real</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet"/>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .stat-card { background: white; border-radius: 12px; padding: 1.2rem; border: 1px solid #e2e8f0; transition: 0.3s; }
-        .btn-base { padding: 12px; border-radius: 8px; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; cursor: pointer; text-align: center; width: 100%; display: block; border: none; transition: 0.2s; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .stat-card { background: white; border-radius: 12px; padding: 1.5rem; border: 1px solid #e2e8f0; height: 100%; transition: all 0.2s ease; }
+        
+        .btn-base { 
+            padding: 12px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; 
+            text-transform: uppercase; cursor: pointer; text-align: center; width: 100%; 
+            display: block; border: none; transition: all 0.2s ease-in-out; 
+        }
+        .btn-base:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); filter: brightness(1.1); }
+        .btn-base:active { transform: translateY(0); }
+
         .btn-blue { background: #2563eb; color: white; }
         .btn-black { background: #1e293b; color: white; }
-        .btn-disabled { background: #ef4444 !important; cursor: not-allowed !important; opacity: 0.8; }
-        input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-        .slot-row { display: flex; justify-content: space-between; font-size: 0.75rem; padding: 4px 0; border-bottom: 1px solid #f1f5f9; }
+        .btn-emerald { background: #10b981; color: white; }
+        .btn-red-outline { background: white; color: #ef4444; border: 2px solid #fee2e2; }
+
+        .btn-locked { background: #ef4444 !important; cursor: not-allowed; opacity: 0.7; color: white; }
+        .btn-locked:hover { transform: none; box-shadow: none; filter: none; }
+
+        .slot-row { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 6px 0; border-bottom: 1px solid #f1f5f9; }
+        .store-header { border-bottom: 2px solid #eff6ff; margin-bottom: 1rem; padding-bottom: 0.5rem; }
     </style>
 </head>
-<body class="p-4 md:p-8" onload="init()">
+<body class="p-4 md:p-10" onload="init()">
 
     <header class="max-w-7xl mx-auto mb-8 flex justify-between items-center bg-white p-6 rounded-2xl border shadow-sm">
         <div class="flex items-center gap-4">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPzUiCVTPF6LznRh6EHznXelLIdGM3N6tcCA&s" class="h-12 rounded-lg">
+            <div class="bg-blue-600 p-3 rounded-lg shadow-md"><span class="text-white font-black text-2xl">Z</span></div>
             <div>
-                <h1 class="text-3xl font-black text-blue-600 uppercase tracking-tighter leading-none">Zubale Control</h1>
-                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Sincronización de Datos Real</p>
+                <h1 class="text-2xl font-black text-blue-600 uppercase tracking-tighter leading-none">Zubale Control</h1>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Costa Rica • Gestión de Producción</p>
             </div>
         </div>
-        <input type="date" id="fecha-selector" class="border-2 rounded-xl p-3 font-black text-blue-600 outline-none">
+        <input type="date" id="fecha-selector" class="border-2 rounded-xl p-2 font-bold text-slate-700 outline-none border-blue-50">
     </header>
 
-    <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div class="stat-card border-l-4 border-blue-500"><h3 class="text-[10px] font-black text-blue-500 uppercase">Batch 1</h3><p id="total-b1" class="text-3xl font-black">0</p></div>
-        <div class="stat-card border-l-4 border-purple-500"><h3 class="text-[10px] font-black text-purple-500 uppercase">Batch 2</h3><p id="total-b2" class="text-3xl font-black">0</p></div>
-        <div class="stat-card border-l-4 border-amber-500"><h3 class="text-[10px] font-black text-amber-500 uppercase">Soluciones</h3><p id="total-sols" class="text-3xl font-black">0</p></div>
-        <div class="stat-card bg-blue-600 text-white shadow-lg"><h3 class="text-[10px] font-black uppercase opacity-80">Gran Total</h3><p id="gran-total" class="text-3xl font-black">0</p></div>
+    <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-center">
+        <div class="stat-card border-t-4 border-blue-500">
+            <h3 class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Batch 1</h3>
+            <p id="total-b1" class="text-4xl font-black mt-2">0</p>
+        </div>
+        <div class="stat-card border-t-4 border-purple-500">
+            <h3 class="text-[10px] font-black text-purple-500 uppercase tracking-widest">Batch 2</h3>
+            <p id="total-b2" class="text-4xl font-black mt-2">0</p>
+        </div>
+        <div class="stat-card border-t-4 border-amber-500">
+            <h3 class="text-[10px] font-black text-amber-500 uppercase tracking-widest">Soluciones</h3>
+            <p id="total-sols" class="text-4xl font-black mt-2">0</p>
+        </div>
+        <div class="stat-card bg-black text-white shadow-2xl border-none">
+            <h3 class="text-[10px] font-black uppercase tracking-widest text-blue-400">CONTADOR GENERAL</h3>
+            <p id="gran-total" class="text-5xl font-black mt-2 text-black">0</p>
+        </div>
     </div>
 
-    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
-        <div class="lg:col-span-5 space-y-4">
-            <div class="stat-card">
-                <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Cargas de Turno</h3>
-                <div class="relative mb-4">
-                    <div class="btn-base btn-black">📥 Cargar Turno Anterior (Rellenar)</div>
-                    <input type="file" onchange="procesarArchivo(this, 'anterior')" accept=".xlsx, .xls, .csv">
-                </div>
-                <div class="flex gap-3 mb-4">
-                    <select id="slot-selector" onchange="verificarBloqueo()" class="w-1/3 rounded-xl px-2 font-black text-xs bg-slate-100 outline-none">
-                        <option value="1">SLOT 1</option><option value="2">SLOT 2</option><option value="3">SLOT 3</option><option value="4">SLOT 4</option>
-                        <option value="5">SLOT 5</option><option value="6">SLOT 6</option><option value="7">SLOT 7</option><option value="8">SLOT 8</option>
-                    </select>
-                    <div class="flex-1 relative">
-                        <div id="btn-label-slot" class="btn-base btn-blue">Subir Slot Actual</div>
-                        <input type="file" id="file-input-slot" onchange="procesarArchivo(this, 'slot')" accept=".xlsx, .xls, .csv">
-                    </div>
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+        <div class="stat-card">
+            <h3 class="text-[11px] font-black text-slate-400 uppercase mb-4 tracking-widest italic">Panel de Control</h3>
+            <div class="relative mb-4">
+                <div class="btn-base btn-black">📥 Inyectar Turno Anterior</div>
+                <input type="file" onchange="inyectarTurno(this)" accept=".xlsx, .xls" class="absolute inset-0 opacity-0 cursor-pointer">
+            </div>
+            <div class="flex gap-4">
+                <select id="slot-selector" onchange="actualizarEstadoBoton()" class="w-1/3 rounded-xl border-2 border-slate-100 px-3 font-bold text-sm outline-none focus:border-blue-500">
+                    <option value="1">SLOT 1</option><option value="2">SLOT 2</option><option value="3">SLOT 3</option><option value="4">SLOT 4</option>
+                    <option value="5">SLOT 5</option><option value="6">SLOT 6</option><option value="7">SLOT 7</option><option value="8">SLOT 8</option>
+                </select>
+                <div class="flex-1 relative">
+                    <div id="btn-label" class="btn-base btn-blue">Subir Slot Seleccionado</div>
+                    <input type="file" id="input-slot" onchange="procesarSlotIndividual(this)" accept=".xlsx, .xls" class="absolute inset-0 opacity-0 cursor-pointer">
                 </div>
             </div>
+            <p id="msg-bloqueo" class="text-[10px] font-bold text-slate-500 uppercase mt-2 text-center tracking-tighter">Archivos en Slot: 0/2</p>
         </div>
-        <div class="lg:col-span-7">
-            <div class="stat-card flex flex-col justify-center items-center gap-4 text-center">
-                <button onclick="descargarExcelLocal()" class="btn-base border-2 border-emerald-500 text-emerald-600 w-full">Exportar Reporte Hoy</button>
-                <button onclick="limpiarTodo()" class="text-[10px] text-red-500 font-bold uppercase tracking-widest">Reiniciar Dashboard</button>
-            </div>
+
+        <div class="stat-card flex flex-col justify-center gap-4">
+            <button onclick="exportarExcel()" class="btn-base btn-emerald">📥 Descargar Reporte Hoy (.xlsx)</button>
+            <button onclick="limpiarTodo()" class="btn-base btn-red-outline">⚠️ Reiniciar Dashboard</button>
         </div>
     </div>
 
@@ -72,85 +95,97 @@
         const allStores = ["Wm Alajuela", "Wm Heredia", "Wm Heredia Este", "Wm Tibas", "Wm Escazu", "Wm Santa Ana", "Wm Guadalupe", "Wm Desamparados"];
         const batch1 = ["Wm Alajuela", "Wm Heredia", "Wm Heredia Este", "Wm Tibas"];
         
-        let localData = JSON.parse(localStorage.getItem('zubale_cache')) || {};
-        let slotCounters = JSON.parse(localStorage.getItem('zubale_counters')) || {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0};
+        let db = JSON.parse(localStorage.getItem('zubale_db')) || {};
+        let locks = JSON.parse(localStorage.getItem('zubale_locks')) || {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0};
 
         function init() {
             const hoy = new Date().toISOString().split('T')[0];
             document.getElementById('fecha-selector').value = hoy;
-            allStores.forEach(s => { if(!localData[s]) localData[s] = { slots: Array(8).fill(0), sol: 0 }; });
+            allStores.forEach(s => { if(!db[s]) db[s] = { slots: Array(8).fill(0), sol: 0 }; });
             renderTiendas();
             actualizarUI();
+            actualizarEstadoBoton();
         }
 
         function renderTiendas() {
-            const container = document.getElementById('tiendas-container');
-            container.innerHTML = allStores.map(name => `
+            document.getElementById('tiendas-container').innerHTML = allStores.map(name => `
                 <div class="stat-card" data-location="${name}">
-                    <div class="flex justify-between items-start mb-3 border-b pb-2">
-                        <h4 class="font-black text-slate-700 uppercase text-[10px] tracking-tight">${name}</h4>
-                        <span class="store-total-val text-xl font-black text-blue-600">0</span>
+                    <div class="flex justify-between items-center store-header">
+                        <h4 class="font-black text-slate-700 uppercase text-[10px] tracking-tighter">${name}</h4>
+                        <span class="store-total-val text-2xl font-black text-blue-600 leading-none">0</span>
                     </div>
-                    <div class="space-y-0.5">
+                    <div class="space-y-1">
                         ${[1,2,3,4,5,6,7,8].map(i => `<div class="slot-row"><span>Slot ${i}</span><span class="s${i}-val font-black">0</span></div>`).join('')}
-                        <div class="slot-row mt-2 bg-amber-50 p-1 rounded font-bold text-amber-700"><span>SOL</span><span class="s-sol-val">0</span></div>
+                        <div class="slot-row mt-4 bg-amber-50 p-2 rounded-lg font-bold text-amber-600 border border-amber-100"><span>SOL</span><span class="s-sol-val">0</span></div>
                     </div>
                 </div>`).join('');
         }
 
-        function procesarArchivo(input, tipo) {
+        function inyectarTurno(input) {
             const file = input.files[0]; if (!file) return;
             const reader = new FileReader();
             reader.onload = (e) => {
-                const data = new Uint8Array(e.target.result);
-                const wb = XLSX.read(data, {type:'array'});
-                const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-                
-                json.forEach(fila => {
-                    const tRaw = fila["Tienda"] || fila["BATCH"] || fila["batch"] || "";
-                    const tEncontrada = tRaw.trim();
-
-                    if (allStores.includes(tEncontrada)) {
-                        if (tipo === 'anterior') {
-                            // LEER VALORES DIRECTOS (No contar filas)
-                            for (let i = 1; i <= 8; i++) {
-                                localData[tEncontrada].slots[i-1] = parseInt(fila[`Slot ${i}`]) || 0;
-                            }
-                            localData[tEncontrada].sol = parseInt(fila["Sol"] || fila["Soluciones"]) || 0;
-                        } else {
-                            // Conteo manual por fila (+1) para subidas de slot actual
-                            const slotSel = parseInt(document.getElementById('slot-selector').value);
-                            localData[tEncontrada].slots[slotSel-1] += 1;
+                const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
+                const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                data.forEach(fila => {
+                    const tienda = fila["Tienda"] || fila["TIENDA"];
+                    if (db[tienda]) {
+                        for (let i = 1; i <= 8; i++) {
+                            db[tienda].slots[i-1] += parseInt(fila[`Slot ${i}`] || fila[`SLOT ${i}`]) || 0;
                         }
+                        db[tienda].sol += parseInt(fila["Sol"] || fila["SOLUCIONES"]) || 0;
                     }
                 });
-
-                if(tipo === 'slot') {
-                    const slotSel = parseInt(document.getElementById('slot-selector').value);
-                    slotCounters[slotSel]++;
-                }
-                
-                saveData();
+                guardar();
                 input.value = "";
-                alert("Dashboard actualizado con los datos del archivo.");
+                alert("Turno inyectado y contabilizado.");
             };
             reader.readAsArrayBuffer(file);
         }
 
-        function saveData() {
-            localStorage.setItem('zubale_cache', JSON.stringify(localData));
-            localStorage.setItem('zubale_counters', JSON.stringify(slotCounters));
+        function procesarSlotIndividual(input) {
+            const slotSel = parseInt(document.getElementById('slot-selector').value);
+            if (locks[slotSel] >= 2) return;
+
+            const file = input.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
+                const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                
+                // Procesamos el archivo sumando al conteo actual del slot
+                data.forEach(fila => {
+                    const str = JSON.stringify(fila).toUpperCase();
+                    let tE = null;
+                    if(str.includes("HEREDIA ESTE")) tE = "Wm Heredia Este";
+                    else if(str.includes("HEREDIA")) tE = "Wm Heredia";
+                    else allStores.forEach(s => { 
+                        if(str.includes(s.replace("Wm ", "").toUpperCase())) tE = s; 
+                    });
+                    if (tE) db[tE].slots[slotSel-1]++;
+                });
+
+                locks[slotSel]++;
+                guardar();
+                input.value = "";
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function guardar() {
+            localStorage.setItem('zubale_db', JSON.stringify(db));
+            localStorage.setItem('zubale_locks', JSON.stringify(locks));
             actualizarUI();
+            actualizarEstadoBoton();
         }
 
         function actualizarUI() {
             let b1 = 0, b2 = 0, sol = 0;
             allStores.forEach(loc => {
-                const info = localData[loc];
+                const info = db[loc];
                 const sSum = info.slots.reduce((a,b)=>a+b,0);
                 if(batch1.includes(loc)) b1 += sSum; else b2 += sSum;
                 sol += info.sol;
-
                 const card = document.querySelector(`[data-location="${loc}"]`);
                 if(card) {
                     card.querySelector('.store-total-val').innerText = sSum + info.sol;
@@ -162,31 +197,36 @@
             document.getElementById('total-b2').innerText = b2;
             document.getElementById('total-sols').innerText = sol;
             document.getElementById('gran-total').innerText = b1 + b2 + sol;
-            verificarBloqueo();
         }
 
-        function verificarBloqueo() {
+        function actualizarEstadoBoton() {
             const slot = document.getElementById('slot-selector').value;
-            const btn = document.getElementById('btn-label-slot');
-            const fileInput = document.getElementById('file-input-slot');
-            if (slotCounters[slot] >= 2) { 
-                btn.classList.add('btn-disabled'); btn.innerText = "Slot Lleno"; 
-                fileInput.disabled = true; 
-            } else { 
-                btn.classList.remove('btn-disabled'); btn.innerText = "Subir Slot Actual"; 
-                fileInput.disabled = false; 
+            const btn = document.getElementById('btn-label');
+            const input = document.getElementById('input-slot');
+            const cargados = locks[slot] || 0;
+            document.getElementById('msg-bloqueo').innerText = `Archivos en Slot ${slot}: ${cargados}/2`;
+            if (cargados >= 2) {
+                btn.className = "btn-base btn-locked"; btn.innerText = "BLOQUEADO"; input.disabled = true;
+            } else {
+                btn.className = "btn-base btn-blue"; btn.innerText = `Subir Slot ${slot}`; input.disabled = false;
             }
         }
 
-        function descargarExcelLocal() {
-            const rows = allStores.map(loc => {
-                const d = localData[loc];
-                return { Tienda: loc, ...d.slots.reduce((acc, v, i) => ({...acc, [`Slot ${i+1}`]: v}), {}), Sol: d.sol, Total: d.slots.reduce((a,b)=>a+b,0)+d.sol };
-            });
-            XLSX.writeFile(XLSX.utils.book_new(), `Zubale_Control_CR.xlsx`);
+        function exportarExcel() {
+            const fecha = document.getElementById('fecha-selector').value;
+            const data = allStores.map(loc => ({
+                "Tienda": loc,
+                ...db[loc].slots.reduce((acc, v, i) => ({...acc, [`Slot ${i+1}`]: v}), {}),
+                "Sol": db[loc].sol,
+                "Total": db[loc].slots.reduce((a,b)=>a+b,0) + db[loc].sol
+            }));
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Reporte");
+            XLSX.writeFile(wb, `Zubale_Control_${fecha}.xlsx`);
         }
 
-        function limpiarTodo() { if(confirm("¿Reiniciar dashboard?")){ localStorage.clear(); location.reload(); } }
+        function limpiarTodo() { if(confirm("¿Borrar todo el Dashboard?")){ localStorage.clear(); location.reload(); } }
     </script>
 </body>
 </html>
