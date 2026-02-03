@@ -3,70 +3,39 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Zubale Control - V7 Contadores Activos</title>
+    <title>Zubale Control - V7.10 Integración Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .stat-card { background: white; border-radius: 12px; padding: 1.2rem; border: 1px solid #e2e8f0; height: 100%; transition: all 0.3s ease; }
-        .stat-card:hover { border-color: #3b82f6; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.05); }
-        
-        .btn-base { 
-            padding: 12px; border-radius: 8px; font-weight: 800; font-size: 0.7rem; 
-            text-transform: uppercase; cursor: pointer; text-align: center; 
-            width: 100%; display: block; border: none; position: relative; 
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .btn-base:hover { transform: translateY(-2px); filter: brightness(110%); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        
+        .stat-card { background: white; border-radius: 12px; padding: 1.2rem; border: 1px solid #e2e8f0; transition: 0.3s; }
+        .btn-base { padding: 12px; border-radius: 8px; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; cursor: pointer; text-align: center; width: 100%; display: block; border: none; transition: 0.2s; }
         .btn-blue { background: #2563eb; color: white; }
         .btn-black { background: #1e293b; color: white; }
-        .btn-amber { background: #f59e0b; color: white; }
-        .btn-emerald { background: #10b981; color: white; }
-        .btn-indigo { background: #4f46e5; color: white; }
-        .btn-purple { background: #9333ea; color: white; }
-        .btn-red-light { background: #fef2f2; color: #ef4444; border: 1px solid #fee2e2; }
-
-        .btn-disabled { background: #94a3b8 !important; cursor: not-allowed !important; transform: none !important; opacity: 0.7; }
-        .hover-style { transition: all 0.2s; cursor: pointer; border: 2px solid #f1f5f9; }
-        .hover-style:hover { border-color: #3b82f6; }
-        
+        .btn-disabled { background: #ef4444 !important; cursor: not-allowed !important; opacity: 0.8; }
         input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-        .slot-row { display: flex; justify-content: space-between; font-size: 0.75rem; padding: 4px 0; border-bottom: 1px solid #f8fafc; }
-        .counter-badge { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 900; }
+        .slot-row { display: flex; justify-content: space-between; font-size: 0.75rem; padding: 4px 0; border-bottom: 1px solid #f1f5f9; }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-4 md:p-8" onload="init()">
 
     <header class="max-w-7xl mx-auto mb-8 flex justify-between items-center bg-white p-6 rounded-2xl border shadow-sm">
         <div class="flex items-center gap-4">
             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPzUiCVTPF6LznRh6EHznXelLIdGM3N6tcCA&s" class="h-12 rounded-lg">
             <div>
                 <h1 class="text-3xl font-black text-blue-600 uppercase tracking-tighter leading-none">Zubale Control</h1>
-                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Costa Rica • Dashboard de Órdenes</p>
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Sincronización de Datos Real</p>
             </div>
         </div>
-        <input type="date" id="fecha-selector" onchange="cambiarFecha()" class="hover-style border-2 rounded-xl p-3 font-black text-blue-600 outline-none">
+        <input type="date" id="fecha-selector" class="border-2 rounded-xl p-3 font-black text-blue-600 outline-none">
     </header>
 
     <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div class="stat-card border-l-4 border-blue-500">
-            <h3 class="text-[10px] font-black text-blue-500 uppercase">Total Batch 1</h3>
-            <p id="total-b1" class="text-3xl font-black text-slate-800">0</p>
-        </div>
-        <div class="stat-card border-l-4 border-purple-500">
-            <h3 class="text-[10px] font-black text-purple-500 uppercase">Total Batch 2</h3>
-            <p id="total-b2" class="text-3xl font-black text-slate-800">0</p>
-        </div>
-        <div class="stat-card border-l-4 border-amber-500">
-            <h3 class="text-[10px] font-black text-amber-500 uppercase">Soluciones</h3>
-            <p id="total-sols" class="text-3xl font-black text-slate-800">0</p>
-        </div>
-        <div class="stat-card bg-blue-600 shadow-lg">
-            <h3 class="text-[10px] font-black text-white uppercase opacity-80">Gran Total</h3>
-            <p id="gran-total" class="text-3xl font-black text-white">0</p>
-        </div>
+        <div class="stat-card border-l-4 border-blue-500"><h3 class="text-[10px] font-black text-blue-500 uppercase">Batch 1</h3><p id="total-b1" class="text-3xl font-black">0</p></div>
+        <div class="stat-card border-l-4 border-purple-500"><h3 class="text-[10px] font-black text-purple-500 uppercase">Batch 2</h3><p id="total-b2" class="text-3xl font-black">0</p></div>
+        <div class="stat-card border-l-4 border-amber-500"><h3 class="text-[10px] font-black text-amber-500 uppercase">Soluciones</h3><p id="total-sols" class="text-3xl font-black">0</p></div>
+        <div class="stat-card bg-blue-600 text-white shadow-lg"><h3 class="text-[10px] font-black uppercase opacity-80">Gran Total</h3><p id="gran-total" class="text-3xl font-black">0</p></div>
     </div>
 
     <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
@@ -74,106 +43,44 @@
             <div class="stat-card">
                 <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Cargas de Turno</h3>
                 <div class="relative mb-4">
-                    <div class="btn-base btn-black">Cargar Turno Anterior</div>
+                    <div class="btn-base btn-black">📥 Cargar Turno Anterior (Rellenar)</div>
                     <input type="file" onchange="procesarArchivo(this, 'anterior')" accept=".xlsx, .xls, .csv">
                 </div>
                 <div class="flex gap-3 mb-4">
-                    <select id="slot-selector" onchange="verificarBloqueo()" class="hover-style w-1/3 rounded-xl px-3 font-black text-xs bg-slate-50 outline-none">
-                        ${[1,2,3,4,5,6,7,8].map(i => `<option value="${i}">SLOT ${i}</option>`).join('')}
+                    <select id="slot-selector" onchange="verificarBloqueo()" class="w-1/3 rounded-xl px-2 font-black text-xs bg-slate-100 outline-none">
+                        <option value="1">SLOT 1</option><option value="2">SLOT 2</option><option value="3">SLOT 3</option><option value="4">SLOT 4</option>
+                        <option value="5">SLOT 5</option><option value="6">SLOT 6</option><option value="7">SLOT 7</option><option value="8">SLOT 8</option>
                     </select>
                     <div class="flex-1 relative">
                         <div id="btn-label-slot" class="btn-base btn-blue">Subir Slot Actual</div>
                         <input type="file" id="file-input-slot" onchange="procesarArchivo(this, 'slot')" accept=".xlsx, .xls, .csv">
                     </div>
                 </div>
-                <div class="relative">
-                    <div class="btn-base btn-amber">Cargar Soluciones</div>
-                    <input type="file" onchange="procesarArchivo(this, 'solucion')" accept=".xlsx, .xls, .csv">
-                </div>
             </div>
         </div>
-
         <div class="lg:col-span-7">
-            <div class="stat-card">
-                <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Centro de Reportes</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                    <div>
-                        <label class="block text-[9px] font-black text-blue-500 uppercase mb-1">Fecha de Reporte</label>
-                        <input type="date" id="fecha-reporte" class="hover-style w-full p-2.5 rounded-xl font-bold border-2">
-                    </div>
-                    <div class="md:col-span-2 grid grid-cols-2 gap-3">
-                        <button onclick="solicitarReporteNube('SEMANAL')" class="btn-base btn-indigo">Semanal</button>
-                        <button onclick="solicitarReporteNube('MENSUAL')" class="btn-base btn-purple">Mensual</button>
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-3 mt-6 pt-6 border-t border-dashed">
-                    <button onclick="descargarExcelLocal()" class="btn-base btn-emerald">Excel Diario</button>
-                    <button onclick="limpiarDatosDia()" class="btn-base btn-red-light">Limpiar Hoy</button>
-                </div>
+            <div class="stat-card flex flex-col justify-center items-center gap-4 text-center">
+                <button onclick="descargarExcelLocal()" class="btn-base border-2 border-emerald-500 text-emerald-600 w-full">Exportar Reporte Hoy</button>
+                <button onclick="limpiarTodo()" class="text-[10px] text-red-500 font-bold uppercase tracking-widest">Reiniciar Dashboard</button>
             </div>
         </div>
     </div>
 
-    <div id="tiendas-container" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+    <div id="tiendas-container" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pb-20"></div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzA4Segqpkbd6-2UmFOtkqwGihgBeJT9r0p6KADkoX_YXukdpFj9Hd0mNe32fWMDi94/exec";
         const allStores = ["Wm Alajuela", "Wm Heredia", "Wm Heredia Este", "Wm Tibas", "Wm Escazu", "Wm Santa Ana", "Wm Guadalupe", "Wm Desamparados"];
         const batch1 = ["Wm Alajuela", "Wm Heredia", "Wm Heredia Este", "Wm Tibas"];
-
+        
         let localData = JSON.parse(localStorage.getItem('zubale_cache')) || {};
         let slotCounters = JSON.parse(localStorage.getItem('zubale_counters')) || {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0};
 
         function init() {
             const hoy = new Date().toISOString().split('T')[0];
-            if(!document.getElementById('fecha-selector').value) document.getElementById('fecha-selector').value = hoy;
-            if(!document.getElementById('fecha-reporte').value) document.getElementById('fecha-reporte').value = hoy;
+            document.getElementById('fecha-selector').value = hoy;
+            allStores.forEach(s => { if(!localData[s]) localData[s] = { slots: Array(8).fill(0), sol: 0 }; });
             renderTiendas();
             actualizarUI();
-            fetchData();
-            setInterval(fetchData, 15000); 
-        }
-
-        async function fetchData() {
-            const fecha = document.getElementById('fecha-selector').value;
-            try {
-                const res = await fetch(`${WEB_APP_URL}?fecha=${fecha}`);
-                const data = await res.json();
-                if (data && data.tiendas) {
-                    localData = data.tiendas;
-                    slotCounters = data.counters || slotCounters;
-                    localStorage.setItem('zubale_cache', JSON.stringify(localData));
-                    localStorage.setItem('zubale_counters', JSON.stringify(slotCounters));
-                    actualizarUI();
-                }
-            } catch (e) { console.log("Cloud sync..."); }
-        }
-
-        function actualizarUI() {
-            let b1Tot = 0, b2Tot = 0, solTot = 0;
-            allStores.forEach(loc => {
-                if (!localData[loc]) localData[loc] = { slots: Array(8).fill(0), sol: 0 };
-                const info = localData[loc];
-                const sSum = info.slots.reduce((a,b)=>a+b,0);
-                
-                if(batch1.includes(loc)) b1Tot += sSum; else b2Tot += sSum;
-                solTot += info.sol;
-
-                const card = document.querySelector(`[data-location="${loc}"]`);
-                if(card) {
-                    card.querySelector('.store-total-val').innerText = sSum + info.sol;
-                    info.slots.forEach((val, i) => { 
-                        const cell = card.querySelector(`.s${i+1}-val`); 
-                        if(cell) cell.innerText = val; 
-                    });
-                    card.querySelector('.s-sol-val').innerText = info.sol;
-                }
-            });
-            document.getElementById('total-b1').innerText = b1Tot;
-            document.getElementById('total-b2').innerText = b2Tot;
-            document.getElementById('total-sols').innerText = solTot;
-            document.getElementById('gran-total').innerText = b1Tot + b2Tot + solTot;
-            verificarBloqueo();
         }
 
         function renderTiendas() {
@@ -185,51 +92,77 @@
                         <span class="store-total-val text-xl font-black text-blue-600">0</span>
                     </div>
                     <div class="space-y-0.5">
-                        ${[1,2,3,4,5,6,7,8].map(i => `<div class="slot-row"><span class="text-slate-400 font-bold text-[9px]">Slot ${i}</span><span class="slot-val s${i}-val font-black">0</span></div>`).join('')}
-                        <div class="slot-row mt-2 bg-amber-50 p-1.5 rounded-lg border border-amber-100"><span class="text-amber-600 font-black text-[9px]">SOLUCIONES</span><span class="text-amber-700 font-black s-sol-val">0</span></div>
+                        ${[1,2,3,4,5,6,7,8].map(i => `<div class="slot-row"><span>Slot ${i}</span><span class="s${i}-val font-black">0</span></div>`).join('')}
+                        <div class="slot-row mt-2 bg-amber-50 p-1 rounded font-bold text-amber-700"><span>SOL</span><span class="s-sol-val">0</span></div>
                     </div>
                 </div>`).join('');
         }
 
         function procesarArchivo(input, tipo) {
             const file = input.files[0]; if (!file) return;
-            const slotSel = parseInt(document.getElementById('slot-selector').value);
-            if(tipo === 'slot' && slotCounters[slotSel] >= 2) { alert("Máximo 2 cargas por Slot."); return; }
-
             const reader = new FileReader();
             reader.onload = (e) => {
                 const data = new Uint8Array(e.target.result);
                 const wb = XLSX.read(data, {type:'array'});
                 const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
                 
-                json.forEach(row => {
-                    const rs = JSON.stringify(row).toUpperCase();
-                    let tEncontrada = null;
-                    if (rs.includes("HEREDIA ESTE")) tEncontrada = "Wm Heredia Este";
-                    else if (rs.includes("HEREDIA")) tEncontrada = "Wm Heredia";
-                    else allStores.forEach(l => { if (rs.includes(l.replace("Wm ", "").toUpperCase())) tEncontrada = l; });
+                json.forEach(fila => {
+                    const tRaw = fila["Tienda"] || fila["BATCH"] || fila["batch"] || "";
+                    const tEncontrada = tRaw.trim();
 
-                    if (tEncontrada) {
-                        if (!localData[tEncontrada]) localData[tEncontrada] = { slots: Array(8).fill(0), sol: 0 };
-                        if (tipo === 'solucion') localData[tEncontrada].sol++;
-                        else localData[tEncontrada].slots[slotSel-1]++;
-                        
-                        enviarANube(tEncontrada, (tipo === 'solucion' ? 'SOL' : slotSel), (tipo === 'solucion' ? localData[tEncontrada].sol : localData[tEncontrada].slots[slotSel-1]));
+                    if (allStores.includes(tEncontrada)) {
+                        if (tipo === 'anterior') {
+                            // LEER VALORES DIRECTOS (No contar filas)
+                            for (let i = 1; i <= 8; i++) {
+                                localData[tEncontrada].slots[i-1] = parseInt(fila[`Slot ${i}`]) || 0;
+                            }
+                            localData[tEncontrada].sol = parseInt(fila["Sol"] || fila["Soluciones"]) || 0;
+                        } else {
+                            // Conteo manual por fila (+1) para subidas de slot actual
+                            const slotSel = parseInt(document.getElementById('slot-selector').value);
+                            localData[tEncontrada].slots[slotSel-1] += 1;
+                        }
                     }
                 });
 
-                if(tipo === 'slot') slotCounters[slotSel]++;
-                localStorage.setItem('zubale_cache', JSON.stringify(localData));
-                localStorage.setItem('zubale_counters', JSON.stringify(slotCounters));
-                actualizarUI();
+                if(tipo === 'slot') {
+                    const slotSel = parseInt(document.getElementById('slot-selector').value);
+                    slotCounters[slotSel]++;
+                }
+                
+                saveData();
                 input.value = "";
-                alert("Carga finalizada con éxito.");
+                alert("Dashboard actualizado con los datos del archivo.");
             };
             reader.readAsArrayBuffer(file);
         }
 
-        function enviarANube(tienda, slot, valor) {
-            fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ fecha: document.getElementById('fecha-selector').value, tienda, slot, valor, counters: slotCounters }) });
+        function saveData() {
+            localStorage.setItem('zubale_cache', JSON.stringify(localData));
+            localStorage.setItem('zubale_counters', JSON.stringify(slotCounters));
+            actualizarUI();
+        }
+
+        function actualizarUI() {
+            let b1 = 0, b2 = 0, sol = 0;
+            allStores.forEach(loc => {
+                const info = localData[loc];
+                const sSum = info.slots.reduce((a,b)=>a+b,0);
+                if(batch1.includes(loc)) b1 += sSum; else b2 += sSum;
+                sol += info.sol;
+
+                const card = document.querySelector(`[data-location="${loc}"]`);
+                if(card) {
+                    card.querySelector('.store-total-val').innerText = sSum + info.sol;
+                    info.slots.forEach((v, i) => { card.querySelector(`.s${i+1}-val`).innerText = v; });
+                    card.querySelector('.s-sol-val').innerText = info.sol;
+                }
+            });
+            document.getElementById('total-b1').innerText = b1;
+            document.getElementById('total-b2').innerText = b2;
+            document.getElementById('total-sols').innerText = sol;
+            document.getElementById('gran-total').innerText = b1 + b2 + sol;
+            verificarBloqueo();
         }
 
         function verificarBloqueo() {
@@ -247,20 +180,13 @@
 
         function descargarExcelLocal() {
             const rows = allStores.map(loc => {
-                const d = localData[loc] || {slots: Array(8).fill(0), sol:0};
+                const d = localData[loc];
                 return { Tienda: loc, ...d.slots.reduce((acc, v, i) => ({...acc, [`Slot ${i+1}`]: v}), {}), Sol: d.sol, Total: d.slots.reduce((a,b)=>a+b,0)+d.sol };
             });
-            const ws = XLSX.utils.json_to_sheet(rows);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Diario");
-            XLSX.writeFile(wb, `Zubale_Control_${document.getElementById('fecha-selector').value}.xlsx`);
+            XLSX.writeFile(XLSX.utils.book_new(), `Zubale_Control_CR.xlsx`);
         }
 
-        function cambiarFecha() { localStorage.removeItem('zubale_cache'); location.reload(); }
-        function limpiarDatosDia() { if(confirm("¿Borrar datos de hoy?")){ localStorage.clear(); location.reload(); } }
-        function solicitarReporteNube(tipo) { window.open(`${WEB_APP_URL}?action=REPORT&type=${tipo}&fecha=${document.getElementById('fecha-reporte').value}`, '_blank'); }
-
-        init();
+        function limpiarTodo() { if(confirm("¿Reiniciar dashboard?")){ localStorage.clear(); location.reload(); } }
     </script>
 </body>
 </html>
