@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Zubale Control - V9.8 Conteo Real</title>
+    <title>Zubale Control - V10.1 Soluciones</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet"/>
@@ -21,6 +21,7 @@
 
         .btn-blue { background: #2563eb; color: white; }
         .btn-black { background: #1e293b; color: white; }
+        .btn-amber { background: #f59e0b; color: white; }
         .btn-emerald { background: #10b981; color: white; }
         .btn-red-outline { background: white; color: #ef4444; border: 2px solid #fee2e2; }
 
@@ -38,7 +39,7 @@
             <div class="bg-blue-600 p-3 rounded-lg shadow-md"><span class="text-white font-black text-2xl">Z</span></div>
             <div>
                 <h1 class="text-2xl font-black text-blue-600 uppercase tracking-tighter leading-none">Zubale Control</h1>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Costa Rica • Gestión de Producción</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Costa Rica • Gestión Operativa</p>
             </div>
         </div>
         <input type="date" id="fecha-selector" class="border-2 rounded-xl p-2 font-bold text-slate-700 outline-none border-blue-50">
@@ -59,17 +60,25 @@
         </div>
         <div class="stat-card bg-black text-white shadow-2xl border-none">
             <h3 class="text-[10px] font-black uppercase tracking-widest text-blue-400">CONTADOR GENERAL</h3>
-            <p id="gran-total" class="text-5xl font-black mt-2 text-">0</p>
+            <p id="gran-total" class="text-5xl font-black mt-2 text-white">0</p>
         </div>
     </div>
 
     <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
         <div class="stat-card">
             <h3 class="text-[11px] font-black text-slate-400 uppercase mb-4 tracking-widest italic">Panel de Control</h3>
-            <div class="relative mb-4">
-                <div class="btn-base btn-black">📥 Inyectar Turno Anterior</div>
-                <input type="file" onchange="inyectarTurno(this)" accept=".xlsx, .xls" class="absolute inset-0 opacity-0 cursor-pointer">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div class="relative">
+                    <div class="btn-base btn-black">📥 Inyectar Turno Anterior</div>
+                    <input type="file" onchange="inyectarTurno(this)" accept=".xlsx, .xls" class="absolute inset-0 opacity-0 cursor-pointer">
+                </div>
+                <div class="relative">
+                    <div class="btn-base btn-amber">🧪 Cargar Soluciones</div>
+                    <input type="file" onchange="procesarSoluciones(this)" accept=".xlsx, .xls" class="absolute inset-0 opacity-0 cursor-pointer">
+                </div>
             </div>
+
             <div class="flex gap-4">
                 <select id="slot-selector" onchange="actualizarEstadoBoton()" class="w-1/3 rounded-xl border-2 border-slate-100 px-3 font-bold text-sm outline-none focus:border-blue-500">
                     <option value="1">SLOT 1</option><option value="2">SLOT 2</option><option value="3">SLOT 3</option><option value="4">SLOT 4</option>
@@ -115,7 +124,7 @@
                         <span class="store-total-val text-2xl font-black text-blue-600 leading-none">0</span>
                     </div>
                     <div class="space-y-1">
-                        ${[1,2,3,4,5,6,7,8].map(i => `<div class="slot-row"><span>Slot ${i}</span><span class="s${i}-val font-black">0</span></div>`).join('')}
+                        ${[1,2,3,4,5,6,7,8].map(i => `<div class="slot-row"><span>Slot ${i}</span><span class="s${i}-val font-black text-slate-600">0</span></div>`).join('')}
                         <div class="slot-row mt-4 bg-amber-50 p-2 rounded-lg font-bold text-amber-600 border border-amber-100"><span>SOL</span><span class="s-sol-val">0</span></div>
                     </div>
                 </div>`).join('');
@@ -138,7 +147,28 @@
                 });
                 guardar();
                 input.value = "";
-                alert("Turno inyectado y contabilizado.");
+                alert("Turno anterior inyectado.");
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function procesarSoluciones(input) {
+            const file = input.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
+                const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                data.forEach(fila => {
+                    const str = JSON.stringify(fila).toUpperCase();
+                    let tE = null;
+                    if(str.includes("HEREDIA ESTE")) tE = "Wm Heredia Este";
+                    else if(str.includes("HEREDIA")) tE = "Wm Heredia";
+                    else allStores.forEach(s => { if(str.includes(s.replace("Wm ", "").toUpperCase())) tE = s; });
+                    if (tE) db[tE].sol++;
+                });
+                guardar();
+                input.value = "";
+                alert("Soluciones procesadas y sumadas al total.");
             };
             reader.readAsArrayBuffer(file);
         }
@@ -146,25 +176,19 @@
         function procesarSlotIndividual(input) {
             const slotSel = parseInt(document.getElementById('slot-selector').value);
             if (locks[slotSel] >= 2) return;
-
             const file = input.files[0]; if (!file) return;
             const reader = new FileReader();
             reader.onload = (e) => {
                 const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
                 const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                
-                // Procesamos el archivo sumando al conteo actual del slot
                 data.forEach(fila => {
                     const str = JSON.stringify(fila).toUpperCase();
                     let tE = null;
                     if(str.includes("HEREDIA ESTE")) tE = "Wm Heredia Este";
                     else if(str.includes("HEREDIA")) tE = "Wm Heredia";
-                    else allStores.forEach(s => { 
-                        if(str.includes(s.replace("Wm ", "").toUpperCase())) tE = s; 
-                    });
+                    else allStores.forEach(s => { if(str.includes(s.replace("Wm ", "").toUpperCase())) tE = s; });
                     if (tE) db[tE].slots[slotSel-1]++;
                 });
-
                 locks[slotSel]++;
                 guardar();
                 input.value = "";
