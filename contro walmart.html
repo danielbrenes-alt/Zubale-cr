@@ -3,91 +3,66 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Zubale Control - V10.1 Soluciones</title>
+    <title>Zubale Control - Walmart V10.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <style>
         :root {
-            --bg: #f8fafc; --card: white; --text: #1e293b; --border: #e2e8f0;
-            --primary: #2563eb; --accent: #1e293b; --neon: #2563eb;
-        }
-
-        .dark-mode {
             --bg: #020c1b; --card: #0a192f; --text: #e6f1ff; --border: #233554;
             --primary: #00ff41; --accent: #112240; --neon: #00ff41;
         }
-
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); transition: all 0.3s ease; }
-        
         .btn-logout {
-            display: flex; align-items: center; gap: 6px;
-            background: rgba(239, 68, 68, 0.08);
-            color: #ef4444; padding: 6px 14px; border-radius: 8px;
-            font-size: 10px; font-weight: 900; text-transform: uppercase;
-            letter-spacing: 1px; border: 1px solid rgba(239, 68, 68, 0.2);
-            cursor: pointer; transition: all 0.2s ease;
+            display: flex; align-items: center; gap: 6px; background: rgba(239, 68, 68, 0.1);
+            color: #ef4444; padding: 6px 14px; border-radius: 8px; font-size: 10px; font-weight: 900;
+            text-transform: uppercase; border: 1px solid rgba(239, 68, 68, 0.2); cursor: pointer;
         }
         .btn-logout:hover { background: #ef4444; color: white; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
-
-        .stat-card { background: var(--card); border-radius: 12px; padding: 1.5rem; border: 1px solid var(--border); height: 100%; transition: all 0.2s ease; }
-        .btn-base { padding: 12px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; text-align: center; width: 100%; display: block; border: none; transition: all 0.2s ease-in-out; }
-        .btn-base:hover { transform: translateY(-3px); filter: brightness(1.1); }
-
-        .btn-blue { background: var(--primary); color: var(--bg); }
-        .btn-black { background: var(--accent); color: var(--text); border: 1px solid var(--border); }
+        .stat-card { background: var(--card); border-radius: 12px; padding: 1.5rem; border: 1px solid var(--border); transition: 0.2s; }
+        .btn-base { padding: 12px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; width: 100%; border: none; transition: 0.2s; }
+        .btn-blue { background: #2563eb; color: white; }
         .btn-amber { background: transparent; color: #f59e0b; border: 1px solid #f59e0b; }
         .btn-emerald { background: transparent; color: var(--neon); border: 1px solid var(--neon); }
-        .btn-red-outline { background: transparent; color: #ef4444; border: 1px solid #ef4444; }
-
         .slot-row { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 6px 0; border-bottom: 1px solid var(--border); }
-        .store-header { border-bottom: 2px solid var(--border); margin-bottom: 1rem; padding-bottom: 0.5rem; }
-        
-        .bg-neon { background: var(--neon) !important; }
-        input[type="date"], select { background: var(--accent); border: 1px solid var(--border); color: var(--text); border-radius: 10px; padding: 8px; font-weight: 700; }
-        .theme-toggle { cursor: pointer; width: 40px; height: 40px; border-radius: 10px; background: var(--accent); display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); }
+        input, select { background: var(--accent); border: 1px solid var(--border); color: white; border-radius: 8px; padding: 8px; font-weight: 700; }
     </style>
 </head>
-<body class="p-4 md:p-10 dark-mode" id="body-tag" onload="init()">
+<body class="p-4 md:p-10" onload="init()">
 
     <div class="max-w-7xl mx-auto">
         <header class="mb-8 flex justify-between items-center stat-card shadow-sm">
             <div class="flex items-center gap-4">
-                <div class="bg-neon p-3 rounded-lg"><span class="text-[#020c1b] font-black text-2xl">Z</span></div>
+                <div class="bg-[#00ff41] p-3 rounded-lg"><span class="text-[#020c1b] font-black text-2xl">Z</span></div>
                 <div>
-                    <h1 class="text-2xl font-black text-neon uppercase tracking-tighter leading-none">Zubale Control</h1>
-                    <p class="text-[10px] font-bold opacity-50 uppercase tracking-widest mt-1 italic">Costa Rica • Gestión Operativa</p>
+                    <h1 class="text-2xl font-black text-[#00ff41] uppercase tracking-tighter">Zubale Control</h1>
+                    <p class="text-[10px] font-bold opacity-50 uppercase tracking-widest italic">Walmart Costa Rica</p>
                 </div>
             </div>
-
             <div class="flex items-center gap-4">
                 <button onclick="window.location.href='index.html'" class="btn-logout">
-                    <span class="material-symbols-outlined" style="font-size: 14px;">logout</span>
-                    Cerrar Sesión
+                    <span class="material-symbols-outlined" style="font-size: 14px;">home</span> INICIO
                 </button>
                 <input type="date" id="fecha-selector">
-                <div class="theme-toggle" onclick="toggleTheme()">
-                    <span class="material-symbols-outlined" id="theme-icon">light_mode</span>
-                </div>
             </div>
         </header>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-center">
             <div class="stat-card" style="border-top: 4px solid var(--neon);">
-                <h3 class="text-[10px] font-black uppercase tracking-widest opacity-60">Batch 1</h3>
+                <h3 class="text-[10px] font-black uppercase opacity-60">Batch 1</h3>
                 <p id="total-b1" class="text-4xl font-black mt-2">0</p>
             </div>
             <div class="stat-card" style="border-top: 4px solid #b388ff;">
-                <h3 class="text-[10px] font-black uppercase tracking-widest opacity-60">Batch 2</h3>
+                <h3 class="text-[10px] font-black uppercase opacity-60">Batch 2</h3>
                 <p id="total-b2" class="text-4xl font-black mt-2">0</p>
             </div>
             <div class="stat-card" style="border-top: 4px solid #f59e0b;">
-                <h3 class="text-[10px] font-black uppercase tracking-widest opacity-60">Soluciones</h3>
+                <h3 class="text-[10px] font-black uppercase opacity-60">Soluciones</h3>
                 <p id="total-sols" class="text-4xl font-black mt-2">0</p>
             </div>
-            <div class="stat-card bg-neon text-[#020c1b]" style="border: none;">
-                <h3 class="text-[10px] font-black uppercase tracking-widest opacity-70">CONTADOR GENERAL</h3>
+            <div class="stat-card bg-[#00ff41] text-[#020c1b]">
+                <h3 class="text-[10px] font-black uppercase opacity-70">TOTAL GENERAL</h3>
                 <p id="gran-total" class="text-5xl font-black mt-2">0</p>
             </div>
         </div>
@@ -97,7 +72,7 @@
                 <h3 class="text-[11px] font-black opacity-40 uppercase mb-4 tracking-widest italic">Panel de Control</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div class="relative">
-                        <div class="btn-base btn-black">Inyectar Turno Anterior</div>
+                        <div class="btn-base bg-slate-800 text-white">Inyectar Turno Anterior</div>
                         <input type="file" onchange="inyectarTurno(this)" accept=".xlsx, .xls" class="absolute inset-0 opacity-0 cursor-pointer">
                     </div>
                     <div class="relative">
@@ -120,7 +95,7 @@
 
             <div class="stat-card flex flex-col justify-center gap-4">
                 <button onclick="exportarExcel()" class="btn-base btn-emerald">Descargar Reporte Hoy (.xlsx)</button>
-                <button onclick="limpiarTodo()" class="btn-base btn-red-outline">Reiniciar Dashboard</button>
+                <button onclick="limpiarTodo()" class="btn-base border border-red-500 text-red-500">Reiniciar Dashboard</button>
             </div>
         </div>
 
@@ -135,31 +110,23 @@
         let locks = JSON.parse(localStorage.getItem('zubale_locks')) || {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0};
 
         function init() {
-            const hoy = new Date().toISOString().split('T')[0];
-            document.getElementById('fecha-selector').value = hoy;
+            document.getElementById('fecha-selector').value = new Date().toISOString().split('T')[0];
             allStores.forEach(s => { if(!db[s]) db[s] = { slots: Array(8).fill(0), sol: 0 }; });
             renderTiendas();
             actualizarUI();
             actualizarEstadoBoton();
         }
 
-        function toggleTheme() {
-            const body = document.getElementById('body-tag');
-            const icon = document.getElementById('theme-icon');
-            body.classList.toggle('dark-mode');
-            icon.innerText = body.classList.contains('dark-mode') ? 'light_mode' : 'dark_mode';
-        }
-
         function renderTiendas() {
             document.getElementById('tiendas-container').innerHTML = allStores.map(name => `
                 <div class="stat-card" data-location="${name}">
-                    <div class="flex justify-between items-center store-header">
-                        <h4 class="font-black uppercase text-[10px] tracking-tighter opacity-60">${name}</h4>
-                        <span class="store-total-val text-2xl font-black text-neon leading-none">0</span>
+                    <div class="flex justify-between items-center border-b border-border pb-2 mb-2">
+                        <h4 class="font-black uppercase text-[10px] opacity-60">${name}</h4>
+                        <span class="store-total-val text-2xl font-black text-[#00ff41]">0</span>
                     </div>
                     <div class="space-y-1">
-                        ${[1,2,3,4,5,6,7,8].map(i => `<div class="slot-row"><span>Slot ${i}</span><span class="s${i}-val font-black opacity-80">0</span></div>`).join('')}
-                        <div class="slot-row mt-4 bg-accent p-2 rounded-lg font-bold text-amber-500 border border-border"><span>SOL</span><span class="s-sol-val">0</span></div>
+                        ${[1,2,3,4,5,6,7,8].map(i => `<div class="slot-row"><span>Slot ${i}</span><span class="s${i}-val opacity-80">0</span></div>`).join('')}
+                        <div class="slot-row mt-4 bg-slate-900 p-2 rounded-lg font-bold text-amber-500 border border-border"><span>SOL</span><span class="s-sol-val">0</span></div>
                     </div>
                 </div>`).join('');
         }
@@ -168,66 +135,50 @@
             const file = input.files[0]; if (!file) return;
             const reader = new FileReader();
             reader.onload = (e) => {
-                const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
-                const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                const data = XLSX.utils.sheet_to_json(XLSX.read(e.target.result, {type:'array'}).Sheets[0]);
                 data.forEach(fila => {
                     const tienda = fila["Tienda"] || fila["TIENDA"];
                     if (db[tienda]) {
-                        for (let i = 1; i <= 8; i++) {
-                            db[tienda].slots[i-1] += parseInt(fila[`Slot ${i}`] || fila[`SLOT ${i}`]) || 0;
-                        }
-                        db[tienda].sol += parseInt(fila["Sol"] || fila["SOLUCIONES"]) || 0;
+                        for (let i = 1; i <= 8; i++) db[tienda].slots[i-1] += parseInt(fila[`Slot ${i}`] || 0);
+                        db[tienda].sol += parseInt(fila["Sol"] || 0);
                     }
                 });
                 guardar();
-                input.value = "";
-                alert("Turno anterior inyectado.");
+                alert("Turno inyectado.");
             };
             reader.readAsArrayBuffer(file);
         }
 
         function procesarSoluciones(input) {
-            const file = input.files[0]; if (!file) return;
             const reader = new FileReader();
             reader.onload = (e) => {
-                const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
-                const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                const data = XLSX.utils.sheet_to_json(XLSX.read(e.target.result, {type:'array'}).Sheets[0]);
                 data.forEach(fila => {
                     const str = JSON.stringify(fila).toUpperCase();
-                    let tE = null;
-                    if(str.includes("HEREDIA ESTE")) tE = "Wm Heredia Este";
-                    else if(str.includes("HEREDIA")) tE = "Wm Heredia";
-                    else allStores.forEach(s => { if(str.includes(s.replace("Wm ", "").toUpperCase())) tE = s; });
+                    let tE = allStores.find(s => str.includes(s.replace("Wm ", "").toUpperCase()));
                     if (tE) db[tE].sol++;
                 });
                 guardar();
-                input.value = "";
-                alert("Soluciones procesadas.");
+                alert("Soluciones cargadas.");
             };
-            reader.readAsArrayBuffer(file);
+            reader.readAsArrayBuffer(input.files[0]);
         }
 
         function procesarSlotIndividual(input) {
             const slotSel = parseInt(document.getElementById('slot-selector').value);
             if (locks[slotSel] >= 2) return;
-            const file = input.files[0]; if (!file) return;
             const reader = new FileReader();
             reader.onload = (e) => {
-                const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
-                const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                const data = XLSX.utils.sheet_to_json(XLSX.read(e.target.result, {type:'array'}).Sheets[0]);
                 data.forEach(fila => {
                     const str = JSON.stringify(fila).toUpperCase();
-                    let tE = null;
-                    if(str.includes("HEREDIA ESTE")) tE = "Wm Heredia Este";
-                    else if(str.includes("HEREDIA")) tE = "Wm Heredia";
-                    else allStores.forEach(s => { if(str.includes(s.replace("Wm ", "").toUpperCase())) tE = s; });
+                    let tE = allStores.find(s => str.includes(s.replace("Wm ", "").toUpperCase()));
                     if (tE) db[tE].slots[slotSel-1]++;
                 });
                 locks[slotSel]++;
                 guardar();
-                input.value = "";
             };
-            reader.readAsArrayBuffer(file);
+            reader.readAsArrayBuffer(input.files[0]);
         }
 
         function guardar() {
@@ -240,15 +191,14 @@
         function actualizarUI() {
             let b1 = 0, b2 = 0, sol = 0;
             allStores.forEach(loc => {
-                const info = db[loc];
-                const sSum = info.slots.reduce((a,b)=>a+b,0);
+                const sSum = db[loc].slots.reduce((a,b)=>a+b,0);
                 if(batch1.includes(loc)) b1 += sSum; else b2 += sSum;
-                sol += info.sol;
+                sol += db[loc].sol;
                 const card = document.querySelector(`[data-location="${loc}"]`);
                 if(card) {
-                    card.querySelector('.store-total-val').innerText = sSum + info.sol;
-                    info.slots.forEach((v, i) => { card.querySelector(`.s${i+1}-val`).innerText = v; });
-                    card.querySelector('.s-sol-val').innerText = info.sol;
+                    card.querySelector('.store-total-val').innerText = sSum + db[loc].sol;
+                    db[loc].slots.forEach((v, i) => card.querySelector(`.s${i+1}-val`).innerText = v);
+                    card.querySelector('.s-sol-val').innerText = db[loc].sol;
                 }
             });
             document.getElementById('total-b1').innerText = b1;
@@ -259,15 +209,15 @@
 
         function actualizarEstadoBoton() {
             const slot = document.getElementById('slot-selector').value;
-            const btn = document.getElementById('btn-label');
-            const input = document.getElementById('input-slot');
             const cargados = locks[slot] || 0;
             document.getElementById('msg-bloqueo').innerText = `Archivos en Slot ${slot}: ${cargados}/2`;
+            const btn = document.getElementById('btn-label');
             if (cargados >= 2) {
-                btn.className = "btn-base bg-red-600 text-white opacity-60 cursor-not-allowed";
-                btn.innerText = "BLOQUEADO"; input.disabled = true;
+                btn.className = "btn-base bg-red-600 opacity-50 cursor-not-allowed";
+                btn.innerText = "BLOQUEADO";
             } else {
-                btn.className = "btn-base btn-blue"; btn.innerText = "Subir Slot Seleccionado"; input.disabled = false;
+                btn.className = "btn-base btn-blue";
+                btn.innerText = "Subir Slot Seleccionado";
             }
         }
 
@@ -276,10 +226,10 @@
             const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Reporte");
-            XLSX.writeFile(wb, `Reporte_Zubale_${document.getElementById('fecha-selector').value}.xlsx`);
+            XLSX.writeFile(wb, `Reporte_Zubale.xlsx`);
         }
 
-        function limpiarTodo() { if(confirm("¿Borrar todo?")){ localStorage.clear(); location.reload(); } }
+        function limpiarTodo() { if(confirm("¿Reiniciar?")) { localStorage.clear(); location.reload(); } }
     </script>
 </body>
 </html>
