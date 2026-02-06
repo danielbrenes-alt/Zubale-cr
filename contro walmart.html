@@ -21,26 +21,15 @@
 
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); transition: all 0.3s ease; }
         
-        /* BOTÓN DE SALIDA ESTÉTICO */
         .btn-logout {
             display: flex; align-items: center; gap: 6px;
             background: rgba(239, 68, 68, 0.08);
-            color: #ef4444;
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 10px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            cursor: pointer;
-            transition: all 0.2s ease;
+            color: #ef4444; padding: 6px 14px; border-radius: 8px;
+            font-size: 10px; font-weight: 900; text-transform: uppercase;
+            letter-spacing: 1px; border: 1px solid rgba(239, 68, 68, 0.2);
+            cursor: pointer; transition: all 0.2s ease;
         }
-        .btn-logout:hover {
-            background: #ef4444;
-            color: white;
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
-        }
+        .btn-logout:hover { background: #ef4444; color: white; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
 
         .stat-card { background: var(--card); border-radius: 12px; padding: 1.5rem; border: 1px solid var(--border); height: 100%; transition: all 0.2s ease; }
         .btn-base { padding: 12px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; text-align: center; width: 100%; display: block; border: none; transition: all 0.2s ease-in-out; }
@@ -55,9 +44,7 @@
         .slot-row { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 6px 0; border-bottom: 1px solid var(--border); }
         .store-header { border-bottom: 2px solid var(--border); margin-bottom: 1rem; padding-bottom: 0.5rem; }
         
-        .text-neon { color: var(--neon) !important; }
         .bg-neon { background: var(--neon) !important; }
-
         input[type="date"], select { background: var(--accent); border: 1px solid var(--border); color: var(--text); border-radius: 10px; padding: 8px; font-weight: 700; }
         .theme-toggle { cursor: pointer; width: 40px; height: 40px; border-radius: 10px; background: var(--accent); display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); }
     </style>
@@ -215,7 +202,7 @@
                 });
                 guardar();
                 input.value = "";
-                alert("Soluciones procesadas y sumadas al total.");
+                alert("Soluciones procesadas.");
             };
             reader.readAsArrayBuffer(file);
         }
@@ -277,27 +264,22 @@
             const cargados = locks[slot] || 0;
             document.getElementById('msg-bloqueo').innerText = `Archivos en Slot ${slot}: ${cargados}/2`;
             if (cargados >= 2) {
-                btn.className = "btn-base btn-locked"; btn.innerText = "BLOQUEADO"; input.disabled = true;
+                btn.className = "btn-base bg-red-600 text-white opacity-60 cursor-not-allowed";
+                btn.innerText = "BLOQUEADO"; input.disabled = true;
             } else {
-                btn.className = "btn-base btn-blue"; btn.innerText = `Subir Slot ${slot}`; input.disabled = false;
+                btn.className = "btn-base btn-blue"; btn.innerText = "Subir Slot Seleccionado"; input.disabled = false;
             }
         }
 
         function exportarExcel() {
-            const fecha = document.getElementById('fecha-selector').value;
-            const data = allStores.map(loc => ({
-                "Tienda": loc,
-                ...db[loc].slots.reduce((acc, v, i) => ({...acc, [`Slot ${i+1}`]: v}), {}),
-                "Sol": db[loc].sol,
-                "Total": db[loc].slots.reduce((a,b)=>a+b,0) + db[loc].sol
-            }));
+            const data = allStores.map(loc => ({ "Tienda": loc, ...db[loc].slots.reduce((acc, v, i) => ({...acc, [`Slot ${i+1}`]: v}), {}), "Sol": db[loc].sol, "Total": db[loc].slots.reduce((a,b)=>a+b,0) + db[loc].sol }));
             const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Reporte");
-            XLSX.writeFile(wb, `Zubale_Control_${fecha}.xlsx`);
+            XLSX.writeFile(wb, `Reporte_Zubale_${document.getElementById('fecha-selector').value}.xlsx`);
         }
 
-        function limpiarTodo() { if(confirm("¿Borrar todo el Dashboard?")){ localStorage.clear(); location.reload(); } }
+        function limpiarTodo() { if(confirm("¿Borrar todo?")){ localStorage.clear(); location.reload(); } }
     </script>
 </body>
 </html>
