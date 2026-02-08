@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Zubale Control - Walmart V10.1</title>
+    <title>Zubale Control - Walmart V10.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet"/>
@@ -12,7 +12,7 @@
         :root { --bg: #020c1b; --card: #0a192f; --text: #e6f1ff; --border: #233554; --neon: #00ff41; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); }
         .stat-card { background: var(--card); border-radius: 12px; padding: 1.5rem; border: 1px solid var(--border); }
-        .btn-base { padding: 12px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; width: 100%; border: none; }
+        .btn-base { padding: 12px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; width: 100%; border: none; text-align: center; }
         .btn-blue { background: #2563eb; color: white; }
         .btn-logout { background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 6px 14px; border-radius: 8px; font-size: 10px; font-weight: 900; border: 1px solid rgba(239, 68, 68, 0.2); }
         .slot-row { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 6px 0; border-bottom: 1px solid var(--border); }
@@ -26,7 +26,7 @@
                 <div class="bg-[#00ff41] p-3 rounded-lg"><span class="text-[#020c1b] font-black text-2xl">Z</span></div>
                 <div>
                     <h1 class="text-2xl font-black text-[#00ff41] uppercase tracking-tighter">Zubale Control</h1>
-                    <p class="text-[10px] font-bold opacity-50 uppercase tracking-widest italic">Walmart Costa Rica</p>
+                    <p class="text-[10px] font-bold opacity-50 uppercase tracking-widest italic">Walmart Costa Rica - Fix V10.2</p>
                 </div>
             </div>
             <div class="flex items-center gap-4">
@@ -118,26 +118,20 @@
                 </div>`).join('');
         }
 
-        // LÓGICA DE BÚSQUEDA REFORZADA: ALMACÉN + ESTE
+        // --- LÓGICA DE BÚSQUEDA CORREGIDA PARA HEREDIA ESTE ---
         function buscarTiendaEnFila(fila) {
-            const textoFila = JSON.stringify(fila).toUpperCase().replace(/\s+/g, '');
-            
-            // Regla específica para Heredia
-            if (textoFila.includes("HEREDIA")) {
-                if (textoFila.includes("ESTE")) {
-                    return "Wm Heredia Este";
-                }
-                return "Wm Heredia";
-            }
+            // Buscamos específicamente en la columna TIENDA
+            const colTienda = (fila["TIENDA"] || fila["Tienda"] || "").toString().toUpperCase();
 
-            // Buscador para el resto de tiendas
-            const restoTiendas = allStores.filter(t => !t.includes("Heredia"));
-            for (let tienda of restoTiendas) {
-                const nombreLimpio = tienda.replace("Wm ", "").toUpperCase().replace(/\s+/g, '');
-                if (textoFila.includes(nombreLimpio)) {
-                    return tienda;
-                }
-            }
+            if (colTienda.includes("HEREDIA ESTE")) return "Wm Heredia Este";
+            if (colTienda.includes("HEREDIA")) return "Wm Heredia";
+            if (colTienda.includes("ALAJUELA")) return "Wm Alajuela";
+            if (colTienda.includes("TIBAS")) return "Wm Tibas";
+            if (colTienda.includes("ESCAZU")) return "Wm Escazu";
+            if (colTienda.includes("SANTA ANA")) return "Wm Santa Ana";
+            if (colTienda.includes("GUADALUPE")) return "Wm Guadalupe";
+            if (colTienda.includes("DESAMPARADOS")) return "Wm Desamparados";
+
             return null;
         }
 
@@ -149,13 +143,14 @@
                 const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
                 data.forEach(fila => {
                     const tE = buscarTiendaEnFila(fila);
-                    if (tE) {
+                    if (tE && (fila["ID"] || fila["PILOTO"])) {
                         for (let i = 1; i <= 8; i++) db[tE].slots[i-1] += parseInt(fila[`Slot ${i}`] || 0);
                         db[tE].sol += parseInt(fila["Sol"] || 0);
                     }
                 });
                 guardar();
-                alert("Turno inyectado correctamente.");
+                alert("Turno inyectado.");
+                input.value = "";
             };
             reader.readAsArrayBuffer(file);
         }
@@ -168,10 +163,11 @@
                 const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
                 data.forEach(fila => {
                     const tE = buscarTiendaEnFila(fila);
-                    if (tE) db[tE].sol++;
+                    if (tE && (fila["ID"] || fila["PILOTO"])) db[tE].sol++;
                 });
                 guardar();
                 alert("Soluciones cargadas.");
+                input.value = "";
             };
             reader.readAsArrayBuffer(file);
         }
@@ -185,11 +181,15 @@
                 const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
                 const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
                 data.forEach(fila => {
-                    const tE = buscarTiendaEnFila(fila);
-                    if (tE) db[tE].slots[slotSel-1]++;
+                    // Validamos que sea una fila con datos reales (ID o Piloto)
+                    if (fila["ID"] || fila["PILOTO"]) {
+                        const tE = buscarTiendaEnFila(fila);
+                        if (tE) db[tE].slots[slotSel-1]++;
+                    }
                 });
                 locks[slotSel]++;
                 guardar();
+                input.value = "";
             };
             reader.readAsArrayBuffer(file);
         }
