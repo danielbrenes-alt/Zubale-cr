@@ -118,6 +118,29 @@
                 </div>`).join('');
         }
 
+        // LÓGICA DE BÚSQUEDA REFORZADA: ALMACÉN + ESTE
+        function buscarTiendaEnFila(fila) {
+            const textoFila = JSON.stringify(fila).toUpperCase().replace(/\s+/g, '');
+            
+            // Regla específica para Heredia
+            if (textoFila.includes("HEREDIA")) {
+                if (textoFila.includes("ESTE")) {
+                    return "Wm Heredia Este";
+                }
+                return "Wm Heredia";
+            }
+
+            // Buscador para el resto de tiendas
+            const restoTiendas = allStores.filter(t => !t.includes("Heredia"));
+            for (let tienda of restoTiendas) {
+                const nombreLimpio = tienda.replace("Wm ", "").toUpperCase().replace(/\s+/g, '');
+                if (textoFila.includes(nombreLimpio)) {
+                    return tienda;
+                }
+            }
+            return null;
+        }
+
         function inyectarTurno(input) {
             const file = input.files[0]; if (!file) return;
             const reader = new FileReader();
@@ -125,14 +148,14 @@
                 const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
                 const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
                 data.forEach(fila => {
-                    const tienda = fila["Tienda"] || fila["TIENDA"];
-                    if (db[tienda]) {
-                        for (let i = 1; i <= 8; i++) db[tienda].slots[i-1] += parseInt(fila[`Slot ${i}`] || 0);
-                        db[tienda].sol += parseInt(fila["Sol"] || 0);
+                    const tE = buscarTiendaEnFila(fila);
+                    if (tE) {
+                        for (let i = 1; i <= 8; i++) db[tE].slots[i-1] += parseInt(fila[`Slot ${i}`] || 0);
+                        db[tE].sol += parseInt(fila["Sol"] || 0);
                     }
                 });
                 guardar();
-                alert("Turno inyectado.");
+                alert("Turno inyectado correctamente.");
             };
             reader.readAsArrayBuffer(file);
         }
@@ -144,8 +167,7 @@
                 const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
                 const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
                 data.forEach(fila => {
-                    const str = JSON.stringify(fila).toUpperCase();
-                    let tE = allStores.find(s => str.includes(s.replace("Wm ", "").toUpperCase()));
+                    const tE = buscarTiendaEnFila(fila);
                     if (tE) db[tE].sol++;
                 });
                 guardar();
@@ -163,8 +185,7 @@
                 const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
                 const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
                 data.forEach(fila => {
-                    const str = JSON.stringify(fila).toUpperCase();
-                    let tE = allStores.find(s => str.includes(s.replace("Wm ", "").toUpperCase()));
+                    const tE = buscarTiendaEnFila(fila);
                     if (tE) db[tE].slots[slotSel-1]++;
                 });
                 locks[slotSel]++;
