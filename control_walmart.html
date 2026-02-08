@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Zubale Control - Walmart V10.2</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Zubale Control - Walmart V10.4</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <style>
@@ -26,7 +26,7 @@
                 <div class="bg-[#00ff41] p-3 rounded-lg"><span class="text-[#020c1b] font-black text-2xl">Z</span></div>
                 <div>
                     <h1 class="text-2xl font-black text-[#00ff41] uppercase tracking-tighter">Zubale Control</h1>
-                    <p class="text-[10px] font-bold opacity-50 uppercase tracking-widest italic">Walmart Costa Rica - Fix V10.2</p>
+                    <p class="text-[10px] font-bold opacity-50 uppercase tracking-widest italic">Walmart Costa Rica - Fix V10.4</p>
                 </div>
             </div>
             <div class="flex items-center gap-4">
@@ -62,11 +62,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div class="relative">
                         <div class="btn-base bg-slate-800 text-white">Inyectar Turno Anterior</div>
-                        <input type="file" onchange="inyectarTurno(this)" accept=".xlsx, .xls" class="absolute inset-0 opacity-0 cursor-pointer">
+                        <input type="file" onchange="inyectarTurno(this)" accept=".xlsx, .xls, .csv" class="absolute inset-0 opacity-0 cursor-pointer">
                     </div>
                     <div class="relative">
                         <div class="btn-base bg-orange-600 text-white">Cargar Soluciones</div>
-                        <input type="file" onchange="procesarSoluciones(this)" accept=".xlsx, .xls" class="absolute inset-0 opacity-0 cursor-pointer">
+                        <input type="file" onchange="procesarSoluciones(this)" accept=".xlsx, .xls, .csv" class="absolute inset-0 opacity-0 cursor-pointer">
                     </div>
                 </div>
                 <div class="flex gap-4">
@@ -76,7 +76,7 @@
                     </select>
                     <div class="flex-1 relative">
                         <div id="btn-label" class="btn-base btn-blue">Subir Slot Seleccionado</div>
-                        <input type="file" id="input-slot" onchange="procesarSlotIndividual(this)" accept=".xlsx, .xls" class="absolute inset-0 opacity-0 cursor-pointer">
+                        <input type="file" id="input-slot" onchange="procesarSlotIndividual(this)" accept=".xlsx, .xls, .csv" class="absolute inset-0 opacity-0 cursor-pointer">
                     </div>
                 </div>
                 <p id="msg-bloqueo" class="text-[10px] font-bold opacity-40 uppercase mt-2 text-center tracking-tighter">Archivos en Slot: 0/2</p>
@@ -106,33 +106,59 @@
 
         function renderTiendas() {
             document.getElementById('tiendas-container').innerHTML = allStores.map(name => `
-                <div class="stat-card" data-location="${name}">
+                <div class="stat-card">
                     <div class="flex justify-between items-center border-b border-border pb-2 mb-2">
                         <h4 class="font-black uppercase text-[10px] opacity-60">${name}</h4>
-                        <span class="store-total-val text-2xl font-black text-[#00ff41]">${db[name].slots.reduce((a,b)=>a+b,0) + db[name].sol}</span>
+                        <span class="text-2xl font-black text-[#00ff41]">${db[name].slots.reduce((a,b)=>a+b,0) + db[name].sol}</span>
                     </div>
                     <div class="space-y-1">
-                        ${[1,2,3,4,5,6,7,8].map((v, i) => `<div class="slot-row"><span>Slot ${i+1}</span><span class="opacity-80">${db[name].slots[i]}</span></div>`).join('')}
+                        ${db[name].slots.map((val, i) => `<div class="slot-row"><span>Slot ${i+1}</span><span class="opacity-80">${val}</span></div>`).join('')}
                         <div class="slot-row mt-4 bg-slate-900 p-2 rounded-lg font-bold text-orange-500"><span>SOL</span><span>${db[name].sol}</span></div>
                     </div>
                 </div>`).join('');
         }
 
-        // --- LÓGICA DE BÚSQUEDA CORREGIDA PARA HEREDIA ESTE ---
         function buscarTiendaEnFila(fila) {
-            // Buscamos específicamente en la columna TIENDA
-            const colTienda = (fila["TIENDA"] || fila["Tienda"] || "").toString().toUpperCase();
-
-            if (colTienda.includes("HEREDIA ESTE")) return "Wm Heredia Este";
-            if (colTienda.includes("HEREDIA")) return "Wm Heredia";
-            if (colTienda.includes("ALAJUELA")) return "Wm Alajuela";
-            if (colTienda.includes("TIBAS")) return "Wm Tibas";
-            if (colTienda.includes("ESCAZU")) return "Wm Escazu";
-            if (colTienda.includes("SANTA ANA")) return "Wm Santa Ana";
-            if (colTienda.includes("GUADALUPE")) return "Wm Guadalupe";
-            if (colTienda.includes("DESAMPARADOS")) return "Wm Desamparados";
-
+            const txt = Object.values(fila).join("|").toUpperCase();
+            if (txt.includes("HEREDIA ESTE")) return "Wm Heredia Este";
+            if (txt.includes("HEREDIA")) return "Wm Heredia";
+            if (txt.includes("ALAJUELA")) return "Wm Alajuela";
+            if (txt.includes("TIBAS") || txt.includes("TIBÁS")) return "Wm Tibas";
+            if (txt.includes("ESCAZU") || txt.includes("ESCAZÚ")) return "Wm Escazu";
+            if (txt.includes("SANTA ANA")) return "Wm Santa Ana";
+            if (txt.includes("GUADALUPE")) return "Wm Guadalupe";
+            if (txt.includes("DESAMPARADOS")) return "Wm Desamparados";
             return null;
+        }
+
+        function procesarArchivoGeneral(input, tipo, slotIdx = null) {
+            const file = input.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
+                const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                let count = 0;
+
+                data.forEach(fila => {
+                    const tE = buscarTiendaEnFila(fila);
+                    if (tE) {
+                        if (tipo === 'slots' && slotIdx !== null) {
+                            db[tE].slots[slotIdx]++;
+                        } else {
+                            db[tE].sol++;
+                        }
+                        count++;
+                    }
+                });
+
+                if (tipo === 'slots' && slotIdx !== null && count > 0) {
+                    locks[slotIdx + 1]++;
+                }
+                guardar();
+                alert(`Completado: ${count} registros procesados.`);
+                input.value = "";
+            };
+            reader.readAsArrayBuffer(file);
         }
 
         function inyectarTurno(input) {
@@ -143,55 +169,28 @@
                 const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
                 data.forEach(fila => {
                     const tE = buscarTiendaEnFila(fila);
-                    if (tE && (fila["ID"] || fila["PILOTO"])) {
-                        for (let i = 1; i <= 8; i++) db[tE].slots[i-1] += parseInt(fila[`Slot ${i}`] || 0);
-                        db[tE].sol += parseInt(fila["Sol"] || 0);
+                    if (tE) {
+                        for (let i = 1; i <= 8; i++) {
+                            db[tE].slots[i-1] += parseInt(fila[`Slot ${i}`] || fila[`SLOT ${i}`] || 0);
+                        }
+                        db[tE].sol += parseInt(fila["Sol"] || fila["SOL"] || 0);
                     }
                 });
                 guardar();
-                alert("Turno inyectado.");
+                alert("Reporte inyectado.");
                 input.value = "";
             };
             reader.readAsArrayBuffer(file);
         }
 
         function procesarSoluciones(input) {
-            const file = input.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
-                const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                data.forEach(fila => {
-                    const tE = buscarTiendaEnFila(fila);
-                    if (tE && (fila["ID"] || fila["PILOTO"])) db[tE].sol++;
-                });
-                guardar();
-                alert("Soluciones cargadas.");
-                input.value = "";
-            };
-            reader.readAsArrayBuffer(file);
+            procesarArchivoGeneral(input, 'sol');
         }
 
         function procesarSlotIndividual(input) {
             const slotSel = parseInt(document.getElementById('slot-selector').value);
             if (locks[slotSel] >= 2) return;
-            const file = input.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
-                const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                data.forEach(fila => {
-                    // Validamos que sea una fila con datos reales (ID o Piloto)
-                    if (fila["ID"] || fila["PILOTO"]) {
-                        const tE = buscarTiendaEnFila(fila);
-                        if (tE) db[tE].slots[slotSel-1]++;
-                    }
-                });
-                locks[slotSel]++;
-                guardar();
-                input.value = "";
-            };
-            reader.readAsArrayBuffer(file);
+            procesarArchivoGeneral(input, 'slots', slotSel - 1);
         }
 
         function guardar() {
@@ -230,11 +229,16 @@
         }
 
         function exportarExcel() {
-            const data = allStores.map(loc => ({ "Tienda": loc, ...db[loc].slots.reduce((acc, v, i) => ({...acc, [`Slot ${i+1}`]: v}), {}), "Sol": db[loc].sol, "Total": db[loc].slots.reduce((a,b)=>a+b,0) + db[loc].sol }));
+            const data = allStores.map(loc => ({
+                "Tienda": loc, 
+                ...db[loc].slots.reduce((acc, v, i) => ({...acc, [`Slot ${i+1}`]: v}), {}), 
+                "Sol": db[loc].sol, 
+                "Total": db[loc].slots.reduce((a,b)=>a+b,0) + db[loc].sol 
+            }));
             const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Reporte");
-            XLSX.writeFile(wb, "Reporte_Zubale.xlsx");
+            XLSX.writeFile(wb, `Zubale_Control_${new Date().toISOString().split('T')[0]}.xlsx`);
         }
 
         function limpiarTodo() { if(confirm("¿Reiniciar todo?")) { localStorage.clear(); location.reload(); } }
