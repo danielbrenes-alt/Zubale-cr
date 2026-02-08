@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Zubale Control - Walmart V10.4</title>
+    <title>Zubale Control - Walmart V10.4 LOCAL</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet"/>
@@ -26,12 +26,12 @@
                 <div class="bg-[#00ff41] p-3 rounded-lg"><span class="text-[#020c1b] font-black text-2xl">Z</span></div>
                 <div>
                     <h1 class="text-2xl font-black text-[#00ff41] uppercase tracking-tighter">Zubale Control</h1>
-                    <p class="text-[10px] font-bold opacity-50 uppercase tracking-widest italic">Walmart Costa Rica - Fix V10.4</p>
+                    <p class="text-[10px] font-bold opacity-50 uppercase tracking-widest italic">Walmart Costa Rica - MODO LOCAL</p>
                 </div>
             </div>
             <div class="flex items-center gap-4">
-                <button onclick="window.location.href='index.html'" class="btn-logout flex items-center gap-2">
-                    <span class="material-symbols-outlined" style="font-size: 14px;">home</span> INICIO
+                <button onclick="window.location.reload()" class="btn-logout flex items-center gap-2">
+                    <span class="material-symbols-outlined" style="font-size: 14px;">refresh</span> RECARGAR
                 </button>
                 <input type="date" id="fecha-selector" class="bg-[#112240] text-white p-2 rounded">
             </div>
@@ -58,7 +58,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
             <div class="stat-card">
-                <h3 class="text-[11px] font-black opacity-40 uppercase mb-4 tracking-widest italic">Panel de Control</h3>
+                <h3 class="text-[11px] font-black opacity-40 uppercase mb-4 tracking-widest italic">Panel de Control Local</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div class="relative">
                         <div class="btn-base bg-slate-800 text-white">Inyectar Turno Anterior</div>
@@ -155,7 +155,7 @@
                     locks[slotIdx + 1]++;
                 }
                 guardar();
-                alert(`Completado: ${count} registros procesados.`);
+                alert(`Carga local exitosa: ${count} registros.`);
                 input.value = "";
             };
             reader.readAsArrayBuffer(file);
@@ -177,7 +177,7 @@
                     }
                 });
                 guardar();
-                alert("Reporte inyectado.");
+                alert("Turno anterior inyectado en memoria local.");
                 input.value = "";
             };
             reader.readAsArrayBuffer(file);
@@ -189,7 +189,10 @@
 
         function procesarSlotIndividual(input) {
             const slotSel = parseInt(document.getElementById('slot-selector').value);
-            if (locks[slotSel] >= 2) return;
+            if (locks[slotSel] >= 2) {
+                alert("Bloqueado: Ya se subieron 2 archivos para este slot.");
+                return;
+            }
             procesarArchivoGeneral(input, 'slots', slotSel - 1);
         }
 
@@ -241,7 +244,7 @@
             XLSX.writeFile(wb, `Zubale_Control_${new Date().toISOString().split('T')[0]}.xlsx`);
         }
 
-        function limpiarTodo() { if(confirm("¿Reiniciar todo?")) { localStorage.clear(); location.reload(); } }
+        function limpiarTodo() { if(confirm("¿Borrar todos los datos locales?")) { localStorage.clear(); location.reload(); } }
     </script>
 </body>
 </html>
