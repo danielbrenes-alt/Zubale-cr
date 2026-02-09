@@ -105,7 +105,6 @@
             document.getElementById('display-sede').innerText = "Sede: " + sedeActual;
         }
 
-        // 1. Dibujar la cuadrícula inicial
         const grid = document.getElementById('clubs-grid');
         grid.innerHTML = sedes.map(s => `
             <div class="ai-card" id="card-${s.toLowerCase()}">
@@ -120,7 +119,6 @@
             </div>
         `).join('');
 
-        // 2. RECUPERAR DATOS DE LOCALSTORAGE
         const datosGuardados = localStorage.getItem('zubale_db_maestra');
         const pilotosGuardados = localStorage.getItem('zubale_config_pilotos');
 
@@ -185,10 +183,7 @@
                     });
                 }
             }
-            
-            // GUARDAR EN LOCALSTORAGE
             localStorage.setItem('zubale_db_maestra', JSON.stringify(dbMaestra));
-            
             document.getElementById('global-count').innerText = dbMaestra.length;
             document.getElementById('btn-export-master').style.display = "block";
             recalcularVisuales();
@@ -213,7 +208,7 @@
         });
     }
 
-    // El resto de funciones (calcularAsignacion, verRutas, exportar) se mantienen igual...
+    // --- INTEGRACIÓN DE IA POR CERCANÍA EN CALCULARASIGNACION ---
     function calcularAsignacion(sede) {
         const nPilotos = parseInt(document.getElementById(`pilotos-${sede.toLowerCase()}`).value) || 1;
         const pedidos = dbMaestra.filter(p => p.tienda.toUpperCase().includes(sede.toUpperCase()));
@@ -228,11 +223,34 @@
 
         const horas = Object.keys(gruposHora).sort();
         let resultado = [];
+
         horas.forEach(h => {
-            const list = gruposHora[h];
-            const tam = Math.ceil(list.length / nPilotos);
+            let listaPedidos = gruposHora[h];
+
+            // Lógica de IA: Ordenamiento por Plus Code y Zona Geográfica
+            listaPedidos.sort((a, b) => {
+                const dirA = a.direccion.trim();
+                const dirB = b.direccion.trim();
+
+                // Detección de Plus Codes (Ej: VW76+CXF)
+                const isPlusCode = (str) => /^[A-Z0-9]{4,8}\+/.test(str);
+
+                if (isPlusCode(dirA) && isPlusCode(dirB)) {
+                    // Orden alfabético de coordenadas = Proximidad geográfica
+                    return dirA.localeCompare(dirB);
+                }
+
+                // Fallback a zona nominal (Sabanilla, Aserrí, etc.)
+                const zonaA = dirA.includes(',') ? dirA.split(',').reverse()[1] : dirA;
+                const zonaB = dirB.includes(',') ? dirB.split(',').reverse()[1] : dirB;
+
+                return zonaA.localeCompare(zonaB);
+            });
+
+            // Repartición equitativa sobre lista agrupada por cercanía
+            const tam = Math.ceil(listaPedidos.length / nPilotos);
             for(let i = 0; i < nPilotos; i++) {
-                const ruta = list.slice(i * tam, (i + 1) * tam);
+                const ruta = listaPedidos.slice(i * tam, (i + 1) * tam);
                 if (ruta.length > 0) {
                     resultado.push({ hora: h, piloto: i + 1, datos: ruta });
                 }
