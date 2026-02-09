@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Zubale Control - Walmart V10.4 LOCAL</title>
+    <title>Zubale Control - V10.4 LOCAL</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet"/>
@@ -26,11 +26,11 @@
                 <div class="bg-[#00ff41] p-3 rounded-lg"><span class="text-[#020c1b] font-black text-2xl">Z</span></div>
                 <div>
                     <h1 class="text-2xl font-black text-[#00ff41] uppercase tracking-tighter">Zubale Control</h1>
-                    <p class="text-[10px] font-bold opacity-50 uppercase tracking-widest italic">Walmart Costa Rica - MODO LOCAL</p>
+                    <p class="text-[10px] font-bold opacity-50 uppercase tracking-widest italic">Walmart Costa Rica - LOCAL</p>
                 </div>
             </div>
             <div class="flex items-center gap-4">
-                <button onclick="irAlInicio()" class="btn-logout flex items-center gap-2">
+                <button onclick="window.location.href='index.html'" class="btn-logout flex items-center gap-2">
                     <span class="material-symbols-outlined" style="font-size: 14px;">home</span> INICIO
                 </button>
                 <input type="date" id="fecha-selector" class="bg-[#112240] text-white p-2 rounded border border-border">
@@ -38,44 +38,27 @@
         </header>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-center">
-            <div class="stat-card" style="border-top: 4px solid var(--neon);">
-                <h3 class="text-[10px] font-black uppercase opacity-60">Batch 1</h3>
-                <p id="total-b1" class="text-4xl font-black mt-2">0</p>
-            </div>
-            <div class="stat-card" style="border-top: 4px solid #b388ff;">
-                <h3 class="text-[10px] font-black uppercase opacity-60">Batch 2</h3>
-                <p id="total-b2" class="text-4xl font-black mt-2">0</p>
-            </div>
-            <div class="stat-card" style="border-top: 4px solid #f59e0b;">
-                <h3 class="text-[10px] font-black uppercase opacity-60">Soluciones</h3>
-                <p id="total-sols" class="text-4xl font-black mt-2">0</p>
-            </div>
-            <div class="stat-card bg-[#00ff41] text-[#020c1b]">
-                <h3 class="text-[10px] font-black uppercase opacity-70">TOTAL GENERAL</h3>
-                <p id="gran-total" class="text-5xl font-black mt-2">0</p>
-            </div>
+            <div class="stat-card" style="border-top: 4px solid var(--neon);"><h3 class="text-[10px] font-black uppercase opacity-60">Batch 1</h3><p id="total-b1" class="text-4xl font-black mt-2">0</p></div>
+            <div class="stat-card" style="border-top: 4px solid #b388ff;"><h3 class="text-[10px] font-black opacity-60">Batch 2</h3><p id="total-b2" class="text-4xl font-black mt-2">0</p></div>
+            <div class="stat-card" style="border-top: 4px solid #f59e0b;"><h3 class="text-[10px] font-black opacity-60">Soluciones</h3><p id="total-sols" class="text-4xl font-black mt-2">0</p></div>
+            <div class="stat-card bg-[#00ff41] text-[#020c1b]"><h3 class="text-[10px] font-black uppercase opacity-70">TOTAL GENERAL</h3><p id="gran-total" class="text-5xl font-black mt-2">0</p></div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
             <div class="stat-card">
-                <h3 class="text-[11px] font-black opacity-40 uppercase mb-4 tracking-widest italic">Panel de Control Local</h3>
+                <h3 class="text-[11px] font-black opacity-40 uppercase mb-4 tracking-widest italic">Panel de Control</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div class="relative">
-                        <div class="btn-base bg-slate-800 text-white">Inyectar Turno Anterior</div>
-                        <input type="file" onchange="inyectarTurno(this)" accept=".xlsx, .xls, .csv" class="absolute inset-0 opacity-0 cursor-pointer">
-                    </div>
-                    <div class="relative">
-                        <div class="btn-base bg-orange-600 text-white">Cargar Soluciones</div>
-                        <input type="file" onchange="procesarSoluciones(this)" accept=".xlsx, .xls, .csv" class="absolute inset-0 opacity-0 cursor-pointer">
-                    </div>
+                    <div class="relative"><div class="btn-base bg-slate-800 text-white">Inyectar Turno Anterior</div><input type="file" onchange="inyectarTurno(this)" accept=".xlsx, .xls, .csv" class="absolute inset-0 opacity-0 cursor-pointer"></div>
+                    <div class="relative"><div class="btn-base bg-orange-600 text-white">Cargar Soluciones</div><input type="file" onchange="procesarArchivoGeneral(this, 'sol')" accept=".xlsx, .xls, .csv" class="absolute inset-0 opacity-0 cursor-pointer"></div>
                 </div>
                 <div class="flex gap-4">
-                    <select id="slot-selector" onchange="actualizarEstadoBoton()" class="w-1/3 bg-[#112240] text-white p-2 rounded">
-                        ${[1,2,3,4,5,6,7,8].map(i => `<option value="${i}">SLOT ${i}</option>`).join('')}
+                    <select id="slot-selector" onchange="actualizarEstadoBoton()" class="w-1/3 bg-[#112240] text-white p-2 rounded border border-border">
+                        <option value="1">SLOT 1</option><option value="2">SLOT 2</option><option value="3">SLOT 3</option><option value="4">SLOT 4</option>
+                        <option value="5">SLOT 5</option><option value="6">SLOT 6</option><option value="7">SLOT 7</option><option value="8">SLOT 8</option>
                     </select>
                     <div class="flex-1 relative">
                         <div id="btn-label" class="btn-base btn-blue">Subir Slot Seleccionado</div>
-                        <input type="file" id="input-slot" onchange="procesarSlotIndividual(this)" accept=".xlsx, .xls, .csv" class="absolute inset-0 opacity-0 cursor-pointer">
+                        <input type="file" id="input-slot" onchange="procesarIndividual(this)" accept=".xlsx, .xls, .csv" class="absolute inset-0 opacity-0 cursor-pointer">
                     </div>
                 </div>
                 <p id="msg-bloqueo" class="text-[10px] font-bold opacity-40 uppercase mt-2 text-center tracking-tighter">Archivos en Slot: 0/2</p>
@@ -92,7 +75,6 @@
     <script>
         const allStores = ["Wm Alajuela", "Wm Heredia", "Wm Heredia Este", "Wm Tibas", "Wm Escazu", "Wm Santa Ana", "Wm Guadalupe", "Wm Desamparados"];
         const batch1 = ["Wm Alajuela", "Wm Heredia", "Wm Heredia Este", "Wm Tibas"];
-        
         let db = JSON.parse(localStorage.getItem('zubale_db')) || {};
         let locks = JSON.parse(localStorage.getItem('zubale_locks')) || {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0};
 
@@ -100,12 +82,6 @@
             document.getElementById('fecha-selector').value = new Date().toISOString().split('T')[0];
             allStores.forEach(s => { if(!db[s]) db[s] = { slots: Array(8).fill(0), sol: 0 }; });
             actualizarUI();
-            actualizarEstadoBoton();
-        }
-
-        // --- FUNCIÓN DE RETORNO ---
-        function irAlInicio() {
-            window.location.href = 'index.html';
         }
 
         function renderTiendas() {
@@ -122,10 +98,8 @@
                 </div>`).join('');
         }
 
-        // --- JERARQUÍA DE HEREDIA PROTEGIDA ---
         function buscarTiendaEnFila(fila) {
             const txt = Object.values(fila).join("|").toUpperCase();
-            // Buscamos primero el nombre más largo para evitar falsos positivos
             if (txt.includes("HEREDIA ESTE")) return "Wm Heredia Este";
             if (txt.includes("HEREDIA")) return "Wm Heredia";
             if (txt.includes("ALAJUELA")) return "Wm Alajuela";
@@ -144,27 +118,26 @@
                 const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
                 const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
                 let count = 0;
-
                 data.forEach(fila => {
                     const tE = buscarTiendaEnFila(fila);
                     if (tE) {
-                        if (tipo === 'slots' && slotIdx !== null) {
-                            db[tE].slots[slotIdx]++;
-                        } else {
-                            db[tE].sol++;
-                        }
+                        if (tipo === 'slots' && slotIdx !== null) db[tE].slots[slotIdx]++;
+                        else db[tE].sol++;
                         count++;
                     }
                 });
-
-                if (tipo === 'slots' && slotIdx !== null && count > 0) {
-                    locks[slotIdx + 1]++;
-                }
+                if (tipo === 'slots' && slotIdx !== null && count > 0) locks[slotIdx + 1]++;
                 guardar();
-                alert(`Carga local exitosa: ${count} registros.`);
+                alert(`Procesados ${count} registros.`);
                 input.value = "";
             };
             reader.readAsArrayBuffer(file);
+        }
+
+        function procesarIndividual(input) {
+            const slotSel = parseInt(document.getElementById('slot-selector').value);
+            if (locks[slotSel] >= 2) { alert("SLOT BLOQUEADO"); input.value = ""; return; }
+            procesarArchivoGeneral(input, 'slots', slotSel - 1);
         }
 
         function inyectarTurno(input) {
@@ -176,37 +149,21 @@
                 data.forEach(fila => {
                     const tE = buscarTiendaEnFila(fila);
                     if (tE) {
-                        for (let i = 1; i <= 8; i++) {
-                            db[tE].slots[i-1] += parseInt(fila[`Slot ${i}`] || fila[`SLOT ${i}`] || 0);
-                        }
+                        for (let i = 1; i <= 8; i++) db[tE].slots[i-1] += parseInt(fila[`Slot ${i}`] || fila[`SLOT ${i}`] || 0);
                         db[tE].sol += parseInt(fila["Sol"] || fila["SOL"] || 0);
                     }
                 });
                 guardar();
-                alert("Turno anterior inyectado.");
+                alert("Turno inyectado.");
                 input.value = "";
             };
             reader.readAsArrayBuffer(file);
-        }
-
-        function procesarSoluciones(input) {
-            procesarArchivoGeneral(input, 'sol');
-        }
-
-        function procesarSlotIndividual(input) {
-            const slotSel = parseInt(document.getElementById('slot-selector').value);
-            if (locks[slotSel] >= 2) {
-                alert("Límite de 2 archivos alcanzado para este slot.");
-                return;
-            }
-            procesarArchivoGeneral(input, 'slots', slotSel - 1);
         }
 
         function guardar() {
             localStorage.setItem('zubale_db', JSON.stringify(db));
             localStorage.setItem('zubale_locks', JSON.stringify(locks));
             actualizarUI();
-            actualizarEstadoBoton();
         }
 
         function actualizarUI() {
@@ -221,6 +178,7 @@
             document.getElementById('total-sols').innerText = sol;
             document.getElementById('gran-total').innerText = b1 + b2 + sol;
             renderTiendas();
+            actualizarEstadoBoton();
         }
 
         function actualizarEstadoBoton() {
@@ -228,29 +186,19 @@
             const cargados = locks[slot] || 0;
             document.getElementById('msg-bloqueo').innerText = `Archivos en Slot ${slot}: ${cargados}/2`;
             const btn = document.getElementById('btn-label');
-            if (cargados >= 2) {
-                btn.className = "btn-base bg-red-600 opacity-50 cursor-not-allowed";
-                btn.innerText = "BLOQUEADO";
-            } else {
-                btn.className = "btn-base btn-blue";
-                btn.innerText = "Subir Slot Seleccionado";
-            }
+            if (cargados >= 2) { btn.className = "btn-base bg-red-600 opacity-50 cursor-not-allowed"; btn.innerText = "BLOQUEADO"; }
+            else { btn.className = "btn-base btn-blue"; btn.innerText = "Subir Slot Seleccionado"; }
         }
 
         function exportarExcel() {
-            const data = allStores.map(loc => ({
-                "Tienda": loc, 
-                ...db[loc].slots.reduce((acc, v, i) => ({...acc, [`Slot ${i+1}`]: v}), {}), 
-                "Sol": db[loc].sol, 
-                "Total": db[loc].slots.reduce((a,b)=>a+b,0) + db[loc].sol 
-            }));
+            const data = allStores.map(loc => ({ "Tienda": loc, ...db[loc].slots.reduce((acc, v, i) => ({...acc, [`Slot ${i+1}`]: v}), {}), "Sol": db[loc].sol, "Total": db[loc].slots.reduce((a,b)=>a+b,0) + db[loc].sol }));
             const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Reporte");
             XLSX.writeFile(wb, `Zubale_Control_${new Date().toISOString().split('T')[0]}.xlsx`);
         }
 
-        function limpiarTodo() { if(confirm("¿Borrar todos los datos actuales?")) { localStorage.clear(); location.reload(); } }
+        function limpiarTodo() { if(confirm("¿Borrar todo?")) { localStorage.clear(); location.reload(); } }
     </script>
 </body>
 </html>
