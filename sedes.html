@@ -1,99 +1,140 @@
 <!DOCTYPE html>
-<html class="dark" lang="es">
+<html lang="es" id="master-html" class="dark">
 <head>
     <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Zubale Pro - Fleet Control</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <title>Zubale CR Systems | Fleet Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,0,0" rel="stylesheet"/>
     <style>
-        :root { 
-            --dark-bg: #020c1b; --dark-sidebar: #010812; --dark-card: #0a192f; 
-            --neon-green: #00ff41; --white: #e6f1ff; --red: #ff3333; 
+        :root {
+            --bg-main: #f1f5f9; --surface: #ffffff; --border-muted: #e2e8f0;
+            --text-main: #0f172a; --primary-accent: #6366f1;
         }
-        body { font-family: 'Manrope', sans-serif; background-color: var(--dark-bg); color: var(--white); margin: 0; overflow-x: hidden; }
-        .sidebar { background: var(--dark-sidebar); border-right: 1px solid rgba(35, 53, 84, 0.5); width: 260px; height: 100vh; position: fixed; padding: 30px 20px; display: flex; flex-direction: column; z-index: 50; }
-        .main-content { margin-left: 260px; padding: 40px; }
+        .dark {
+            --bg-main: #020617; --surface: #0f172a; --border-muted: #1e293b;
+            --text-main: #f8fafc;
+        }
+        body {
+            font-family: 'Inter', sans-serif; background-color: var(--bg-main);
+            color: var(--text-main); letter-spacing: -0.01em; transition: 0.3s;
+        }
+        .sidebar { 
+            width: 220px; height: 100vh; position: fixed; 
+            background: var(--surface); border-right: 1px solid var(--border-muted); 
+            z-index: 50; display: flex; flex-direction: column; 
+        }
+        .main-content { margin-left: 220px; padding: 40px; }
         
-        /* BOTÓN DE RETORNO A INICIO CORREGIDO */
-        .btn-home {
-            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(35, 53, 84, 0.8);
-            color: var(--white); padding: 12px; border-radius: 12px; font-weight: 700;
-            font-size: 11px; display: flex; align-items: center; justify-content: center;
-            gap: 10px; margin-bottom: 25px; transition: 0.3s; text-transform: uppercase; width: 100%; cursor: pointer;
+        /* Botones Elite */
+        .btn-elite { 
+            font-size: 9px; font-weight: 800; padding: 10px; border-radius: 4px; 
+            text-transform: uppercase; cursor: pointer; text-align: center; 
+            transition: 0.2s; border: none; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .btn-home:hover { background: rgba(0, 255, 65, 0.1); border-color: var(--neon-green); color: var(--neon-green); transform: translateX(5px); }
+        .btn-primary { background: var(--primary-accent); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); }
+        .btn-secondary { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+        .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
-        .nav-button {
-            background: var(--neon-green); color: black; padding: 16px; border-radius: 12px;
-            font-weight: 900; text-align: center; cursor: pointer; text-transform: uppercase;
-            font-size: 11px; display: flex; align-items: center; justify-content: center;
-            gap: 12px; transition: 0.3s; border: none; box-shadow: 0 8px 20px rgba(0, 255, 65, 0.15);
-            margin-bottom: 30px; width: 100%;
+        /* Card de Sede */
+        .enterprise-card { 
+            background: var(--surface); border: 1px solid var(--border-muted); 
+            border-radius: 6px; padding: 20px; transition: all 0.3s ease; opacity: 0.5;
         }
-        .nav-button:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .enterprise-card.active { 
+            opacity: 1; border-color: var(--primary-accent); 
+            box-shadow: 0 8px 20px -10px rgba(99, 102, 241, 0.4); 
+        }
 
-        .ai-card { background: var(--dark-card); border-radius: 20px; padding: 25px; border: 1px solid rgba(35, 53, 84, 0.8); transition: all 0.3s ease; }
-        .ai-card.active { border-color: var(--neon-green); box-shadow: 0 10px 30px rgba(0, 255, 65, 0.05); }
+        .label-micro { font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; color: #64748b; }
 
-        .switch { position: relative; display: inline-block; width: 42px; height: 22px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; inset: 0; background-color: #233554; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--neon-green); }
-        input:checked + .slider:before { transform: translateX(20px); }
+        /* Switch Día/Noche */
+        .theme-switch { width: 34px; height: 18px; background: #334155; border-radius: 20px; position: relative; cursor: pointer; }
+        .theme-switch::before { content: ""; position: absolute; width: 14px; height: 14px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s; }
+        .dark .theme-switch::before { left: 18px; background: var(--primary-accent); }
+
+        /* Checkbox Switch Sede */
+        .sede-switch { position: relative; display: inline-block; width: 32px; height: 16px; }
+        .sede-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; inset: 0; background-color: #334155; transition: .3s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 2px; bottom: 2px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary-accent); }
+        input:checked + .slider:before { transform: translateX(16px); }
     </style>
 </head>
 <body onload="init()">
 
-<div class="sidebar">
-    <div class="mb-10 text-center">
-        <h1 style="font-weight: 900; font-size: 22px; color: var(--neon-green); letter-spacing: -1px;">ZUBALE<span style="color:white">PRO</span></h1>
+<aside class="sidebar p-6">
+    <div class="flex items-center gap-3 mb-10">
+        <img src="https://i.ibb.co/LzN2Vp9/zubale-logo-pro.png" alt="Logo" class="w-8 h-8 object-contain">
+        <div>
+            <h1 class="text-[11px] font-black tracking-tight uppercase leading-none">Zubale <span class="text-indigo-500">CR</span></h1>
+            <p class="text-[7px] font-bold text-slate-500 uppercase tracking-widest mt-1">Systems Fleet</p>
+        </div>
     </div>
 
-    <button onclick="window.location.href='index.html'" class="btn-home">
-        <span class="material-symbols-outlined">home</span> Inicio
+    <button onclick="window.location.href='index.html'" class="btn-elite btn-secondary mb-3">
+        <span class="material-symbols-outlined text-[14px]">home</span> Hub Central
     </button>
     
-    <button onclick="guardarYPasar()" class="nav-button">
-        <span class="material-symbols-outlined">analytics</span> PROCESAR DESPACHO
+    <button onclick="guardarYPasar()" class="btn-elite btn-primary mb-8">
+        <span class="material-symbols-outlined text-[14px]">analytics</span> Procesar Despacho
     </button>
 
-    <div style="margin-top: auto; background: rgba(0, 255, 65, 0.05); padding: 20px; border-radius: 16px; border: 1px solid rgba(0, 255, 65, 0.1);">
-        <p style="font-size: 9px; color: var(--neon-green); font-weight: 900; margin-bottom: 5px;">ESTATUS GLOBAL</p>
-        <p id="active-count" style="font-size: 32px; font-weight: 800; color: white;">0</p>
+    <div class="mt-auto p-4 rounded bg-indigo-500/5 border border-indigo-500/10">
+        <p class="label-micro text-indigo-500 mb-1">Sedes Activas</p>
+        <div class="flex items-baseline gap-1">
+            <span id="active-count" class="text-2xl font-black">0</span>
+            <span class="text-[8px] font-bold text-slate-500 uppercase">Unidades</span>
+        </div>
     </div>
-</div>
 
-<div class="main-content">
+    <div class="mt-6 pt-4 border-t border-slate-700/10 flex items-center justify-between">
+        <span class="label-micro">Tema</span>
+        <div class="theme-switch" onclick="toggleTheme()"></div>
+    </div>
+</aside>
+
+<main class="main-content">
     <header class="mb-12">
-        <h2 style="font-size: 36px; font-weight: 900; letter-spacing: -1.5px; margin-bottom: 10px;">Control de Sedes</h2>
-        <p style="font-size: 14px; color: #8892b0; font-weight: 600;">Selecciona las ubicaciones para el despacho.</p>
+        <h2 class="text-3xl font-black tracking-tight uppercase mb-1">Configuración de Flota</h2>
+        <p class="label-micro text-indigo-500">Habilite o deshabilite las sedes para la generación de rutas</p>
     </header>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="clubs-grid"></div>
-</div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="clubs-grid"></div>
+</main>
 
 <script>
     const listaClubes = ["Alajuela", "Cartago", "Escazu", "Heredia", "Liberia", "Llorente", "Tres Rios", "Zapote"];
 
     function init() {
+        if(localStorage.getItem('zubale_theme') === 'light') {
+            document.getElementById('master-html').classList.remove('dark');
+        }
+
         const grid = document.getElementById('clubs-grid');
         grid.innerHTML = listaClubes.map(nombre => {
             const id = nombre.toLowerCase().replace(/ /g, "-");
             return `
-                <div class="ai-card active" id="card-${id}">
+                <div class="enterprise-card active" id="card-${id}">
                     <div class="flex justify-between items-start mb-6">
-                        <span class="material-symbols-outlined" style="color: var(--neon-green); font-size: 28px;">storefront</span>
-                        <label class="switch">
+                        <span class="material-symbols-outlined text-indigo-500" style="font-size: 24px;">hub</span>
+                        <label class="sede-switch">
                             <input type="checkbox" checked onchange="toggleSede('${id}')" id="check-${id}">
                             <span class="slider"></span>
                         </label>
                     </div>
-                    <h3 style="font-weight: 900; font-size: 18px; text-transform: uppercase;">${nombre}</h3>
+                    <h3 class="text-xs font-black uppercase tracking-widest">${nombre}</h3>
                 </div>
             `;
         }).join('');
         actualizarContador();
+    }
+
+    function toggleTheme() {
+        const h = document.getElementById('master-html');
+        h.classList.toggle('dark');
+        localStorage.setItem('zubale_theme', h.classList.contains('dark') ? 'dark' : 'light');
     }
 
     function toggleSede(id) {
