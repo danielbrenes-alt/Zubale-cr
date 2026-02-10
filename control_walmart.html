@@ -1,84 +1,140 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" id="master-html" class="dark">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Zubale Control - V10.4 LOCAL</title>
+    <title>Zubale CR Systems | Elite Control</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <style>
-        :root { --bg: #020c1b; --card: #0a192f; --text: #e6f1ff; --border: #233554; --neon: #00ff41; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); }
-        .stat-card { background: var(--card); border-radius: 12px; padding: 1.5rem; border: 1px solid var(--border); }
-        .btn-base { padding: 12px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; width: 100%; border: none; text-align: center; }
-        .btn-blue { background: #2563eb; color: white; }
-        .btn-logout { background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 6px 14px; border-radius: 8px; font-size: 10px; font-weight: 900; border: 1px solid rgba(239, 68, 68, 0.2); }
-        .slot-row { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 6px 0; border-bottom: 1px solid var(--border); }
+        :root {
+            --bg-main: #f1f5f9; --surface: #ffffff; --border-muted: #e2e8f0;
+            --text-main: #0f172a; --primary-accent: #6366f1;
+        }
+        .dark {
+            --bg-main: #020617; --surface: #0f172a; --border-muted: #1e293b;
+            --text-main: #f8fafc;
+        }
+        body {
+            font-family: 'Inter', sans-serif; background-color: var(--bg-main);
+            color: var(--text-main); letter-spacing: -0.01em; font-size: 10.5px; transition: 0.3s;
+        }
+        .enterprise-card { background: var(--surface); border: 1px solid var(--border-muted); border-radius: 4px; }
+        .label-micro { font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; color: #64748b; }
+        .btn-elite { font-size: 9px; font-weight: 800; padding: 8px 12px; border-radius: 4px; text-transform: uppercase; cursor: pointer; text-align: center; transition: 0.2s; border: none; width: 100%; }
+        .btn-primary { background: var(--primary-accent); color: white; }
+        .btn-secondary { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+        
+        /* Switch Día/Noche */
+        .theme-switch { width: 34px; height: 18px; background: #334155; border-radius: 20px; position: relative; cursor: pointer; }
+        .theme-switch::before { content: ""; position: absolute; width: 14px; height: 14px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s; }
+        .dark .theme-switch::before { left: 18px; background: var(--primary-accent); }
+
+        input[type="date"], select { background: var(--bg-main); border: 1px solid var(--border-muted); color: var(--text-main); font-size: 9px; padding: 4px 8px; border-radius: 4px; }
+        .slot-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid rgba(128,128,128,0.1); }
+        .file-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
+        .file-wrapper input[type=file] { position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; width: 100%; }
+
+        /* Estilo para el Logo */
+        .brand-logo { width: 32px; height: 32px; object-fit: contain; filter: drop-shadow(0 0 2px rgba(99, 102, 241, 0.5)); transition: 0.3s; }
+        .dark .brand-logo { filter: brightness(1.2) drop-shadow(0 0 5px rgba(99, 102, 241, 0.8)); }
     </style>
 </head>
-<body class="p-4 md:p-10" onload="init()">
+<body class="p-4 md:p-8" onload="init()">
 
     <div class="max-w-7xl mx-auto">
-        <header class="mb-8 flex justify-between items-center stat-card shadow-sm">
+        <header class="mb-6 flex flex-col md:flex-row justify-between items-center enterprise-card p-5 shadow-sm">
             <div class="flex items-center gap-4">
-                <div class="bg-[#00ff41] p-3 rounded-lg"><span class="text-[#020c1b] font-black text-2xl">Z</span></div>
+                <img src="https://i.ibb.co/LzN2Vp9/zubale-logo-pro.png" alt="Zubale Logo" class="brand-logo">
                 <div>
-                    <h1 class="text-2xl font-black text-[#00ff41] uppercase tracking-tighter">Zubale Control</h1>
-                    <p class="text-[10px] font-bold opacity-50 uppercase tracking-widest italic">Walmart Costa Rica - LOCAL</p>
+                    <h1 class="text-sm font-black tracking-tight uppercase">Zubale <span class="text-indigo-500 font-normal">CR Systems</span></h1>
+                    <p class="label-micro italic">Elite Logistics Control Center</p>
                 </div>
             </div>
-            <div class="flex items-center gap-4">
-                <button onclick="window.location.href='index.html'" class="btn-logout flex items-center gap-2">
-                    <span class="material-symbols-outlined" style="font-size: 14px;">home</span> INICIO
+            <div class="flex items-center gap-4 mt-4 md:mt-0">
+                <div class="flex items-center gap-2 mr-2">
+                    <span class="material-symbols-outlined text-slate-500 text-sm">light_mode</span>
+                    <div class="theme-switch" onclick="toggleTheme()"></div>
+                    <span class="material-symbols-outlined text-slate-500 text-sm">dark_mode</span>
+                </div>
+                <input type="date" id="fecha-selector">
+                <button onclick="window.location.href='index.html'" class="btn-elite btn-secondary flex items-center gap-2 w-auto px-4">
+                    <span class="material-symbols-outlined text-[12px]">home</span> Hub
                 </button>
-                <input type="date" id="fecha-selector" class="bg-[#112240] text-white p-2 rounded border border-border">
             </div>
         </header>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-center">
-            <div class="stat-card" style="border-top: 4px solid var(--neon);"><h3 class="text-[10px] font-black uppercase opacity-60">Batch 1</h3><p id="total-b1" class="text-4xl font-black mt-2">0</p></div>
-            <div class="stat-card" style="border-top: 4px solid #b388ff;"><h3 class="text-[10px] font-black opacity-60">Batch 2</h3><p id="total-b2" class="text-4xl font-black mt-2">0</p></div>
-            <div class="stat-card" style="border-top: 4px solid #f59e0b;"><h3 class="text-[10px] font-black opacity-60">Soluciones</h3><p id="total-sols" class="text-4xl font-black mt-2">0</p></div>
-            <div class="stat-card bg-[#00ff41] text-[#020c1b]"><h3 class="text-[10px] font-black uppercase opacity-70">TOTAL GENERAL</h3><p id="gran-total" class="text-5xl font-black mt-2">0</p></div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 text-center">
+            <div class="enterprise-card p-3 border-t-2 border-t-[#00ff41]">
+                <h3 class="label-micro">Batch 1</h3>
+                <p id="total-b1" class="text-xl font-bold mt-1">0</p>
+            </div>
+            <div class="enterprise-card p-3 border-t-2 border-t-indigo-500">
+                <h3 class="label-micro">Batch 2</h3>
+                <p id="total-b2" class="text-xl font-bold mt-1">0</p>
+            </div>
+            <div class="enterprise-card p-3 border-t-2 border-t-orange-500">
+                <h3 class="label-micro">Soluciones</h3>
+                <p id="total-sols" class="text-xl font-bold mt-1">0</p>
+            </div>
+            <div class="enterprise-card p-3 bg-indigo-600 text-white border-none shadow-md">
+                <h3 class="text-[8px] uppercase font-bold opacity-70">Total General</h3>
+                <p id="gran-total" class="text-2xl font-black mt-1">0</p>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
-            <div class="stat-card">
-                <h3 class="text-[11px] font-black opacity-40 uppercase mb-4 tracking-widest italic">Panel de Control</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div class="relative"><div class="btn-base bg-slate-800 text-white">Inyectar Turno Anterior</div><input type="file" onchange="inyectarTurno(this)" accept=".xlsx, .xls, .csv" class="absolute inset-0 opacity-0 cursor-pointer"></div>
-                    <div class="relative"><div class="btn-base bg-orange-600 text-white">Cargar Soluciones</div><input type="file" onchange="procesarArchivoGeneral(this, 'sol')" accept=".xlsx, .xls, .csv" class="absolute inset-0 opacity-0 cursor-pointer"></div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-6">
+            <div class="enterprise-card p-5 lg:col-span-2">
+                <h3 class="label-micro mb-3">Sincronización de Datos</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                    <div class="file-wrapper">
+                        <div class="btn-elite btn-secondary">Inyectar Turno Anterior</div>
+                        <input type="file" onchange="inyectarTurno(this)" accept=".xlsx, .xls, .csv">
+                    </div>
+                    <div class="file-wrapper">
+                        <div class="btn-elite bg-orange-600 text-white">Cargar Soluciones</div>
+                        <input type="file" onchange="procesarArchivoGeneral(this, 'sol')" accept=".xlsx, .xls, .csv">
+                    </div>
                 </div>
-                <div class="flex gap-4">
-                    <select id="slot-selector" onchange="actualizarEstadoBoton()" class="w-1/3 bg-[#112240] text-white p-2 rounded border border-border">
+                <div class="flex flex-col md:flex-row gap-3">
+                    <select id="slot-selector" onchange="actualizarEstadoBoton()" class="md:w-32">
                         <option value="1">SLOT 1</option><option value="2">SLOT 2</option><option value="3">SLOT 3</option><option value="4">SLOT 4</option>
                         <option value="5">SLOT 5</option><option value="6">SLOT 6</option><option value="7">SLOT 7</option><option value="8">SLOT 8</option>
                     </select>
-                    <div class="flex-1 relative">
-                        <div id="btn-label" class="btn-base btn-blue">Subir Slot Seleccionado</div>
-                        <input type="file" id="input-slot" onchange="procesarIndividual(this)" accept=".xlsx, .xls, .csv" class="absolute inset-0 opacity-0 cursor-pointer">
+                    <div class="flex-1 file-wrapper">
+                        <div id="btn-label" class="btn-elite btn-primary">Subir Slot Seleccionado</div>
+                        <input type="file" id="input-slot" onchange="procesarIndividual(this)" accept=".xlsx, .xls, .csv">
                     </div>
                 </div>
-                <p id="msg-bloqueo" class="text-[10px] font-bold opacity-40 uppercase mt-2 text-center tracking-tighter">Archivos en Slot: 0/2</p>
+                <p id="msg-bloqueo" class="label-micro mt-2 text-center opacity-40">Status: 0/2 Archivos</p>
             </div>
-            <div class="stat-card flex flex-col justify-center gap-4 text-center">
-                <button onclick="exportarExcel()" class="btn-base border border-[#00ff41] text-[#00ff41]">Descargar Reporte Hoy</button>
-                <button onclick="limpiarTodo()" class="btn-base border border-red-500 text-red-500">Reiniciar Dashboard</button>
+            
+            <div class="enterprise-card p-5 flex flex-col justify-center gap-3 text-center">
+                <h3 class="label-micro mb-1">Consolidados</h3>
+                <button onclick="exportarExcel()" class="btn-elite btn-primary">Exportar Reporte Hoy</button>
+                <button onclick="limpiarTodo()" class="btn-elite border border-red-500/20 text-red-500/60 hover:text-white hover:bg-red-500">Reiniciar Sistema</button>
             </div>
         </div>
 
-        <div id="tiendas-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pb-20"></div>
+        <div id="tiendas-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 pb-8"></div>
     </div>
 
     <script>
+        function toggleTheme() {
+            const h = document.getElementById('master-html');
+            h.classList.toggle('dark');
+            localStorage.setItem('zubale_theme', h.classList.contains('dark') ? 'dark' : 'light');
+        }
+
         const allStores = ["Wm Alajuela", "Wm Heredia", "Wm Heredia Este", "Wm Tibas", "Wm Escazu", "Wm Santa Ana", "Wm Guadalupe", "Wm Desamparados"];
         const batch1 = ["Wm Alajuela", "Wm Heredia", "Wm Heredia Este", "Wm Tibas"];
         let db = JSON.parse(localStorage.getItem('zubale_db')) || {};
         let locks = JSON.parse(localStorage.getItem('zubale_locks')) || {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0};
 
         function init() {
+            if(localStorage.getItem('zubale_theme') === 'light') document.getElementById('master-html').classList.remove('dark');
             document.getElementById('fecha-selector').value = new Date().toISOString().split('T')[0];
             allStores.forEach(s => { if(!db[s]) db[s] = { slots: Array(8).fill(0), sol: 0 }; });
             actualizarUI();
@@ -86,14 +142,16 @@
 
         function renderTiendas() {
             document.getElementById('tiendas-container').innerHTML = allStores.map(name => `
-                <div class="stat-card">
-                    <div class="flex justify-between items-center border-b border-border pb-2 mb-2">
-                        <h4 class="font-black uppercase text-[10px] opacity-60">${name}</h4>
-                        <span class="text-2xl font-black text-[#00ff41]">${db[name].slots.reduce((a,b)=>a+b,0) + db[name].sol}</span>
+                <div class="enterprise-card p-3">
+                    <div class="flex justify-between items-center border-b border-slate-700/10 pb-1.5 mb-2">
+                        <h4 class="label-micro">${name}</h4>
+                        <span class="text-base font-bold text-indigo-500">${db[name].slots.reduce((a,b)=>a+b,0) + db[name].sol}</span>
                     </div>
-                    <div class="space-y-1">
-                        ${db[name].slots.map((val, i) => `<div class="slot-row"><span>Slot ${i+1}</span><span class="opacity-80">${val}</span></div>`).join('')}
-                        <div class="slot-row mt-4 bg-slate-900 p-2 rounded-lg font-bold text-orange-500"><span>SOL</span><span>${db[name].sol}</span></div>
+                    <div class="space-y-0.5">
+                        ${db[name].slots.map((val, i) => `<div class="slot-row"><span>Slot ${i+1}</span><span class="font-bold">${val}</span></div>`).join('')}
+                        <div class="flex justify-between items-center mt-2 pt-1.5 border-t border-slate-700/10 font-bold text-orange-500 text-[9px] uppercase">
+                            <span>Soluciones</span><span>${db[name].sol}</span>
+                        </div>
                     </div>
                 </div>`).join('');
         }
@@ -184,10 +242,13 @@
         function actualizarEstadoBoton() {
             const slot = document.getElementById('slot-selector').value;
             const cargados = locks[slot] || 0;
-            document.getElementById('msg-bloqueo').innerText = `Archivos en Slot ${slot}: ${cargados}/2`;
+            document.getElementById('msg-bloqueo').innerText = `Slot ${slot}: ${cargados}/2 Cargados`;
             const btn = document.getElementById('btn-label');
-            if (cargados >= 2) { btn.className = "btn-base bg-red-600 opacity-50 cursor-not-allowed"; btn.innerText = "BLOQUEADO"; }
-            else { btn.className = "btn-base btn-blue"; btn.innerText = "Subir Slot Seleccionado"; }
+            if (cargados >= 2) { 
+                btn.className = "btn-elite bg-red-950 text-red-500 opacity-50 cursor-not-allowed"; 
+                btn.innerText = "BLOQUEADO"; 
+            }
+            else { btn.className = "btn-elite btn-primary"; btn.innerText = "Subir Slot Seleccionado"; }
         }
 
         function exportarExcel() {
@@ -198,7 +259,7 @@
             XLSX.writeFile(wb, `Zubale_Control_${new Date().toISOString().split('T')[0]}.xlsx`);
         }
 
-        function limpiarTodo() { if(confirm("¿Borrar todo?")) { localStorage.clear(); location.reload(); } }
+        function limpiarTodo() { if(confirm("¿Borrar todos los datos actuales?")) { localStorage.clear(); location.reload(); } }
     </script>
 </body>
 </html>
