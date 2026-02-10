@@ -2,7 +2,7 @@
 <html lang="es" id="master-html" class="dark">
 <head>
     <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zubale CR Systems | Intelligence Hub</title>
+    <title>Zubale CR Systems | Dispatch</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -10,61 +10,65 @@
     <style>
         :root { --primary: #6366f1; --bg: #f8fafc; --surface: #ffffff; --border: #e2e8f0; --text: #0f172a; --text-dim: #64748b; }
         .dark { --bg: #020617; --surface: #0f172a; --border: #1e293b; --text: #f8fafc; --text-dim: #94a3b8; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 11px; transition: 0.3s; margin: 0; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 10.5px; transition: 0.3s; margin: 0; }
+        .enterprise-card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; }
         .sidebar { background: var(--surface); border-right: 1px solid var(--border); width: 220px; height: 100vh; position: fixed; z-index: 50; }
         .main-content { margin-left: 220px; padding: 30px; }
-        .enterprise-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; transition: 0.2s; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .label-micro { font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; color: var(--text-dim); }
         .theme-switch { width: 34px; height: 18px; background: #334155; border-radius: 20px; position: relative; cursor: pointer; }
         .theme-switch::before { content: ""; position: absolute; width: 14px; height: 14px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s; }
         .dark .theme-switch::before { left: 18px; background: var(--primary); }
-        .config-input { background: var(--bg); border: 1px solid var(--border); color: var(--text); font-size: 11px; font-weight: 800; padding: 4px 6px; border-radius: 4px; width: 45px; text-align: center; outline: none; }
-        #modal-rutas { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 100; align-items: center; justify-content: center; }
-        .modal-box { background: var(--surface); width: 90%; max-width: 1000px; max-height: 85vh; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; }
+        .label-micro { font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; color: var(--text-dim); }
+        input[type="number"], input[type="text"] { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 1px 4px; font-size: 9px; border-radius: 2px; width: 35px; text-align: center; font-weight: 800; }
+        .overload-warning { border-color: #ef4444 !important; background: rgba(239, 68, 68, 0.05) !important; }
+        .overload-badge { background: #ef4444; color: white; padding: 1px 4px; border-radius: 2px; font-size: 8px; font-weight: 900; }
     </style>
 </head>
 <body onload="init()">
 
-<aside class="sidebar p-5 flex flex-col">
-    <div class="flex items-center justify-between mb-10">
-        <h1 class="text-[11px] font-extrabold tracking-tight uppercase">Zubale <span class="text-indigo-500 text-xs">CR Systems</span></h1>
+<div class="sidebar p-5 flex flex-col">
+    <div class="mb-8 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <img src="https://i.ibb.co/LzN2Vp9/zubale-logo-pro.png" alt="Logo" class="w-6 h-6 object-contain">
+            <h1 class="text-[11px] font-black tracking-tight uppercase">ZUBALE <span class="text-indigo-500">CR</span></h1>
+        </div>
         <div class="theme-switch" onclick="toggleTheme()"></div>
     </div>
-    <nav class="flex-1 space-y-2">
-        <p class="label-micro mb-4">Navegación</p>
-        <button onclick="window.location.href='index.html'" class="w-full flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-indigo-500 transition font-semibold">
-            <span class="material-symbols-outlined text-base">arrow_back</span> Regresar al Hub
+    <nav class="flex-1 space-y-1">
+        <button onclick="window.location.href='index.html'" class="w-full flex items-center gap-2 px-3 py-1.5 text-slate-500 hover:text-indigo-500 transition font-bold uppercase text-[9px]">
+            <span class="material-symbols-outlined text-[14px]">home</span> Hub Central
         </button>
-        <button onclick="location.reload()" class="w-full flex items-center gap-3 px-3 py-2 rounded bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 font-semibold">
-            <span class="material-symbols-outlined text-base">dashboard</span> Monitor Central
+        <button onclick="location.reload()" class="w-full flex items-center gap-2 px-3 py-1.5 rounded bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 font-bold uppercase text-[9px]">
+            <span class="material-symbols-outlined text-[14px]">dashboard</span> Monitor
         </button>
-        <button onclick="limpiarDashboard()" class="w-full flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-red-500 transition">
-            <span class="material-symbols-outlined text-base">delete_forever</span> Purgar Datos
+        <button onclick="limpiarDashboard()" class="w-full flex items-center gap-2 px-3 py-1.5 text-slate-500 hover:text-red-500 transition font-bold uppercase text-[9px] mt-4">
+            <span class="material-symbols-outlined text-[14px]">delete_sweep</span> Purgar Memoria
         </button>
     </nav>
-    <div class="p-4 bg-indigo-500/5 border border-indigo-500/10 rounded-lg">
-        <p class="label-micro">Carga Cargada</p>
-        <div class="flex items-baseline gap-1 mt-1 mb-3"><span id="global-count" class="text-2xl font-black">0</span><span class="text-[9px] text-indigo-500 font-bold uppercase">Uds</span></div>
-        <button id="btn-export" onclick="exportarTodasLasTiendas()" class="hidden w-full bg-indigo-600 text-white py-2 rounded text-[9px] font-black uppercase tracking-widest hover:bg-indigo-700 transition">📦 Exportar Todo</button>
+    <div class="p-3 rounded border border-dashed border-slate-700/30">
+        <p class="label-micro">Global</p>
+        <div class="flex items-baseline gap-1 mt-1"><span id="global-count" class="text-lg font-bold">0</span><span class="text-[8px] text-indigo-500 font-bold italic">items</span></div>
+        <button id="btn-export-master" onclick="exportarTodasLasTiendas()" class="hidden w-full mt-3 bg-indigo-600 text-white py-1 rounded text-[9px] font-bold uppercase">Exportar Todo</button>
     </div>
-</aside>
+</div>
 
-<main class="main-content">
-    <header class="flex justify-between items-center mb-10">
-        <div><h2 class="text-lg font-black uppercase tracking-tighter">Gestión de Rutas</h2><p class="label-micro text-indigo-500">PriceSmart Logistics Console</p></div>
-        <button onclick="document.getElementById('file-input').click()" class="bg-indigo-600 text-white px-6 py-2.5 rounded text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 transition-all">Importar Master XLSX</button>
+<div class="main-content">
+    <header class="flex justify-between items-center mb-10 border-b border-slate-700/10 pb-5">
+        <div><h2 class="text-lg font-black tracking-tighter uppercase">DESPACHO PRICEMART</h2></div>
+        <button onclick="document.getElementById('file-input').click()" class="bg-indigo-600 text-white px-4 py-1.5 rounded text-[10px] font-bold uppercase tracking-wider">Cargar Archivo</button>
         <input type="file" id="file-input" class="hidden" onchange="procesarArchivo(this)">
     </header>
-    <div id="clubs-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
-</main>
+    <div id="clubs-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3"></div>
+</div>
 
-<div id="modal-rutas"><div class="modal-box">
-    <div class="p-4 border-b border-slate-700/10 flex justify-between items-center bg-slate-950/10">
-        <h2 class="label-micro font-black text-indigo-500">Logística de Sede: <span id="modal-sede-name" class="text-current">-</span></h2>
-        <button onclick="document.getElementById('modal-rutas').style.display='none'"><span class="material-symbols-outlined">close</span></button>
+<div id="modal-rutas" class="fixed inset-0 hidden z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+    <div class="enterprise-card w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl">
+        <div class="p-4 border-b border-slate-700/10 flex justify-between items-center bg-slate-900/5">
+            <h2 class="label-micro text-indigo-500">Manifiesto de Ruta</h2>
+            <button onclick="document.getElementById('modal-rutas').style.display='none'"><span class="material-symbols-outlined text-slate-500 text-[16px]">close</span></button>
+        </div>
+        <div id="modal-body" class="p-5 overflow-y-auto space-y-3"></div>
     </div>
-    <div id="modal-body" class="p-5 overflow-y-auto space-y-4"></div>
-</div></div>
+</div>
 
 <script>
     let dbMaestra = [];
@@ -74,20 +78,20 @@
         if(localStorage.getItem('theme') === 'light') document.getElementById('master-html').classList.remove('dark');
         const grid = document.getElementById('clubs-grid');
         grid.innerHTML = sedes.map(s => `
-            <div class="enterprise-card p-5 opacity-40 hover:opacity-100 transition-all" id="card-${s.toLowerCase()}">
-                <div class="flex justify-between items-start mb-6">
-                    <h3 class="text-xs font-black uppercase tracking-widest">${s}</h3>
-                    <div class="flex gap-4">
-                        <div class="flex flex-col items-center"><span class="text-[7px] font-black text-slate-500 mb-1 uppercase">Pilotos</span><input type="number" id="p-${s.toLowerCase()}" value="4" class="config-input" onchange="saveConfig()"></div>
-                        <div class="flex flex-col items-center"><span class="text-[7px] font-black text-slate-500 mb-1 uppercase">Máx Cjs</span><input type="number" id="l-${s.toLowerCase()}" value="14" class="config-input" onchange="saveConfig()"></div>
+            <div class="enterprise-card p-4 opacity-40 transition-all hover:opacity-100" id="card-${s.toLowerCase()}">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="label-micro">${s}</h3>
+                    <div class="flex gap-2 text-[7px] font-bold text-slate-500">
+                        <div class="text-center">PILOTOS<br><input type="number" id="pilotos-${s.toLowerCase()}" value="4" onchange="recalcularVisuales()"></div>
+                        <div class="text-center">ALERTA<br><input type="number" id="limit-${s.toLowerCase()}" value="14" onchange="recalcularVisuales()"></div>
                     </div>
                 </div>
                 <div id="info-${s.toLowerCase()}" class="hidden">
-                    <div class="flex justify-between items-end mb-5 bg-slate-500/5 p-3 rounded">
-                        <div><p class="label-micro text-slate-500">Pedidos</p><p id="count-${s.toLowerCase()}" class="text-xl font-black">0</p></div>
-                        <div class="text-right"><p class="label-micro text-slate-500">Bultos</p><p id="weight-${s.toLowerCase()}" class="text-sm font-bold text-indigo-500">0</p></div>
+                    <div class="flex justify-between items-end mb-4 bg-slate-500/5 p-2 rounded">
+                        <div><p class="label-micro">Pedidos</p><p id="count-${s.toLowerCase()}" class="text-lg font-black">0</p></div>
+                        <div class="text-right"><p class="label-micro">Bultos</p><p id="weight-${s.toLowerCase()}" class="text-xs font-bold text-indigo-500">0</p></div>
                     </div>
-                    <button onclick="verRutas('${s}')" class="w-full py-2.5 bg-indigo-600/10 text-indigo-500 border border-indigo-600/20 text-[9px] font-black uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all rounded">Gestionar</button>
+                    <button onclick="verRutas('${s}')" class="w-full py-1.5 border border-slate-700/20 text-[9px] font-black uppercase hover:bg-indigo-600 hover:text-white transition">Gestionar</button>
                 </div>
             </div>
         `).join('');
@@ -100,6 +104,13 @@
         localStorage.setItem('theme', h.classList.contains('dark') ? 'dark' : 'light');
     }
 
+    function limpiarDashboard() {
+        if(confirm("¿Estás seguro de que deseas purgar toda la memoria de rutas?")) {
+            localStorage.removeItem('zubale_db');
+            location.reload();
+        }
+    }
+
     function procesarArchivo(input) {
         if (!input.files[0]) return;
         const reader = new FileReader();
@@ -110,7 +121,7 @@
                 tienda: String(f[8] || ""), id: String(f[2] || ""), 
                 hora: extraerHora(f[15]), cliente: String(f[26] || ""), 
                 direccion: String(f[27] || ""), cajas: parseInt(f[36]) || 1,
-                zona: f[27] ? (f[27].match(/^[A-Z0-9]{4,8}\+/) ? f[27].substring(0,4) : f[27].split(',').slice(-2,-1)[0]?.trim() || "GEN") : "GEN"
+                zona: f[27] ? (f[27].match(/^[A-Z0-9]{4,8}\+/) ? f[27].substring(0,4) : f[27].split(',').slice(-2,-1)[0]?.trim().toUpperCase() || "GEN") : "GEN"
             }));
             localStorage.setItem('zubale_db', JSON.stringify(dbMaestra));
             recalcularVisuales();
@@ -124,13 +135,79 @@
             const d = XLSX.SSF.parse_date_code(v);
             return `${String(d.h).padStart(2,'0')}:${String(d.m).padStart(2,'0')}`;
         }
-        const m = String(v).match(/(\d{1,2}):(\d{2})/);
-        return m ? m[0] : "00:00";
+        return String(v).match(/(\d{1,2}):(\d{2})/) ? String(v).match(/(\d{1,2}):(\d{2})/)[0] : "00:00";
+    }
+
+    function calcularAsignacion(sede) {
+        const nPilotos = parseInt(document.getElementById(`pilotos-${sede.toLowerCase()}`).value) || 4;
+        const limit = parseInt(document.getElementById(`limit-${sede.toLowerCase()}`).value) || 14;
+        const pedidos = dbMaestra.filter(p => p.tienda.toUpperCase().includes(sede.toUpperCase()));
+        const hGroups = {};
+        pedidos.forEach(p => { if(!hGroups[p.hora]) hGroups[p.hora] = []; hGroups[p.hora].push(p); });
+
+        let result = [];
+        Object.keys(hGroups).sort().forEach(h => {
+            // 1. Mantenemos el orden por ZONA para evitar cruces
+            let list = hGroups[h].sort((a,b) => a.zona.localeCompare(b.zona));
+            let totalPedidos = list.length;
+            
+            // 2. Calculamos cuántos pedidos le tocan a cada piloto para balancear la carga
+            let pedidosPorPiloto = Math.ceil(totalPedidos / nPilotos);
+            let pilotos = Array.from({length: nPilotos}, () => ({ datos: [], carga: 0 }));
+            
+            let currentPiloto = 0;
+            let pedidosEnEstePiloto = 0;
+
+            list.forEach((p) => {
+                // Si el piloto actual ya cumplió su cuota equitativa, pasamos al siguiente
+                if (pedidosEnEstePiloto >= pedidosPorPiloto && currentPiloto < nPilotos - 1) {
+                    currentPiloto++;
+                    pedidosEnEstePiloto = 0;
+                }
+                
+                pilotos[currentPiloto].datos.push(p);
+                pilotos[currentPiloto].carga += p.cajas;
+                pedidosEnEstePiloto++;
+            });
+
+            pilotos.forEach((pil, i) => {
+                if(pil.datos.length > 0) result.push({ hora: h, piloto: i+1, datos: pil.datos, total: pil.carga, over: pil.carga > limit });
+            });
+        });
+        return result;
+    }
+
+    function verRutas(sede) {
+        const asign = calcularAsignacion(sede);
+        const body = document.getElementById('modal-body');
+        body.innerHTML = asign.map(g => `
+            <div class="enterprise-card overflow-hidden mb-3 ${g.over ? 'overload-warning' : ''}">
+                <div class="bg-indigo-500/5 p-2 flex justify-between items-center border-b border-slate-700/10">
+                    <span class="text-indigo-500 font-bold uppercase text-[9px]">Piloto #${g.piloto} <span class="text-slate-500 font-normal">| Ventana ${g.hora}</span></span>
+                    <div class="flex items-center gap-2">
+                        ${g.over ? '<span class="overload-badge">SOBRECARGA</span>' : ''}
+                        <span class="text-[9px] font-black text-slate-500">${g.total} BULTOS</span>
+                    </div>
+                </div>
+                <div class="p-2 space-y-1">
+                    ${g.datos.map((p, idx) => `
+                        <div class="flex justify-between items-center p-1.5 rounded hover:bg-indigo-500/5 transition">
+                            <div class="truncate"><p class="text-[10px] font-bold truncate">${idx+1}. ${p.cliente} <span class="text-indigo-500">(${p.cajas} cjs)</span></p></div>
+                            <div class="flex gap-2">
+                                <span class="text-[8px] bg-slate-700/30 px-1 py-0.5 rounded text-slate-400 font-bold uppercase">${p.zona}</span>
+                                <a href="https://waze.com/ul?q=${encodeURIComponent(p.direccion)}&navigate=yes" target="_blank" class="bg-indigo-500 text-white px-2 py-0.5 rounded text-[8px] font-bold uppercase">Waze</a>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('');
+        document.getElementById('modal-rutas').style.display = "flex";
     }
 
     function recalcularVisuales() {
         document.getElementById('global-count').innerText = dbMaestra.length;
-        document.getElementById('btn-export').classList.toggle('hidden', dbMaestra.length === 0);
+        document.getElementById('btn-export-master').classList.toggle('hidden', dbMaestra.length === 0);
         sedes.forEach(s => {
             const f = dbMaestra.filter(p => p.tienda.toUpperCase().includes(s.toUpperCase()));
             const c = document.getElementById(`card-${s.toLowerCase()}`);
@@ -143,94 +220,24 @@
         });
     }
 
-    function calcularAsignacion(sede) {
-        const nPilotos = parseInt(document.getElementById(`p-${sede.toLowerCase()}`).value) || 4;
-        const maxCjs = parseInt(document.getElementById(`l-${sede.toLowerCase()}`).value) || 14;
-        const pedidos = dbMaestra.filter(p => p.tienda.toUpperCase().includes(sede.toUpperCase()));
-        const hGroups = {};
-        pedidos.forEach(p => { if(!hGroups[p.hora]) hGroups[p.hora] = []; hGroups[p.hora].push(p); });
-
-        let result = [];
-        Object.keys(hGroups).sort().forEach(h => {
-            let list = hGroups[h].sort((a,b) => a.zona.localeCompare(b.zona));
-            let pilotos = Array.from({length: nPilotos}, () => ({ pedidos: [], carga: 0 }));
-            list.forEach(p => {
-                let assigned = false;
-                for (let i = 0; i < nPilotos; i++) {
-                    if (pilotos[i].carga + p.cajas <= maxCjs) {
-                        pilotos[i].pedidos.push(p);
-                        pilotos[i].carga += p.cajas;
-                        assigned = true; break;
-                    }
-                }
-                if (!assigned) {
-                    let minIdx = 0;
-                    pilotos.forEach((pil, idx) => { if(pil.carga < pilotos[minIdx].carga) minIdx = idx; });
-                    pilotos[minIdx].pedidos.push(p);
-                    pilotos[minIdx].carga += p.cajas;
-                }
-            });
-            pilotos.forEach((pil, i) => { if(pil.pedidos.length > 0) result.push({ hora: h, piloto: i+1, datos: pil.pedidos, total: pil.carga, over: pil.carga > maxCjs }); });
-        });
-        return result;
-    }
-
-    function verRutas(sede) {
-        document.getElementById('modal-sede-name').innerText = sede.toUpperCase();
-        const asign = calcularAsignacion(sede);
-        const body = document.getElementById('modal-body');
-        body.innerHTML = asign.map(g => `
-            <div class="enterprise-card overflow-hidden ${g.over ? 'border-red-500/50 bg-red-500/5' : ''}">
-                <div class="bg-slate-800/20 p-3 flex justify-between items-center border-b border-slate-700/10">
-                    <input type="text" value="PILOTO #${g.piloto}" class="bg-transparent border-none text-indigo-400 font-black uppercase text-[10px] w-32 outline-none">
-                    <div class="flex items-center gap-4">
-                        ${g.over ? '<span class="text-[8px] bg-red-600 text-white px-2 py-0.5 rounded font-bold">SOBRECARGA</span>' : ''}
-                        <span class="text-[10px] font-bold text-slate-500 tracking-tighter">VENTANA ${g.hora} | ${g.total} CAJAS</span>
-                    </div>
-                </div>
-                <div class="p-2 space-y-1">
-                    ${g.datos.map((p, idx) => `
-                        <div class="flex justify-between items-center p-2 hover:bg-indigo-500/5 rounded transition-colors">
-                            <div class="truncate"><p class="text-[11px] font-bold truncate">${idx+1}. ${p.cliente} <span class="text-indigo-500/70 ml-1">(${p.cajas} cjs)</span></p><p class="text-[9px] text-slate-500 truncate w-72">${p.direccion}</p></div>
-                            <a href="https://waze.com/ul?q=${encodeURIComponent(p.direccion)}&navigate=yes" target="_blank" class="bg-indigo-600 text-white px-3 py-1 rounded text-[9px] font-black tracking-widest uppercase hover:bg-indigo-700 transition-all">WAZE</a>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `).join('');
-        document.getElementById('modal-rutas').style.display = "flex";
-    }
-
-    function saveConfig() {
-        const cfg = {}; sedes.forEach(s => { cfg[s] = { p: document.getElementById(`p-${s.toLowerCase()}`).value, l: document.getElementById(`l-${s.toLowerCase()}`).value }; });
-        localStorage.setItem('zubale_cfg', JSON.stringify(cfg));
-    }
-
     function loadMemoria() {
         const d = localStorage.getItem('zubale_db'); if(d) { dbMaestra = JSON.parse(d); recalcularVisuales(); }
-        const c = JSON.parse(localStorage.getItem('zubale_cfg'));
-        if(c) sedes.forEach(s => { if(c[s]) { document.getElementById(`p-${s.toLowerCase()}`).value = c[s].p; document.getElementById(`l-${s.toLowerCase()}`).value = c[s].l; } });
     }
-
-    function limpiarDashboard() { if(confirm("¿Purgar todos los datos del sistema?")) { localStorage.clear(); location.reload(); } }
 
     function exportarTodasLasTiendas() {
         const wb = XLSX.utils.book_new();
-        let flag = false;
         sedes.forEach(sede => {
             const f = dbMaestra.filter(p => p.tienda.toUpperCase().includes(sede.toUpperCase()));
             if (f.length > 0) {
-                flag = true;
                 const asign = calcularAsignacion(sede);
                 const rows = asign.flatMap(g => g.datos.map((p, idx) => ({
-                    "VENTANA": g.hora, "PILOTO": "Piloto " + g.piloto, "ORDEN": idx + 1,
-                    "CLIENTE": p.cliente, "BULTOS": p.cajas, "DIRECCIÓN": p.direccion
+                    "VENTANA": g.hora, "PILOTO": "Piloto " + g.piloto, "ORDEN": idx + 1, "ZONA": p.zona,
+                    "CLIENTE": p.cliente, "BULTOS": p.cajas, "DIRECCION": p.direccion
                 })));
                 XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), sede.substring(0,31));
             }
         });
-        if(flag) XLSX.writeFile(wb, "Rutas_Consolidadas_ZubaleCR.xlsx");
-        else alert("Cargue datos primero.");
+        XLSX.writeFile(wb, "Rutas_Balanceadas_Zubale.xlsx");
     }
 </script>
 </body>
