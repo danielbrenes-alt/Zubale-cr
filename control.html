@@ -226,31 +226,49 @@
         horas.forEach(h => {
             let listaPedidos = gruposHora[h];
 
-            // 1. Ordenamiento inteligente por zona/pluscode
-            listaPedidos.sort((a, b) => {
-                const dirA = a.direccion.trim();
-                const dirB = b.direccion.trim();
-                const isPlusCode = (str) => /^[A-Z0-9]{4,8}\+/.test(str);
-                if (isPlusCode(dirA) && isPlusCode(dirB)) return dirA.localeCompare(dirB);
-                const zonaA = dirA.includes(',') ? dirA.split(',').reverse()[1] : dirA;
-                const zonaB = dirB.includes(',') ? dirB.split(',').reverse()[1] : dirB;
-                return zonaA.localeCompare(zonaB);
+            // 1. EXTRAER "ZONA CLAVE" DE CADA DIRECCIÓN PARA AGRUPAMIENTO
+            listaPedidos.forEach(p => {
+                const dir = p.direccion.trim();
+                const plusCodeMatch = dir.match(/^[A-Z0-9]{4,8}\+/);
+                if (plusCodeMatch) {
+                    p._zonaClave = plusCodeMatch[0].substring(0, 4);
+                } else {
+                    const partes = dir.split(',');
+                    p._zonaClave = partes.length > 1 ? partes[partes.length - 2].trim().toLowerCase() : dir.toLowerCase();
+                }
             });
 
-            // 2. Repartición exacta
-            const totalPedidos = listaPedidos.length;
-            const base = Math.floor(totalPedidos / nPilotos);
-            const residuo = totalPedidos % nPilotos;
-            
-            let inicio = 0;
-            for (let i = 0; i < nPilotos; i++) {
-                const cantidadParaEstePiloto = i < residuo ? base + 1 : base;
-                const ruta = listaPedidos.slice(inicio, inicio + cantidadParaEstePiloto);
-                if (ruta.length > 0) {
-                    resultado.push({ hora: h, piloto: i + 1, datos: ruta });
+            // 2. AGRUPAR PEDIDOS POR ESA ZONA CLAVE
+            const pedidosPorZona = {};
+            listaPedidos.forEach(p => {
+                if (!pedidosPorZona[p._zonaClave]) pedidosPorZona[p._zonaClave] = [];
+                pedidosPorZona[p._zonaClave].push(p);
+            });
+
+            // 3. REPARTIR LAS ZONAS ENTRE LOS PILOTOS POR BLOQUES
+            const zonasOrdenadas = Object.keys(pedidosPorZona).sort();
+            const asignacionPilotos = Array.from({ length: nPilotos }, () => []);
+            const metaPedidos = Math.ceil(listaPedidos.length / nPilotos);
+            let pilotoActual = 0;
+
+            zonasOrdenadas.forEach(zona => {
+                const pedidosDeZona = pedidosPorZona[zona];
+                if (asignacionPilotos[pilotoActual].length >= metaPedidos && pilotoActual < nPilotos - 1) {
+                    pilotoActual++;
                 }
-                inicio += cantidadParaEstePiloto;
-            }
+                asignacionPilotos[pilotoActual].push(...pedidosDeZona);
+            });
+
+            // 4. CONVERTIR AL FORMATO FINAL
+            asignacionPilotos.forEach((datosRuta, index) => {
+                if (datosRuta.length > 0) {
+                    resultado.push({
+                        hora: h,
+                        piloto: index + 1,
+                        datos: datosRuta
+                    });
+                }
+            });
         });
         return resultado;
     }
