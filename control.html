@@ -208,7 +208,6 @@
         });
     }
 
-    // --- INTEGRACIÓN DE IA POR CERCANÍA EN CALCULARASIGNACION ---
     function calcularAsignacion(sede) {
         const nPilotos = parseInt(document.getElementById(`pilotos-${sede.toLowerCase()}`).value) || 1;
         const pedidos = dbMaestra.filter(p => p.tienda.toUpperCase().includes(sede.toUpperCase()));
@@ -227,33 +226,30 @@
         horas.forEach(h => {
             let listaPedidos = gruposHora[h];
 
-            // Lógica de IA: Ordenamiento por Plus Code y Zona Geográfica
+            // 1. Ordenamiento inteligente por zona/pluscode
             listaPedidos.sort((a, b) => {
                 const dirA = a.direccion.trim();
                 const dirB = b.direccion.trim();
-
-                // Detección de Plus Codes (Ej: VW76+CXF)
                 const isPlusCode = (str) => /^[A-Z0-9]{4,8}\+/.test(str);
-
-                if (isPlusCode(dirA) && isPlusCode(dirB)) {
-                    // Orden alfabético de coordenadas = Proximidad geográfica
-                    return dirA.localeCompare(dirB);
-                }
-
-                // Fallback a zona nominal (Sabanilla, Aserrí, etc.)
+                if (isPlusCode(dirA) && isPlusCode(dirB)) return dirA.localeCompare(dirB);
                 const zonaA = dirA.includes(',') ? dirA.split(',').reverse()[1] : dirA;
                 const zonaB = dirB.includes(',') ? dirB.split(',').reverse()[1] : dirB;
-
                 return zonaA.localeCompare(zonaB);
             });
 
-            // Repartición equitativa sobre lista agrupada por cercanía
-            const tam = Math.ceil(listaPedidos.length / nPilotos);
-            for(let i = 0; i < nPilotos; i++) {
-                const ruta = listaPedidos.slice(i * tam, (i + 1) * tam);
+            // 2. Repartición exacta
+            const totalPedidos = listaPedidos.length;
+            const base = Math.floor(totalPedidos / nPilotos);
+            const residuo = totalPedidos % nPilotos;
+            
+            let inicio = 0;
+            for (let i = 0; i < nPilotos; i++) {
+                const cantidadParaEstePiloto = i < residuo ? base + 1 : base;
+                const ruta = listaPedidos.slice(inicio, inicio + cantidadParaEstePiloto);
                 if (ruta.length > 0) {
                     resultado.push({ hora: h, piloto: i + 1, datos: ruta });
                 }
+                inicio += cantidadParaEstePiloto;
             }
         });
         return resultado;
