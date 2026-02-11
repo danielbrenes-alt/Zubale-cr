@@ -117,20 +117,16 @@
         reader.onload = (e) => {
             const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
             const raw = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1}); 
-            dbMaestra = raw.slice(1).filter(f => f.length > 30).map(f => {
-                // EXTRACCIÓN MEJORADA DE TELÉFONO
-                let telRaw = f[30] || f[31] || f[32] || f[29] || "N/A";
-                return {
-                    tienda: String(f[8] || ""), 
-                    id: String(f[2] || ""), 
-                    hora: extraerHora(f[15]), 
-                    cliente: String(f[26] || ""), 
-                    telefono: String(telRaw).replace(/[^0-9]/g, "").length > 5 ? String(telRaw) : "Sin Teléfono",
-                    direccion: String(f[27] || ""), 
-                    cajas: parseInt(f[36]) || 1,
-                    zona: f[27] ? (f[27].match(/^[A-Z0-9]{4,8}\+/) ? f[27].substring(0,4) : f[27].split(',').slice(-2,-1)[0]?.trim().toUpperCase() || "GEN") : "GEN"
-                }
-            });
+            dbMaestra = raw.slice(1).filter(f => f.length > 28).map(f => ({
+                tienda: String(f[8] || ""), 
+                id: String(f[2] || ""), 
+                hora: extraerHora(f[15]), 
+                cliente: String(f[26] || ""), 
+                telefono: String(f[28] || "Sin Datos"), // COLUMNA AC = ÍNDICE 28
+                direccion: String(f[27] || ""), 
+                cajas: parseInt(f[36]) || 1,
+                zona: f[27] ? (f[27].match(/^[A-Z0-9]{4,8}\+/) ? f[27].substring(0,4) : f[27].split(',').slice(-2,-1)[0]?.trim().toUpperCase() || "GEN") : "GEN"
+            }));
             localStorage.setItem('zubale_db', JSON.stringify(dbMaestra));
             recalcularVisuales();
         };
@@ -155,13 +151,11 @@
 
         let result = [];
         Object.keys(hGroups).sort().forEach(h => {
-            // LÓGICA GEOGRÁFICA REFORZADA (Sin repartos equitativos que crucen direcciones)
             let list = hGroups[h].sort((a,b) => a.zona.localeCompare(b.zona));
             let pilotos = Array.from({length: nPilotos}, () => ({ datos: [], carga: 0 }));
             
             let pIdx = 0;
             list.forEach(p => {
-                // Solo saltamos al siguiente piloto si el actual llegó al límite Y quedan pilotos disponibles
                 if (pilotos[pIdx].carga >= limit && pIdx < nPilotos - 1) {
                     pIdx++;
                 }
@@ -239,7 +233,7 @@
                 XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), sede.substring(0,31));
             }
         });
-        XLSX.writeFile(wb, "Rutas_Dispatch_Pro.xlsx");
+        XLSX.writeFile(wb, "Rutas_Dispatch_Zubale.xlsx");
     }
 </script>
 </body>
