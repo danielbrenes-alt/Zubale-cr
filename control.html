@@ -18,7 +18,7 @@
         .theme-switch::before { content: ""; position: absolute; width: 14px; height: 14px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s; }
         .dark .theme-switch::before { left: 18px; background: var(--primary); }
         .label-micro { font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; color: var(--text-dim); }
-        input[type="number"] { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 1px 4px; font-size: 9px; border-radius: 2px; width: 35px; text-align: center; font-weight: 800; }
+        input[type="number"], input[type="text"] { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 1px 4px; font-size: 9px; border-radius: 2px; width: 35px; text-align: center; font-weight: 800; }
         .overload-warning { border-color: #ef4444 !important; background: rgba(239, 68, 68, 0.05) !important; }
         .overload-badge { background: #ef4444; color: white; padding: 1px 4px; border-radius: 2px; font-size: 8px; font-weight: 900; }
     </style>
@@ -117,16 +117,20 @@
         reader.onload = (e) => {
             const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
             const raw = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1}); 
-            dbMaestra = raw.slice(1).filter(f => f.length > 30).map(f => ({
-                tienda: String(f[8] || ""), 
-                id: String(f[2] || ""), 
-                hora: extraerHora(f[15]), 
-                cliente: String(f[26] || ""), 
-                telefono: String(f[30] || f[31] || "N/A"), // SE AGREGÓ TELÉFONO
-                direccion: String(f[27] || ""), 
-                cajas: parseInt(f[36]) || 1,
-                zona: f[27] ? (f[27].match(/^[A-Z0-9]{4,8}\+/) ? f[27].substring(0,4) : f[27].split(',').slice(-2,-1)[0]?.trim().toUpperCase() || "GEN") : "GEN"
-            }));
+            dbMaestra = raw.slice(1).filter(f => f.length > 30).map(f => {
+                // EXTRACCIÓN MEJORADA DE TELÉFONO
+                let telRaw = f[30] || f[31] || f[32] || f[29] || "N/A";
+                return {
+                    tienda: String(f[8] || ""), 
+                    id: String(f[2] || ""), 
+                    hora: extraerHora(f[15]), 
+                    cliente: String(f[26] || ""), 
+                    telefono: String(telRaw).replace(/[^0-9]/g, "").length > 5 ? String(telRaw) : "Sin Teléfono",
+                    direccion: String(f[27] || ""), 
+                    cajas: parseInt(f[36]) || 1,
+                    zona: f[27] ? (f[27].match(/^[A-Z0-9]{4,8}\+/) ? f[27].substring(0,4) : f[27].split(',').slice(-2,-1)[0]?.trim().toUpperCase() || "GEN") : "GEN"
+                }
+            });
             localStorage.setItem('zubale_db', JSON.stringify(dbMaestra));
             recalcularVisuales();
         };
@@ -151,13 +155,13 @@
 
         let result = [];
         Object.keys(hGroups).sort().forEach(h => {
-            // LÓGICA GEOGRÁFICA ESTRICTA (REPARADA)
+            // LÓGICA GEOGRÁFICA REFORZADA (Sin repartos equitativos que crucen direcciones)
             let list = hGroups[h].sort((a,b) => a.zona.localeCompare(b.zona));
             let pilotos = Array.from({length: nPilotos}, () => ({ datos: [], carga: 0 }));
             
             let pIdx = 0;
             list.forEach(p => {
-                // Si el piloto ya alcanzó el límite, salta al siguiente SOLO si todavía hay pilotos
+                // Solo saltamos al siguiente piloto si el actual llegó al límite Y quedan pilotos disponibles
                 if (pilotos[pIdx].carga >= limit && pIdx < nPilotos - 1) {
                     pIdx++;
                 }
@@ -186,14 +190,14 @@
                 </div>
                 <div class="p-2 space-y-1">
                     ${g.datos.map((p, idx) => `
-                        <div class="flex flex-col p-2 border-b border-slate-700/10 hover:bg-indigo-500/5 transition">
-                            <div class="flex justify-between items-start mb-1">
+                        <div class="flex flex-col p-2 border-b border-slate-700/5 hover:bg-indigo-500/5 transition">
+                            <div class="flex justify-between items-start">
                                 <p class="text-[10px] font-bold">${idx+1}. ${p.cliente} <span class="text-indigo-500">(${p.cajas} cjs)</span></p>
                                 <span class="text-[8px] bg-slate-700/30 px-1 py-0.5 rounded text-slate-400 font-bold uppercase">${p.zona}</span>
                             </div>
-                            <div class="flex justify-between items-center">
-                                <p class="text-[9px] text-slate-500 truncate w-40 italic">Tel: ${p.telefono}</p>
-                                <a href="https://waze.com/ul?q=${encodeURIComponent(p.direccion)}&navigate=yes" target="_blank" class="bg-indigo-500 text-white px-3 py-0.5 rounded text-[8px] font-bold uppercase tracking-tighter">Waze</a>
+                            <div class="flex justify-between items-center mt-1">
+                                <p class="text-[9px] text-slate-500 italic">Tel: ${p.telefono}</p>
+                                <a href="https://waze.com/ul?q=${encodeURIComponent(p.direccion)}&navigate=yes" target="_blank" class="bg-indigo-500 text-white px-2 py-0.5 rounded text-[8px] font-bold uppercase">Waze</a>
                             </div>
                         </div>
                     `).join('')}
@@ -235,7 +239,7 @@
                 XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), sede.substring(0,31));
             }
         });
-        XLSX.writeFile(wb, "Rutas_Geograficas_Zubale.xlsx");
+        XLSX.writeFile(wb, "Rutas_Dispatch_Pro.xlsx");
     }
 </script>
 </body>
