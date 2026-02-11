@@ -2,7 +2,7 @@
 <html lang="es" id="master-html" class="dark">
 <head>
     <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zubale CR Systems | Dispatch Pro</title>
+    <title>Zubale CR Systems | IA Pure Territory</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -42,17 +42,17 @@
             <span class="material-symbols-outlined text-[14px]">delete_sweep</span> Purgar Memoria
         </button>
     </nav>
-    <div class="p-3 rounded border border-dashed border-slate-700/30 mt-auto">
+    <div class="p-3 rounded border border-dashed border-slate-700/30">
         <p class="label-micro">Global</p>
-        <div class="flex items-baseline gap-1 mt-1"><span id="global-count" class="text-lg font-bold">0</span><span class="text-[8px] text-indigo-500 font-bold italic text-xs ml-1">items</span></div>
-        <button id="btn-export-master" onclick="exportarTodasLasTiendas()" class="hidden w-full mt-3 bg-indigo-600 text-white py-1 rounded text-[9px] font-bold uppercase tracking-widest">Exportar Todo</button>
+        <div class="flex items-baseline gap-1 mt-1"><span id="global-count" class="text-lg font-bold">0</span><span class="text-[8px] text-indigo-500 font-bold italic ml-1">órdenes</span></div>
+        <button id="btn-export-master" onclick="exportarTodasLasTiendas()" class="hidden w-full mt-3 bg-indigo-600 text-white py-1 rounded text-[9px] font-bold uppercase tracking-widest">Exportar Excel</button>
     </div>
 </div>
 
 <div class="main-content">
     <header class="flex justify-between items-center mb-10 border-b border-slate-700/10 pb-5">
         <div><h2 class="text-lg font-black tracking-tighter uppercase">DESPACHO PRICEMART</h2></div>
-        <button onclick="document.getElementById('file-input').click()" class="bg-indigo-600 text-white px-4 py-1.5 rounded text-[10px] font-bold uppercase tracking-wider">Cargar Archivo</button>
+        <button onclick="document.getElementById('file-input').click()" class="bg-indigo-600 text-white px-4 py-1.5 rounded text-[10px] font-bold uppercase tracking-wider">Cargar Excel</button>
         <input type="file" id="file-input" class="hidden" onchange="procesarArchivo(this)">
     </header>
     <div id="clubs-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3"></div>
@@ -60,8 +60,8 @@
 
 <div id="modal-rutas" class="fixed inset-0 hidden z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
     <div class="enterprise-card w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl">
-        <div class="p-4 border-b border-slate-700/10 flex justify-between items-center bg-slate-900/5 text-indigo-500">
-            <h2 class="label-micro">Manifiesto de Ruta</h2>
+        <div class="p-4 border-b border-slate-700/10 flex justify-between items-center bg-slate-900/5">
+            <h2 class="label-micro text-indigo-500">Manifiesto Territorial Pro</h2>
             <button onclick="document.getElementById('modal-rutas').style.display='none'"><span class="material-symbols-outlined text-slate-500 text-[16px]">close</span></button>
         </div>
         <div id="modal-body" class="p-5 overflow-y-auto space-y-3"></div>
@@ -81,15 +81,14 @@
                     <h3 class="label-micro">${s}</h3>
                     <div class="flex gap-2 text-[7px] font-bold text-slate-500">
                         <div class="text-center">PILOTOS<br><input type="number" id="pilotos-${s.toLowerCase()}" value="4" onchange="recalcularVisuales()"></div>
-                        <div class="text-center">ALERTA<br><input type="number" id="limit-${s.toLowerCase()}" value="14" onchange="recalcularVisuales()"></div>
                     </div>
                 </div>
                 <div id="info-${s.toLowerCase()}" class="hidden">
-                    <div class="flex justify-between items-end mb-4 bg-slate-500/5 p-2 rounded border border-slate-700/10">
-                        <div><p class="label-micro">Pedidos</p><p id="count-${s.toLowerCase()}" class="text-lg font-black">0</p></div>
+                    <div class="flex justify-between items-end mb-4 bg-slate-500/5 p-2 rounded">
+                        <div><p class="label-micro">Órdenes</p><p id="count-${s.toLowerCase()}" class="text-lg font-black">0</p></div>
                         <div class="text-right"><p class="label-micro">Bultos</p><p id="weight-${s.toLowerCase()}" class="text-xs font-bold text-indigo-500">0</p></div>
                     </div>
-                    <button onclick="verRutas('${s}')" class="w-full py-1.5 border border-indigo-600/20 text-indigo-500 text-[9px] font-black uppercase hover:bg-indigo-600 hover:text-white transition rounded">Gestionar</button>
+                    <button onclick="verRutas('${s}')" class="w-full py-1.5 border border-indigo-600/20 text-indigo-500 text-[9px] font-black uppercase hover:bg-indigo-600 hover:text-white transition rounded">Gestionar Zonas</button>
                 </div>
             </div>
         `).join('');
@@ -103,7 +102,7 @@
     }
 
     function limpiarDashboard() {
-        if(confirm("¿Estás seguro de que deseas purgar toda la memoria de rutas?")) {
+        if(confirm("¿Eliminar todos los datos?")) {
             localStorage.removeItem('zubale_db');
             location.reload();
         }
@@ -115,16 +114,22 @@
         reader.onload = (e) => {
             const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
             const raw = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1}); 
-            dbMaestra = raw.slice(1).filter(f => f.length > 28).map(f => ({
-                tienda: String(f[8] || ""), 
-                id: String(f[2] || ""), 
-                hora: extraerHora(f[15]), 
-                cliente: String(f[26] || ""), 
-                telefono: String(f[28] || "N/A"), 
-                direccion: String(f[27] || ""), 
-                cajas: parseInt(f[36]) || 1,
-                zona: f[27] ? (f[27].match(/^[A-Z0-9]{4,8}\+/) ? f[27].substring(0,4) : f[27].split(',').slice(-2,-1)[0]?.trim().toUpperCase() || "GEN") : "GEN"
-            }));
+            dbMaestra = raw.slice(1).filter(f => f.length > 28).map(f => {
+                let dir = String(f[27] || "").toUpperCase();
+                return {
+                    tienda: String(f[8] || ""), id: String(f[2] || ""), hora: extraerHora(f[15]), 
+                    cliente: String(f[26] || ""), telefono: String(f[28] || "S/D"), direccion: dir, 
+                    cajas: parseInt(f[36]) || 1,
+                    // IA DE DETECCIÓN TERRITORIAL
+                    zona: dir.includes("COYOL") ? "COYOL" : 
+                          dir.includes("ANTONIO") ? "SAN ANTONIO" :
+                          dir.includes("RAFAEL") ? "SAN RAFAEL" :
+                          dir.includes("GUACHIPELIN") ? "GUACHIPELIN" :
+                          dir.includes("BELEN") || dir.includes("RIVERA") ? "BELEN/RIVERA" :
+                          dir.includes("ULLOA") ? "ULLOA" :
+                          (f[27]?.match(/^[A-Z0-9]{4,8}\+/) ? f[27].substring(0,4) : "OTROS")
+                }
+            });
             localStorage.setItem('zubale_db', JSON.stringify(dbMaestra));
             recalcularVisuales();
         };
@@ -142,38 +147,40 @@
 
     function calcularAsignacion(sede) {
         const nPilotos = parseInt(document.getElementById(`pilotos-${sede.toLowerCase()}`).value) || 1;
-        const limit = parseInt(document.getElementById(`limit-${sede.toLowerCase()}`).value) || 14;
-        const pedidosSede = dbMaestra.filter(p => p.tienda.toUpperCase().includes(sede.toUpperCase()));
-        
+        const pedidos = dbMaestra.filter(p => p.tienda.toUpperCase().includes(sede.toUpperCase()));
         const hGroups = {};
-        pedidosSede.forEach(p => { if(!hGroups[p.hora]) hGroups[p.hora] = []; hGroups[p.hora].push(p); });
+        pedidos.forEach(p => { if(!hGroups[p.hora]) hGroups[p.hora] = []; hGroups[p.hora].push(p); });
 
         let result = [];
         Object.keys(hGroups).sort().forEach(h => {
-            // LÓGICA DE DIVISIÓN EQUITATIVA POR PILOTOS ELEGIDOS
-            let list = hGroups[h].sort((a,b) => a.zona.localeCompare(b.zona));
-            let totalVentana = list.length;
-            
-            // Calculamos cuántos pedidos le tocan a cada piloto según tu selección
-            let cuotaPedidos = Math.ceil(totalVentana / nPilotos);
-            let pilotos = Array.from({length: nPilotos}, () => ({ datos: [], carga: 0 }));
-            
-            let pIdx = 0;
-            let pedidosEnEstePiloto = 0;
+            // Agrupar por zona detectada
+            let porZonas = {};
+            hGroups[h].forEach(p => {
+                if(!porZonas[p.zona]) porZonas[p.zona] = { pedidos: [], carga: 0 };
+                porZonas[p.zona].pedidos.push(p);
+                porZonas[p.zona].carga += p.cajas;
+            });
 
-            list.forEach((p) => {
-                // Cambia de piloto si llegó a la cuota equitativa O si se pasa de bultos
-                if ((pedidosEnEstePiloto >= cuotaPedidos || pilotos[pIdx].carga >= limit) && pIdx < nPilotos - 1) {
+            let pilotos = Array.from({length: nPilotos}, () => ({ datos: [], carga: 0 }));
+            let zonaKeys = Object.keys(porZonas);
+            
+            // Reparto proporcional por zonas entre los pilotos elegidos
+            let zonasPorPiloto = Math.ceil(zonaKeys.length / nPilotos);
+            let pIdx = 0;
+            let zonasEnEstePiloto = 0;
+
+            zonaKeys.forEach(zName => {
+                if (zonasEnEstePiloto >= zonasPorPiloto && pIdx < nPilotos - 1) {
                     pIdx++;
-                    pedidosEnEstePiloto = 0;
+                    zonasEnEstePiloto = 0;
                 }
-                pilotos[pIdx].datos.push(p);
-                pilotos[pIdx].carga += p.cajas;
-                pedidosEnEstePiloto++;
+                pilotos[pIdx].datos.push(...porZonas[zName].pedidos);
+                pilotos[pIdx].carga += porZonas[zName].carga;
+                zonasEnEstePiloto++;
             });
 
             pilotos.forEach((pil, i) => {
-                if(pil.datos.length > 0) result.push({ hora: h, piloto: i+1, datos: pil.datos, total: pil.carga, over: pil.carga > limit });
+                if(pil.datos.length > 0) result.push({ hora: h, piloto: i+1, datos: pil.datos, total: pil.carga });
             });
         });
         return result;
@@ -183,24 +190,21 @@
         const asign = calcularAsignacion(sede);
         const body = document.getElementById('modal-body');
         body.innerHTML = asign.map(g => `
-            <div class="enterprise-card overflow-hidden mb-3 ${g.over ? 'border-red-500 bg-red-500/5' : 'border-slate-700/50'}">
-                <div class="bg-slate-900/40 p-2 flex justify-between items-center border-b border-slate-700/10">
+            <div class="enterprise-card overflow-hidden mb-3 border-slate-700/30">
+                <div class="bg-indigo-500/5 p-2 flex justify-between items-center border-b border-slate-700/10">
                     <span class="text-indigo-500 font-bold uppercase text-[9px]">Piloto #${g.piloto} <span class="text-slate-500 font-normal">| Ventana ${g.hora}</span></span>
-                    <div class="flex items-center gap-2">
-                        ${g.over ? '<span class="bg-red-500 text-white px-2 py-0.5 rounded text-[8px] font-black italic">SOBRECARGA</span>' : ''}
-                        <span class="text-[9px] font-black text-slate-500">${g.total} BULTOS</span>
-                    </div>
+                    <span class="text-[9px] font-black text-slate-500 uppercase tracking-tighter">Bultos Totales: ${g.total}</span>
                 </div>
                 <div class="p-2 space-y-1">
                     ${g.datos.map((p, idx) => `
                         <div class="flex flex-col p-2 border-b border-slate-700/5 hover:bg-indigo-500/5 transition">
                             <div class="flex justify-between items-start">
-                                <p class="text-[10px] font-bold">${idx+1}. ${p.cliente} <span class="text-indigo-500/70 ml-1">(${p.cajas} cjs)</span></p>
-                                <span class="text-[8px] bg-slate-700/30 px-1 py-0.5 rounded text-slate-400 font-bold uppercase tracking-tighter">${p.zona}</span>
+                                <p class="text-[10px] font-bold">${idx+1}. ${p.cliente}</p>
+                                <span class="text-[8px] bg-indigo-500 text-white px-1.5 py-0.5 rounded font-black uppercase">${p.zona}</span>
                             </div>
                             <div class="flex justify-between items-center mt-1">
-                                <p class="text-[9px] text-slate-500">Tel: ${p.telefono}</p>
-                                <a href="https://waze.com/ul?q=${encodeURIComponent(p.direccion)}&navigate=yes" target="_blank" class="bg-indigo-600 text-white px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest">Waze</a>
+                                <p class="text-[9px] text-slate-500">Tel: ${p.telefono} <span class="ml-2 font-bold text-indigo-400">(${p.cajas} bultos)</span></p>
+                                <a href="https://waze.com/ul?q=${encodeURIComponent(p.direccion)}&navigate=yes" target="_blank" class="bg-indigo-600 text-white px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest">Waze</a>
                             </div>
                         </div>
                     `).join('')}
