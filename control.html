@@ -2,7 +2,7 @@
 <html lang="es" id="master-html" class="dark">
 <head>
     <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zubale CR Systems | Dispatch</title>
+    <title>Zubale CR Systems | Dispatch Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@
         .theme-switch::before { content: ""; position: absolute; width: 14px; height: 14px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s; }
         .dark .theme-switch::before { left: 18px; background: var(--primary); }
         .label-micro { font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; color: var(--text-dim); }
-        input[type="number"], input[type="text"] { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 1px 4px; font-size: 9px; border-radius: 2px; width: 35px; text-align: center; font-weight: 800; }
+        input[type="number"] { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 1px 4px; font-size: 9px; border-radius: 2px; width: 35px; text-align: center; font-weight: 800; }
         .overload-warning { border-color: #ef4444 !important; background: rgba(239, 68, 68, 0.05) !important; }
         .overload-badge { background: #ef4444; color: white; padding: 1px 4px; border-radius: 2px; font-size: 8px; font-weight: 900; }
     </style>
@@ -118,9 +118,13 @@
             const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
             const raw = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1}); 
             dbMaestra = raw.slice(1).filter(f => f.length > 30).map(f => ({
-                tienda: String(f[8] || ""), id: String(f[2] || ""), 
-                hora: extraerHora(f[15]), cliente: String(f[26] || ""), 
-                direccion: String(f[27] || ""), cajas: parseInt(f[36]) || 1,
+                tienda: String(f[8] || ""), 
+                id: String(f[2] || ""), 
+                hora: extraerHora(f[15]), 
+                cliente: String(f[26] || ""), 
+                telefono: String(f[30] || f[31] || "N/A"), // SE AGREGÓ TELÉFONO
+                direccion: String(f[27] || ""), 
+                cajas: parseInt(f[36]) || 1,
                 zona: f[27] ? (f[27].match(/^[A-Z0-9]{4,8}\+/) ? f[27].substring(0,4) : f[27].split(',').slice(-2,-1)[0]?.trim().toUpperCase() || "GEN") : "GEN"
             }));
             localStorage.setItem('zubale_db', JSON.stringify(dbMaestra));
@@ -147,27 +151,18 @@
 
         let result = [];
         Object.keys(hGroups).sort().forEach(h => {
-            // 1. Mantenemos el orden por ZONA para evitar cruces
+            // LÓGICA GEOGRÁFICA ESTRICTA (REPARADA)
             let list = hGroups[h].sort((a,b) => a.zona.localeCompare(b.zona));
-            let totalPedidos = list.length;
-            
-            // 2. Calculamos cuántos pedidos le tocan a cada piloto para balancear la carga
-            let pedidosPorPiloto = Math.ceil(totalPedidos / nPilotos);
             let pilotos = Array.from({length: nPilotos}, () => ({ datos: [], carga: 0 }));
             
-            let currentPiloto = 0;
-            let pedidosEnEstePiloto = 0;
-
-            list.forEach((p) => {
-                // Si el piloto actual ya cumplió su cuota equitativa, pasamos al siguiente
-                if (pedidosEnEstePiloto >= pedidosPorPiloto && currentPiloto < nPilotos - 1) {
-                    currentPiloto++;
-                    pedidosEnEstePiloto = 0;
+            let pIdx = 0;
+            list.forEach(p => {
+                // Si el piloto ya alcanzó el límite, salta al siguiente SOLO si todavía hay pilotos
+                if (pilotos[pIdx].carga >= limit && pIdx < nPilotos - 1) {
+                    pIdx++;
                 }
-                
-                pilotos[currentPiloto].datos.push(p);
-                pilotos[currentPiloto].carga += p.cajas;
-                pedidosEnEstePiloto++;
+                pilotos[pIdx].datos.push(p);
+                pilotos[pIdx].carga += p.cajas;
             });
 
             pilotos.forEach((pil, i) => {
@@ -191,11 +186,14 @@
                 </div>
                 <div class="p-2 space-y-1">
                     ${g.datos.map((p, idx) => `
-                        <div class="flex justify-between items-center p-1.5 rounded hover:bg-indigo-500/5 transition">
-                            <div class="truncate"><p class="text-[10px] font-bold truncate">${idx+1}. ${p.cliente} <span class="text-indigo-500">(${p.cajas} cjs)</span></p></div>
-                            <div class="flex gap-2">
+                        <div class="flex flex-col p-2 border-b border-slate-700/10 hover:bg-indigo-500/5 transition">
+                            <div class="flex justify-between items-start mb-1">
+                                <p class="text-[10px] font-bold">${idx+1}. ${p.cliente} <span class="text-indigo-500">(${p.cajas} cjs)</span></p>
                                 <span class="text-[8px] bg-slate-700/30 px-1 py-0.5 rounded text-slate-400 font-bold uppercase">${p.zona}</span>
-                                <a href="https://waze.com/ul?q=${encodeURIComponent(p.direccion)}&navigate=yes" target="_blank" class="bg-indigo-500 text-white px-2 py-0.5 rounded text-[8px] font-bold uppercase">Waze</a>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <p class="text-[9px] text-slate-500 truncate w-40 italic">Tel: ${p.telefono}</p>
+                                <a href="https://waze.com/ul?q=${encodeURIComponent(p.direccion)}&navigate=yes" target="_blank" class="bg-indigo-500 text-white px-3 py-0.5 rounded text-[8px] font-bold uppercase tracking-tighter">Waze</a>
                             </div>
                         </div>
                     `).join('')}
@@ -232,12 +230,12 @@
                 const asign = calcularAsignacion(sede);
                 const rows = asign.flatMap(g => g.datos.map((p, idx) => ({
                     "VENTANA": g.hora, "PILOTO": "Piloto " + g.piloto, "ORDEN": idx + 1, "ZONA": p.zona,
-                    "CLIENTE": p.cliente, "BULTOS": p.cajas, "DIRECCION": p.direccion
+                    "CLIENTE": p.cliente, "TELÉFONO": p.telefono, "BULTOS": p.cajas, "DIRECCION": p.direccion
                 })));
                 XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), sede.substring(0,31));
             }
         });
-        XLSX.writeFile(wb, "Rutas_Balanceadas_Zubale.xlsx");
+        XLSX.writeFile(wb, "Rutas_Geograficas_Zubale.xlsx");
     }
 </script>
 </body>
