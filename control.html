@@ -49,7 +49,7 @@
 
 <div class="main-content">
     <header class="flex justify-between items-center mb-10 border-b border-slate-700/10 pb-5">
-        <div><h2 class="text-lg font-black tracking-tighter uppercase">DESPACHO PRICEMART <span class="text-[10px] text-indigo-500 font-medium ml-2 tracking-normal">Optimización v2.2 (Columna C)</span></h2></div>
+        <div><h2 class="text-lg font-black tracking-tighter uppercase">DESPACHO PRICEMART <span class="text-[10px] text-indigo-500 font-medium ml-2 tracking-normal">Optimización v2.3 (Pedido ID Fix)</span></h2></div>
         <button onclick="document.getElementById('file-input').click()" class="bg-indigo-600 text-white px-4 py-1.5 rounded text-[10px] font-bold uppercase tracking-wider">Cargar Excel</button>
         <input type="file" id="file-input" class="hidden" onchange="procesarArchivo(this)">
     </header>
@@ -59,7 +59,7 @@
 <div id="modal-rutas" class="fixed inset-0 hidden z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
     <div class="enterprise-card w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl">
         <div class="p-4 border-b border-slate-700/10 flex justify-between items-center bg-slate-900/5">
-            <h2 class="label-micro text-indigo-500">Distribución Equitativa de Rutas</h2>
+            <h2 class="label-micro text-indigo-500">Distribución de Rutas con Pedido</h2>
             <button onclick="document.getElementById('modal-rutas').style.display='none'"><span class="material-symbols-outlined text-slate-500 text-[16px]">close</span></button>
         </div>
         <div id="modal-body" class="p-5 overflow-y-auto space-y-3"></div>
@@ -127,7 +127,7 @@
 
                 return {
                     tienda: String(f[8] || ""), 
-                    pedido: String(f[2] || "S/N"), // <--- MAPEO COLUMNA C (Índice 2)
+                    pedido: String(f[2] || "S/N"), // <--- Columna C (Índice 2)
                     hora: extraerHora(f[15]), 
                     cliente: String(f[26] || ""), 
                     telefono: String(f[28] || "S/D"), 
@@ -199,23 +199,17 @@
         body.innerHTML = asign.map(g => `
             <div class="enterprise-card overflow-hidden mb-3 border-slate-700/30">
                 <div class="bg-indigo-500/5 p-2 flex justify-between items-center border-b border-slate-700/10">
-                    <span class="text-indigo-500 font-bold uppercase text-[9px]">Piloto #${g.piloto} <span class="text-slate-500 font-normal">| Ventana ${g.hora}</span></span>
-                    <div class="flex items-center gap-2">
-                        <span class="badge-equidad text-[7px]">OPTIMIZADO</span>
-                        <span class="text-[9px] font-black text-slate-500 uppercase tracking-tighter">Bultos: ${g.total}</span>
-                    </div>
+                    <span class="text-indigo-500 font-bold uppercase text-[9px]">Piloto #${g.piloto} <span class="text-slate-500 font-normal">| ${g.hora}</span></span>
+                    <span class="text-[9px] font-black text-slate-500">Bultos: ${g.total}</span>
                 </div>
                 <div class="p-2 space-y-1">
                     ${g.datos.map((p, idx) => `
-                        <div class="flex flex-col p-2 border-b border-slate-700/5 hover:bg-indigo-500/5 transition">
+                        <div class="flex flex-col p-2 border-b border-slate-700/5 hover:bg-indigo-500/5">
                             <div class="flex justify-between items-start">
                                 <p class="text-[10px] font-bold">${idx+1}. ${p.cliente}</p>
-                                <span class="text-[8px] bg-indigo-500/10 text-indigo-400 px-1.5 py-0.5 rounded font-black uppercase border border-indigo-500/20">ID: ${p.pedido}</span>
+                                <span class="text-[8px] bg-indigo-500 text-white px-1.5 py-0.5 rounded font-black">ID: ${p.pedido}</span>
                             </div>
-                            <div class="flex justify-between items-center mt-1">
-                                <p class="text-[9px] text-slate-500">Zona: ${p.zona} <span class="ml-2 font-bold text-indigo-400">(${p.cajas} bultos)</span></p>
-                                <a href="https://waze.com/ul?q=${encodeURIComponent(p.direccion)}&navigate=yes" target="_blank" class="bg-indigo-600 text-white px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest">Waze</a>
-                            </div>
+                            <p class="text-[9px] text-slate-500 mt-1">Zona: ${p.zona} | Bultos: ${p.cajas}</p>
                         </div>
                     `).join('')}
                 </div>
@@ -253,7 +247,7 @@
                     "VENTANA": g.hora, 
                     "PILOTO": "Piloto " + g.piloto, 
                     "ORDEN": idx + 1, 
-                    "NUM_PEDIDO": p.pedido, // <--- COLUMNA C EN LA DESCARGA
+                    "NUM_PEDIDO": p.pedido, // Exportación verificada
                     "ZONA": p.zona,
                     "CLIENTE": p.cliente, 
                     "TELÉFONO": p.telefono, 
@@ -263,7 +257,7 @@
                 XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), sede.substring(0,31));
             }
         });
-        XLSX.writeFile(wb, "Rutas_Optimizadas_Zubale_v2.2.xlsx");
+        XLSX.writeFile(wb, "Rutas_Optimizadas_Zubale_v2.3.xlsx");
     }
 </script>
 </body>
