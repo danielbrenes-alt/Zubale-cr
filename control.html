@@ -49,7 +49,7 @@
 
 <div class="main-content">
     <header class="flex justify-between items-center mb-10 border-b border-slate-700/10 pb-5">
-        <div><h2 class="text-lg font-black tracking-tighter uppercase">DESPACHO PRICEMART <span class="text-[10px] text-indigo-500 font-medium ml-2 tracking-normal">Optimización Territorial v2</span></h2></div>
+        <div><h2 class="text-lg font-black tracking-tighter uppercase">DESPACHO PRICEMART <span class="text-[10px] text-indigo-500 font-medium ml-2 tracking-normal">Optimización v2.2 (Columna C)</span></h2></div>
         <button onclick="document.getElementById('file-input').click()" class="bg-indigo-600 text-white px-4 py-1.5 rounded text-[10px] font-bold uppercase tracking-wider">Cargar Excel</button>
         <input type="file" id="file-input" class="hidden" onchange="procesarArchivo(this)">
     </header>
@@ -114,9 +114,6 @@
             const raw = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1}); 
             dbMaestra = raw.slice(1).filter(f => f.length > 28).map(f => {
                 let dir = String(f[27] || "").toUpperCase();
-                
-                // --- SOLUCIÓN 1: DETECCIÓN DE PINS (PLUS CODES) ---
-                // Busca códigos tipo 9WF6+F7 o similares en la dirección
                 const plusCodeMatch = dir.match(/[A-Z0-9]{4,8}\+[A-Z0-9]{2,4}/);
                 let zonaDetectada = "OTROS";
                 
@@ -126,11 +123,15 @@
                 else if (dir.includes("GUACHIPELIN")) zonaDetectada = "GUACHIPELIN";
                 else if (dir.includes("BELEN") || dir.includes("RIVERA")) zonaDetectada = "BELEN/RIVERA";
                 else if (dir.includes("ULLOA")) zonaDetectada = "ULLOA";
-                else if (plusCodeMatch) zonaDetectada = `PIN: ${plusCodeMatch[0].substring(0,4)}`; // Agrupa por los primeros 4 dígitos del Pin
+                else if (plusCodeMatch) zonaDetectada = `PIN: ${plusCodeMatch[0].substring(0,4)}`;
 
                 return {
-                    tienda: String(f[8] || ""), id: String(f[2] || ""), hora: extraerHora(f[15]), 
-                    cliente: String(f[26] || ""), telefono: String(f[28] || "S/D"), direccion: dir, 
+                    tienda: String(f[8] || ""), 
+                    pedido: String(f[2] || "S/N"), // <--- MAPEO COLUMNA C (Índice 2)
+                    hora: extraerHora(f[15]), 
+                    cliente: String(f[26] || ""), 
+                    telefono: String(f[28] || "S/D"), 
+                    direccion: dir, 
                     cajas: parseInt(f[36]) || 1,
                     zona: zonaDetectada
                 }
@@ -150,20 +151,15 @@
         return String(v).match(/(\d{1,2}):(\d{2})/) ? String(v).match(/(\d{1,2}):(\d{2})/)[0] : "00:00";
     }
 
-    // --- SOLUCIÓN 2 & 3: BLOQUES TERRITORIALES Y LÓGICA DE AUXILIO ---
     function calcularAsignacion(sede) {
         const nPilotos = parseInt(document.getElementById(`pilotos-${sede.toLowerCase()}`).value) || 1;
         const pedidos = dbMaestra.filter(p => p.tienda.toUpperCase().includes(sede.toUpperCase()));
-        
-        // Agrupar por ventana horaria
         const hGroups = {};
         pedidos.forEach(p => { if(!hGroups[p.hora]) hGroups[p.hora] = []; hGroups[p.hora].push(p); });
 
         let result = [];
         Object.keys(hGroups).sort().forEach(h => {
             let list = hGroups[h];
-            
-            // Agrupamos por Zonas/Pins para crear "Bloques"
             let bloques = {};
             let totalCajasVentana = 0;
             list.forEach(p => {
@@ -173,32 +169,23 @@
                 totalCajasVentana += p.cajas;
             });
 
-            // Convertir a array y ordenar para que los bloques "OTROS" o similares queden juntos
             let bloquesArray = Object.keys(bloques).map(z => ({ nombre: z, ...bloques[z] }));
-            
             let pilotos = Array.from({length: nPilotos}, () => ({ datos: [], carga: 0 }));
             const cargaObjetivo = totalCajasVentana / nPilotos;
             let pIdx = 0;
 
             bloquesArray.forEach(bloque => {
-                // Lógica de salto de piloto:
-                // Si el piloto actual ya tiene carga y sumarle este bloque nuevo lo aleja 
-                // significativamente de la carga promedio, pasamos al siguiente piloto.
                 if (pIdx < nPilotos - 1 && pilotos[pIdx].carga > 0) {
                     const diffActual = Math.abs(pilotos[pIdx].carga - cargaObjetivo);
                     const diffConNuevo = Math.abs((pilotos[pIdx].carga + bloque.carga) - cargaObjetivo);
-                    
-                    // Si el piloto ya cumplió al menos el 80% de su cuota y el nuevo bloque es muy pesado
                     if (diffConNuevo > diffActual && pilotos[pIdx].carga >= (cargaObjetivo * 0.8)) {
                         pIdx++;
                     }
                 }
-                
                 pilotos[pIdx].datos.push(...bloque.pedidos);
                 pilotos[pIdx].carga += bloque.carga;
             });
 
-            // Limpiar pilotos que pudieron quedar vacíos por falta de volumen
             pilotos.forEach((pil, i) => {
                 if(pil.datos.length > 0) result.push({ hora: h, piloto: i+1, datos: pil.datos, total: pil.carga });
             });
@@ -214,7 +201,7 @@
                 <div class="bg-indigo-500/5 p-2 flex justify-between items-center border-b border-slate-700/10">
                     <span class="text-indigo-500 font-bold uppercase text-[9px]">Piloto #${g.piloto} <span class="text-slate-500 font-normal">| Ventana ${g.hora}</span></span>
                     <div class="flex items-center gap-2">
-                         <span class="badge-equidad text-[7px]">OPTIMIZADO</span>
+                        <span class="badge-equidad text-[7px]">OPTIMIZADO</span>
                         <span class="text-[9px] font-black text-slate-500 uppercase tracking-tighter">Bultos: ${g.total}</span>
                     </div>
                 </div>
@@ -223,10 +210,10 @@
                         <div class="flex flex-col p-2 border-b border-slate-700/5 hover:bg-indigo-500/5 transition">
                             <div class="flex justify-between items-start">
                                 <p class="text-[10px] font-bold">${idx+1}. ${p.cliente}</p>
-                                <span class="text-[8px] bg-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded font-black uppercase border border-indigo-500/30">${p.zona}</span>
+                                <span class="text-[8px] bg-indigo-500/10 text-indigo-400 px-1.5 py-0.5 rounded font-black uppercase border border-indigo-500/20">ID: ${p.pedido}</span>
                             </div>
                             <div class="flex justify-between items-center mt-1">
-                                <p class="text-[9px] text-slate-500">Tel: ${p.telefono} <span class="ml-2 font-bold text-indigo-400">(${p.cajas} bultos)</span></p>
+                                <p class="text-[9px] text-slate-500">Zona: ${p.zona} <span class="ml-2 font-bold text-indigo-400">(${p.cajas} bultos)</span></p>
                                 <a href="https://waze.com/ul?q=${encodeURIComponent(p.direccion)}&navigate=yes" target="_blank" class="bg-indigo-600 text-white px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest">Waze</a>
                             </div>
                         </div>
@@ -263,13 +250,20 @@
             if (f.length > 0) {
                 const asign = calcularAsignacion(sede);
                 const rows = asign.flatMap(g => g.datos.map((p, idx) => ({
-                    "VENTANA": g.hora, "PILOTO": "Piloto " + g.piloto, "ORDEN": idx + 1, "ZONA": p.zona,
-                    "CLIENTE": p.cliente, "TELÉFONO": p.telefono, "BULTOS": p.cajas, "DIRECCION": p.direccion
+                    "VENTANA": g.hora, 
+                    "PILOTO": "Piloto " + g.piloto, 
+                    "ORDEN": idx + 1, 
+                    "NUM_PEDIDO": p.pedido, // <--- COLUMNA C EN LA DESCARGA
+                    "ZONA": p.zona,
+                    "CLIENTE": p.cliente, 
+                    "TELÉFONO": p.telefono, 
+                    "BULTOS": p.cajas, 
+                    "DIRECCION": p.direccion
                 })));
                 XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), sede.substring(0,31));
             }
         });
-        XLSX.writeFile(wb, "Rutas_Optimizadas_Zubale.xlsx");
+        XLSX.writeFile(wb, "Rutas_Optimizadas_Zubale_v2.2.xlsx");
     }
 </script>
 </body>
