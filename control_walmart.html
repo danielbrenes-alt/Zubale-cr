@@ -215,6 +215,9 @@
                     <p id="msg-bloqueo" class="text-[11px] font-semibold text-enterprise-500 uppercase tracking-wider">
                         Slot 1: 0/2 Cargados</p>
                     <div class="flex items-center gap-3">
+                        <button onclick="exportarExcel()" class="px-4 py-2 text-xs font-semibold bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all">
+                            Exportar Reporte
+                        </button>
                         <button onclick="limpiarTodo()" class="px-4 py-2 text-xs font-semibold border border-red-300 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all">
         Reiniciar Todo
       </button>
@@ -297,6 +300,28 @@ function procesarArchivoGeneral(input, tipo, slotIdx = null) {
         input.value = "";
     };
     reader.readAsArrayBuffer(file);
+}
+
+function exportarExcel() {
+    try {
+        const dataExport = allStores.map(name => {
+            const row = { "Tienda": name };
+            db[name].slots.forEach((val, i) => {
+                row[`Slot ${i+1}`] = val;
+            });
+            row["Soluciones"] = db[name].sol;
+            row["Total"] = db[name].slots.reduce((a, b) => a + b, 0) + db[name].sol;
+            return row;
+        });
+
+        const ws = XLSX.utils.json_to_sheet(dataExport);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Reporte_General");
+        XLSX.writeFile(wb, `Zubale_Reporte_${new Date().toISOString().slice(0, 10)}.xlsx`);
+        mostrarToast("💾 Reporte exportado correctamente", "success");
+    } catch (error) {
+        mostrarToast("❌ Error al exportar", "error");
+    }
 }
 
 function guardar() {
