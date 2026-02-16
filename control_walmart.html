@@ -67,15 +67,22 @@
     <header class="sticky top-0 z-40 w-full border-b border-enterprise-200 dark:border-enterprise-800 bg-white/80 dark:bg-enterprise-900/80 backdrop-blur-md">
         <div class="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-8">
-                <div class="flex items-center space-x-4 cursor-pointer hover:opacity-80 transition-opacity" onclick="window.location.reload()">
+                <a href="index.html" class="flex items-center space-x-4 cursor-pointer hover:opacity-80 transition-opacity">
                     <div class="w-8 h-8 bg-accent-500 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-accent-500/20">Z</div>
                     <div>
                         <h1 class="text-lg font-bold tracking-tight text-enterprise-900 dark:text-white leading-none">Zubale CR Systems</h1>
                         <span class="text-[10px] uppercase tracking-widest text-enterprise-600 font-semibold">Logistics Control Center</span>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="flex items-center space-x-4">
+                <a href="index.html" class="flex items-center space-x-2 px-3 py-2 text-xs font-semibold text-enterprise-600 dark:text-enterprise-300 hover:bg-enterprise-100 dark:hover:bg-enterprise-800 rounded-lg transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                    <span>Volver al Hub</span>
+                </a>
+
+                <div class="h-6 w-[1px] bg-enterprise-200 dark:bg-enterprise-800"></div>
+
                 <button class="p-2 rounded-full hover:bg-enterprise-100 dark:hover:bg-enterprise-800 transition-colors" id="themeToggle">
                     <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
                     <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
@@ -183,11 +190,9 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // --- FUNCIÓN CON RESTRICCIÓN DE 2 ARCHIVOS ---
         function procesarArchivoGeneral(input, tipo, slotIdx = null) {
             const file = input.files[0]; if (!file) return;
 
-            // Bloqueo si ya hay 2 archivos en el slot seleccionado
             if (tipo === 'slots' && slotIdx !== null) {
                 const numSlot = slotIdx + 1;
                 if ((locks[numSlot] || 0) >= 2) {
@@ -299,9 +304,9 @@
 
         document.getElementById('input-inyectar').addEventListener('change', function() { inyectarTurno(this); });
         document.getElementById('input-soluciones').addEventListener('change', function() { procesarArchivoGeneral(this, 'sol'); });
-        document.getElementById('input-slot').addEventListener('change', function() { 
+        document.getElementById('input-slot').addEventListener('change', function() { 
             const slotIdx = parseInt(document.getElementById('slot-selector').value) - 1;
-            procesarArchivoGeneral(this, 'slots', slotIdx); 
+            procesarArchivoGeneral(this, 'slots', slotIdx); 
         });
         document.getElementById('themeToggle').addEventListener('click', () => document.documentElement.classList.toggle('dark'));
 
