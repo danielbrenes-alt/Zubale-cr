@@ -1,377 +1,258 @@
 <!DOCTYPE html>
 <html class="light" lang="es">
-
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>PriceSmart Route Planner | Logistics Control</title>
-    <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <title>PriceSmart Route Planner | Zubale CR Logistics</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
-        tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { ps: { 50: '#F0F4FF', 100: '#E0E7FF', 500: '#4F46E5', 600: '#4338CA', 700: '#3730A3' }, slate: { 850: '#162032' } } } } }
+        tailwind.config = { 
+            darkMode: 'class', 
+            theme: { 
+                extend: { 
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }, 
+                    colors: { 
+                        ps: { 50: '#F0F4FF', 100: '#E0E7FF', 500: '#4F46E5', 600: '#4338CA', 700: '#3730A3' } 
+                    } 
+                } 
+            } 
+        }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; background: #F8FAFC }
-        .dark body { background: #0F172A }
-        .glass { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(12px); border: 1px solid #E2E8F0 }
-        .dark .glass { background: rgba(30, 41, 59, 0.7); border: 1px solid #334155 }
-        .overflow-x-auto::-webkit-scrollbar { height: 8px; }
-        .overflow-x-auto::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 4px; }
-        .overflow-x-auto::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.2); border-radius: 4px; }
-        .dark .overflow-x-auto::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
-        .dark .overflow-x-auto::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); }
-        .toast { animation: slideIn .4s ease, fadeO .4s ease 2.6s forwards }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0 } to { transform: translateX(0); opacity: 1 } }
-        @keyframes fadeO { from { opacity: 1 } to { opacity: 0 } }
-        .pilot-card { transition: all .3s ease }
-        .pilot-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) }
-        .file-drop { border: 2px dashed #94A3B8; transition: all .3s ease }
-        .file-drop.dragover { border-color: #4F46E5; background: rgba(79, 70, 229, 0.05) }
+        body { font-family: 'Inter', sans-serif; background: #F8FAFC; transition: all .3s ease; }
+        .dark body { background: #0F172A; }
+        .glass { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(12px); border: 1px solid #E2E8F0; }
+        .dark .glass { background: rgba(30, 41, 59, 0.7); border: 1px solid #334155; }
+        
+        /* Acordeón */
+        details > summary { list-style: none; cursor: pointer; outline: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] .arrow-icon { transform: rotate(180deg); }
+        .arrow-icon { transition: transform .3s ease; }
+        
+        .pilot-card { transition: all .3s ease; border-left: 4px solid; }
+        .pilot-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12); }
+
+        .custom-scroll::-webkit-scrollbar { height: 8px; width: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.1); border-radius: 10px; }
+        .dark .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); }
     </style>
 </head>
-
-<body class="font-sans antialiased bg-[#F8FAFC] text-slate-800 dark:bg-slate-900 dark:text-slate-100 transition-colors duration-200">
-
-    <div id="toast-box" class="fixed top-20 right-6 z-[100] flex flex-col gap-2"></div>
+<body class="antialiased text-slate-800 dark:text-slate-100">
 
     <header class="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
-        <div class="max-w-[1440px] mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
+        <div class="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
                 <div class="w-9 h-9 bg-gradient-to-br from-ps-500 to-ps-700 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-ps-500/20 text-sm">PS</div>
                 <div>
                     <h1 class="text-base md:text-lg font-bold tracking-tight text-slate-900 dark:text-white leading-none">PriceSmart Route Planner</h1>
-                    <span class="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">Logistics Control Center</span>
+                    <span class="text-[10px] uppercase tracking-widest text-slate-500 font-semibold italic">Zubale CR Logistics</span>
                 </div>
             </div>
-            <div class="flex items-center space-x-3">
-                <a href="index.html" class="flex items-center space-x-2 px-3 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
-                    <span>Hub</span>
-                </a>
-                <div class="h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
-                <button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" id="themeBtn">
-                    <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
-                    <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
-                </button>
-            </div>
+            <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            </button>
         </div>
     </header>
 
     <main class="max-w-[1440px] mx-auto px-4 md:px-6 py-6 space-y-6">
 
-        <section class="glass rounded-2xl p-5 md:p-6 shadow-sm">
-            <h2 class="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                <svg class="w-4 h-4 text-ps-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
-                1. Cargar Excel Original
+        <section class="glass rounded-2xl p-6 shadow-sm">
+            <h2 class="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2 uppercase tracking-tighter">
+                <svg class="w-4 h-4 text-ps-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                1. Importación de Reporte
             </h2>
-            <div id="dropZone" class="file-drop rounded-xl p-6 text-center cursor-pointer mb-2" onclick="document.getElementById('fileInput').click()">
+            <div onclick="document.getElementById('fileInput').click()" class="group border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl p-8 text-center cursor-pointer hover:border-ps-500 hover:bg-ps-50/50 transition-all">
                 <input type="file" id="fileInput" class="hidden" accept=".xlsx,.xls,.csv" />
-                <svg class="w-8 h-8 mx-auto text-slate-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
-                <p class="text-xs text-slate-500">Arrastra o haz clic para subir el Excel</p>
-                <p class="text-[10px] text-slate-400 mt-1">El sistema agrupará por hora de inicio exacta.</p>
+                <p class="text-xs text-slate-500 font-medium">Click para cargar el archivo Excel</p>
             </div>
-            <p id="fileStatus" class="text-[11px] text-emerald-500 font-medium hidden text-center"></p>
+            <p id="fileStatus" class="text-[11px] text-emerald-500 font-bold mt-4 hidden text-center italic"></p>
         </section>
 
-        <section id="configSection" class="hidden glass rounded-2xl p-5 md:p-6 shadow-sm">
-            <h2 class="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                <svg class="w-4 h-4 text-ps-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
-                2. Configurar Pilotos por Tienda Detectada
+        <section id="configSection" class="hidden glass rounded-2xl p-6 shadow-sm">
+            <h2 class="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2 uppercase tracking-tighter">
+                <svg class="w-4 h-4 text-ps-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                2. Distribución de Flota
             </h2>
             <div id="storeConfigContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6"></div>
             <div class="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
-                <button onclick="distribuirRutas()" class="px-6 py-2.5 bg-gradient-to-r from-ps-500 to-ps-700 text-white rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-ps-500/25 transition-all active:scale-[0.98] flex items-center gap-2">
-                    Generar Rutas Optimizadas
+                <button onclick="distribuirRutas()" class="px-6 py-2.5 bg-gradient-to-r from-ps-500 to-ps-700 text-white rounded-xl font-bold text-sm hover:shadow-lg transition-all active:scale-95">
+                    GENERAR RUTAS
                 </button>
             </div>
         </section>
 
         <section id="resultsSection" class="hidden space-y-6">
-            <div class="flex flex-wrap items-center justify-between gap-3 glass rounded-xl px-5 py-3">
-                <div class="flex items-center gap-2">
-                    <h3 class="font-bold text-slate-800 dark:text-white text-sm">Resumen de Rutas</h3>
-                    <span id="totalOrdersBagde" class="text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-full font-mono">0 pedidos</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="exportarExcel()" class="px-4 py-2 text-xs font-semibold bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all flex items-center gap-1.5 shadow-md shadow-emerald-600/10">Exportar Excel por Clubes</button>
-                    <button onclick="limpiar()" class="px-4 py-2 text-xs font-semibold border border-red-300 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all flex items-center gap-1.5">Reiniciar</button>
+            <div class="flex items-center justify-between glass rounded-xl px-5 py-3 shadow-sm">
+                <h3 class="font-bold text-slate-800 dark:text-white text-sm" id="totalOrdersBadge">0 Pedidos</h3>
+                <div class="flex gap-2">
+                    <button onclick="exportarExcel()" class="px-4 py-2 text-xs font-semibold bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all shadow-md">Exportar Excel</button>
+                    <button onclick="limpiarDashboard()" class="px-4 py-2 text-xs font-semibold border border-red-300 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all">Reiniciar</button>
                 </div>
             </div>
-            <div id="routesContainer" class="space-y-8"></div>
+            <div id="routesContainer" class="space-y-4"></div>
         </section>
     </main>
 
     <script>
         const STORES_CONFIG = {
-            'alajuela': { name: 'PriceSmart Alajuela', lat: 10.016, lng: -84.214, aliases: ['ALAJUELA', 'PR - ALAJUELA'] },
-            'cartago': { name: 'PriceSmart Cartago', lat: 9.864, lng: -83.919, aliases: ['CARTAGO', 'PR - CARTAGO'] },
-            'escazu': { name: 'PriceSmart Escazú', lat: 9.934, lng: -84.139, aliases: ['ESCAZU', 'ESCAZÚ', 'PR - ESCAZU'] },
-            'heredia': { name: 'PriceSmart Heredia', lat: 9.998, lng: -84.120, aliases: ['HEREDIA', 'PR - HEREDIA'] },
-            'liberia': { name: 'PriceSmart Liberia', lat: 10.635, lng: -85.437, aliases: ['LIBERIA', 'PR - LIBERIA'] },
-            'llorente': { name: 'PriceSmart Llorente', lat: 9.964, lng: -84.079, aliases: ['LLORENTE', 'PR - LLORENTE', 'TIBAS', 'TIBÁS'] },
-            'santa_ana': { name: 'PriceSmart Santa Ana', lat: 9.934, lng: -84.181, aliases: ['SANTA ANA', 'PR - SANTA ANA'] },
-            'tres_rios': { name: 'PriceSmart Tres Ríos', lat: 9.905, lng: -83.987, aliases: ['TRES RIOS', 'TRES RÍOS', 'PR - TRES RIOS'] },
-            'zapote': { name: 'PriceSmart Zapote', lat: 9.925, lng: -84.055, aliases: ['ZAPOTE', 'PR - ZAPOTE'] }
+            'alajuela': { name: 'Alajuela', lat: 10.016, lng: -84.214, aliases: ['ALAJUELA'] },
+            'cartago': { name: 'Cartago', lat: 9.864, lng: -83.919, aliases: ['CARTAGO'] },
+            'escazu': { name: 'Escazú', lat: 9.934, lng: -84.139, aliases: ['ESCAZU'] },
+            'heredia': { name: 'Heredia', lat: 9.998, lng: -84.120, aliases: ['HEREDIA'] },
+            'liberia': { name: 'Liberia', lat: 10.635, lng: -85.437, aliases: ['LIBERIA'] },
+            'llorente': { name: 'Llorente', lat: 9.964, lng: -84.079, aliases: ['LLORENTE'] },
+            'santa_ana': { name: 'Santa Ana', lat: 9.934, lng: -84.181, aliases: ['SANTA ANA'] },
+            'tres_rios': { name: 'Tres Ríos', lat: 9.905, lng: -83.987, aliases: ['TRES RIOS'] },
+            'zapote': { name: 'Zapote', lat: 9.925, lng: -84.055, aliases: ['ZAPOTE'] }
         };
 
-        let GLOBAL_DATA = { raw: [], byStore: {} };
-        let FINAL_ROUTES = {};
+        let GLOBAL_DATA = { byStore: {} };
+        const COLORS = ['bg-blue-500', 'bg-red-500', 'bg-emerald-500', 'bg-amber-500', 'bg-purple-500'];
+        const BGS = ['bg-blue-50', 'bg-red-50', 'bg-emerald-50', 'bg-amber-50', 'bg-purple-50'];
 
-        function getCol(row, keywords) {
-            const keys = Object.keys(row);
-            for (const k of keywords) {
-                const found = keys.find(key => key.toLowerCase().trim() === k.toLowerCase().trim());
-                if (found) return row[found];
-            }
-            return '';
-        }
-
-        function identifyStore(storeStr) {
-            if (!storeStr) return 'unknown';
-            const upper = String(storeStr).toUpperCase();
-            for (const [key, cfg] of Object.entries(STORES_CONFIG)) {
-                if (cfg.aliases.some(alias => upper.includes(alias))) return key;
-            }
-            return 'unknown';
-        }
-
-        function parseTimeH(dateStr) {
-            try {
-                if (typeof dateStr === 'number') {
-                    const dateObj = new Date(Math.round((dateStr - 25569) * 86400 * 1000));
-                    return dateObj.getHours();
-                }
-                if (dateStr.includes(':')) {
-                    const timePart = dateStr.includes(' ') ? dateStr.split(' ')[1] : dateStr;
-                    return parseInt(timePart.split(':')[0]);
-                }
-                return 0;
-            } catch (e) { return 0; }
-        }
-
-        function bearing(lat1, lng1, lat2, lng2) {
-            const dLng = (lng2 - lng1) * Math.PI / 180;
-            const lat1R = lat1 * Math.PI / 180;
-            const lat2R = lat2 * Math.PI / 180;
-            const y = Math.sin(dLng) * Math.cos(lat2R);
-            const x = Math.cos(lat1R) * Math.sin(lat2R) - Math.sin(lat1R) * Math.cos(lat2R) * Math.cos(dLng);
-            return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
-        }
-
-        const ZONE_COORDS = { 'ESCAZU': { lat: 9.93, lng: -84.13 }, 'SANTA ANA': { lat: 9.93, lng: -84.18 }, 'ALAJUELA': { lat: 10.01, lng: -84.21 }, 'HEREDIA': { lat: 9.99, lng: -84.12 }, 'CARTAGO': { lat: 9.86, lng: -83.92 }, 'TRES RIOS': { lat: 9.90, lng: -83.98 }, 'ZAPOTE': { lat: 9.92, lng: -84.05 }, 'SAN JOSE': { lat: 9.93, lng: -84.08 }, 'TIBAS': { lat: 9.96, lng: -84.07 }, 'MORAVIA': { lat: 9.96, lng: -84.05 }, 'GUADALUPE': { lat: 9.94, lng: -84.05 }, 'DESAMPARADOS': { lat: 9.89, lng: -84.07 }, 'PAVAS': { lat: 9.94, lng: -84.11 }, 'ROHRMOSER': { lat: 9.94, lng: -84.11 }, 'CURRIDABAT': { lat: 9.91, lng: -84.03 }, 'SAN PEDRO': { lat: 9.93, lng: -84.05 }, 'SABANILLA': { lat: 9.94, lng: -84.03 }, 'HATILLO': { lat: 9.92, lng: -84.10 } };
-
-        function getFakeCoords(address, storeLat, storeLng) {
-            const upper = String(address || '').toUpperCase();
-            for (const [zone, coords] of Object.entries(ZONE_COORDS)) {
-                if (upper.includes(zone)) return { lat: coords.lat + (Math.random() - 0.5) * 0.01, lng: coords.lng + (Math.random() - 0.5) * 0.01 };
-            }
-            return { lat: storeLat + (Math.random() - 0.5) * 0.05, lng: storeLng + (Math.random() - 0.5) * 0.05 };
-        }
-
-        async function handleFile(file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-                const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                GLOBAL_DATA.byStore = {};
-                let count = 0;
-
-                rows.forEach(r => {
-                    const storeKey = identifyStore(getCol(r, ['store_name', 'Tienda']));
-                    const startH = parseTimeH(getCol(r, ['local_delivery_window_start', 'Inicio']));
-                    if (storeKey !== 'unknown') {
-                        const order = {
-                            id: getCol(r, ['external_source_id', 'id', 'Order ID']),
-                            client: getCol(r, ['client_name', 'client', 'nombre', 'Client']),
-                            phone: getCol(r, ['client_phone', 'phone', 'telefono', 'client_phone']), // Captura de teléfono
-                            address: getCol(r, ['client_address', 'address', 'direccion']),
-                            items: getCol(r, ['items', 'productos', 'cantidad']) || '1',
-                            startHour: startH,
-                            storeKey: storeKey
-                        };
-                        if (!GLOBAL_DATA.byStore[storeKey]) GLOBAL_DATA.byStore[storeKey] = [];
-                        GLOBAL_DATA.byStore[storeKey].push(order);
-                        count++;
-                    }
-                });
-                document.getElementById('fileStatus').textContent = `✅ Leídos ${count} pedidos.`;
-                document.getElementById('fileStatus').classList.remove('hidden');
-                renderStoreConfigs(Object.keys(GLOBAL_DATA.byStore));
-                document.getElementById('configSection').classList.remove('hidden');
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        function renderStoreConfigs(storeKeys) {
+        function renderStoreConfigs() {
             const container = document.getElementById('storeConfigContainer');
             container.innerHTML = '';
-            storeKeys.sort().forEach(key => {
-                const card = document.createElement('div');
-                card.className = "bg-white dark:bg-slate-800 rounded-xl p-4 border dark:border-slate-700 shadow-sm";
-                card.innerHTML = `<h3 class="font-bold text-sm mb-2">${STORES_CONFIG[key].name}</h3>
-                <label class="text-[10px] text-slate-500 uppercase">Pilotos: <span id="label-${key}">3</span></label>
-                <input type="range" id="pilots-${key}" min="1" max="5" value="3" class="w-full accent-ps-500" oninput="document.getElementById('label-${key}').textContent = this.value">`;
-                container.appendChild(card);
+            Object.keys(GLOBAL_DATA.byStore).sort().forEach(k => {
+                container.innerHTML += `
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="font-bold text-xs uppercase text-ps-500 tracking-widest">${STORES_CONFIG[k].name}</span>
+                            <span id="pCount-${k}" class="text-ps-600 font-black text-sm">3</span>
+                        </div>
+                        <input type="range" id="pilots-${k}" min="1" max="5" value="3" step="1" list="tickmarks" class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-ps-500" oninput="document.getElementById('pCount-${k}').textContent = this.value">
+                        <div class="flex justify-between px-1 mt-1">
+                            <span class="w-0.5 h-1.5 bg-slate-300 dark:bg-slate-600"></span>
+                            <span class="w-0.5 h-1.5 bg-slate-300 dark:bg-slate-600"></span>
+                            <span class="w-0.5 h-1.5 bg-slate-300 dark:bg-slate-600"></span>
+                            <span class="w-0.5 h-1.5 bg-slate-300 dark:bg-slate-600"></span>
+                            <span class="w-0.5 h-1.5 bg-slate-300 dark:bg-slate-600"></span>
+                        </div>
+                    </div>`;
             });
         }
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
+                const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1, defval: ""});
+                GLOBAL_DATA.byStore = {};
+                for (let i = 1; i < rows.length; i++) {
+                    const r = rows[i];
+                    if (!r[8]) continue;
+                    const cell = String(r[8]).toUpperCase();
+                    const key = Object.keys(STORES_CONFIG).find(k => STORES_CONFIG[k].aliases.some(a => cell.includes(a)));
+                    if (key) {
+                        const h = !r[15] ? "Manual" : String(r[15]).match(/(\d{1,2})/) ? String(r[15]).match(/(\d{1,2})/)[1] : "Manual";
+                        if (!GLOBAL_DATA.byStore[key]) GLOBAL_DATA.byStore[key] = [];
+                        GLOBAL_DATA.byStore[key].push({ id: r[2], client: r[26], address: r[27], hour: h, items: r[19] || 1 });
+                    }
+                }
+                renderStoreConfigs();
+                document.getElementById('configSection').classList.remove('hidden');
+                document.getElementById('fileStatus').textContent = `✓ Reporte cargado.`;
+                document.getElementById('fileStatus').classList.remove('hidden');
+            };
+            reader.readAsArrayBuffer(file);
+        });
 
         function distribuirRutas() {
-            FINAL_ROUTES = {};
-            Object.keys(GLOBAL_DATA.byStore).forEach(storeKey => {
-                const pilotCount = parseInt(document.getElementById(`pilots-${storeKey}`).value);
-                const orders = GLOBAL_DATA.byStore[storeKey];
-                FINAL_ROUTES[storeKey] = {};
-                const byHour = {};
-                orders.forEach(o => {
-                    if (!byHour[o.startHour]) byHour[o.startHour] = [];
-                    byHour[o.startHour].push(o);
-                });
-                Object.keys(byHour).forEach(hour => {
-                    const hourOrders = byHour[hour].map(o => {
-                        const c = getFakeCoords(o.address, STORES_CONFIG[storeKey].lat, STORES_CONFIG[storeKey].lng);
-                        return { ...o, coords: c, bearing: bearing(STORES_CONFIG[storeKey].lat, STORES_CONFIG[storeKey].lng, c.lat, c.lng) };
-                    });
-                    hourOrders.sort((a, b) => a.bearing - b.bearing);
-                    const distribution = Array.from({ length: pilotCount }, () => []);
-                    const chunkSize = Math.ceil(hourOrders.length / pilotCount);
-                    hourOrders.forEach((o, i) => distribution[Math.min(Math.floor(i / chunkSize), pilotCount - 1)].push(o));
-                    FINAL_ROUTES[storeKey][hour] = distribution;
-                });
-            });
-            renderResults();
-            document.getElementById('resultsSection').classList.remove('hidden');
-        }
-
-        function renderResults() {
             const container = document.getElementById('routesContainer');
             container.innerHTML = '';
             let total = 0;
-            const pColors = ['bg-blue-500', 'bg-red-500', 'bg-emerald-500', 'bg-amber-500', 'bg-purple-500'];
-            const pBgs = ['bg-blue-50', 'bg-red-50', 'bg-emerald-50', 'bg-amber-50', 'bg-purple-50'];
-
-            Object.entries(FINAL_ROUTES).forEach(([storeKey, hoursData]) => {
-                const storeBlock = document.createElement('div');
-                storeBlock.className = 'border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm bg-white dark:bg-slate-900';
-                storeBlock.innerHTML = `<div class="bg-slate-50 dark:bg-slate-800 px-6 py-4 font-bold border-b dark:border-slate-700">${STORES_CONFIG[storeKey].name}</div>`;
-                const content = document.createElement('div');
-                content.className = 'p-6 space-y-10';
-
-                Object.keys(hoursData).sort((a, b) => a - b).forEach(hour => {
-                    const pilotsData = hoursData[hour];
-                    const hourSection = document.createElement('div');
-                    hourSection.innerHTML = `<div class="flex items-center gap-4 mb-6"><h4 class="text-base font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide border-b-2 border-ps-100 pb-1">🕑 Hora de Inicio: ${hour}:00</h4></div>`;
-                    
-                    const pilotsStack = document.createElement('div');
-                    pilotsStack.className = 'grid grid-cols-1 gap-6';
-
-                    pilotsData.forEach((orders, pIdx) => {
-                        total += orders.length;
-                        const pilotCard = document.createElement('div');
-                        pilotCard.className = `pilot-card ${pBgs[pIdx % 5]} dark:bg-slate-800/30 rounded-xl border border-transparent shadow-sm overflow-hidden`;
-                        
-                        let tableRows = orders.map((o, oIdx) => `
-                            <tr class="hover:bg-white/60 transition-colors border-b border-black/5 last:border-0 group">
-                                <td class="p-3 w-24"><div class="font-mono text-[11px] text-slate-500">${o.id}</div></td>
-                                <td class="p-3 w-48"><div class="font-bold text-sm text-slate-800 dark:text-slate-200">${o.client}</div><div class="text-[10px] text-slate-400">${o.phone || ''}</div></td>
-                                <td class="p-3 w-20 text-center"><span class="inline-flex items-center justify-center w-8 h-8 bg-white rounded-full font-bold text-sm border shadow-sm">${o.items}</span></td>
-                                <td class="p-3">
-                                    <div class="text-xs text-slate-600 truncate max-w-md">${o.address}</div>
-                                    <div class="flex gap-3 mt-2">
-                                        <a href="https://waze.com/ul?q=${encodeURIComponent(o.address)}" target="_blank" class="text-[10px] font-bold text-cyan-600 bg-cyan-50 px-2 py-1 rounded">Waze</a>
-                                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.address)}" target="_blank" class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">Maps</a>
-                                    </div>
-                                </td>
-                                <td class="p-3 text-right">
-                                    <select onchange="reassignOrder('${storeKey}', '${hour}', ${pIdx}, ${oIdx}, this.value)" class="text-[10px] border rounded px-1 outline-none">
-                                        <option value="" selected disabled>Mover...</option>
-                                        ${pilotsData.map((_, i) => i !== pIdx ? `<option value="${i}">P${i+1}</option>` : '').join('')}
-                                    </select>
-                                </td>
-                            </tr>`).join('');
-
-                        pilotCard.innerHTML = `
-                            <div class="px-5 py-3 flex items-center justify-between bg-white/40 border-b border-black/5">
-                                <h5 class="font-bold text-slate-800 dark:text-white flex items-center gap-3"><span class="w-2.5 h-2.5 rounded-full ${pColors[pIdx % 5]}"></span> Piloto ${pIdx + 1}</h5>
-                                <span class="bg-white/60 text-xs font-bold px-2.5 py-1 rounded-lg">${orders.length} pedidos</span>
-                            </div>
-                            <div class="overflow-x-auto"><table class="w-full text-left">
-                                <thead class="text-[10px] uppercase text-slate-500 bg-black/5"><tr><th class="p-3">ID</th><th class="p-3">Cliente</th><th class="p-3 text-center">Items</th><th class="p-3">Navegación</th><th class="p-3 text-right">Acción</th></tr></thead>
-                                <tbody>${tableRows || '<tr><td colspan="5" class="p-8 text-center text-sm italic">Sin pedidos</td></tr>'}</tbody>
-                            </table></div>`;
-                        pilotsStack.appendChild(pilotCard);
+            Object.entries(GLOBAL_DATA.byStore).sort().forEach(([sK, orders]) => {
+                const pilotCount = parseInt(document.getElementById(`pilots-${sK}`).value);
+                const storeGeo = STORES_CONFIG[sK];
+                const byHour = {};
+                orders.forEach(o => { if(!byHour[o.hour]) byHour[o.hour] = []; byHour[o.hour].push(o); });
+                const detail = document.createElement('details');
+                detail.className = "border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm bg-white dark:bg-slate-900";
+                let storeContent = "";
+                Object.keys(byHour).sort((a,b)=>a-b).forEach(h => {
+                    const hourOrders = byHour[h];
+                    const groups = {};
+                    hourOrders.forEach(o => {
+                        const addr = o.address.toUpperCase().trim();
+                        if (!groups[addr]) {
+                            const hash = addr.split('').reduce((a, b) => (a << 5) - a + b.charCodeAt(0), 0);
+                            groups[addr] = { bearing: getBearing(storeGeo.lat, storeGeo.lng, storeGeo.lat + (Math.sin(hash)*0.01), storeGeo.lng + (Math.cos(hash)*0.01)), orders: [] };
+                        }
+                        groups[addr].orders.push(o);
                     });
-                    hourSection.appendChild(pilotsStack);
-                    content.appendChild(hourSection);
+                    const sorted = Object.values(groups).sort((a, b) => a.bearing - b.bearing);
+                    const pilotRoutes = Array.from({ length: pilotCount }, () => []);
+                    sorted.forEach((loc, i) => pilotRoutes[Math.floor((i * pilotCount) / sorted.length)].push(...loc.orders));
+                    storeContent += `<div class="p-3 bg-slate-50 dark:bg-slate-800/50 border-b dark:border-slate-700 text-[10px] font-bold uppercase text-slate-500 italic">Slot: ${h}:00</div>`;
+                    storeContent += `<div class="p-4 space-y-4">`;
+                    pilotRoutes.forEach((pOrders, pIdx) => {
+                        if(pOrders.length === 0) return;
+                        total += pOrders.length;
+                        storeContent += `
+                            <div class="pilot-card rounded-xl overflow-hidden ${BGS[pIdx % 5]} dark:bg-slate-800/20">
+                                <div class="px-5 py-2.5 flex items-center justify-between border-b border-black/5 bg-white/40">
+                                    <h5 class="font-bold text-slate-800 dark:text-white text-[11px] flex items-center gap-2">
+                                        <span class="w-2.5 h-2.5 rounded-sm rotate-45 ${COLORS[pIdx % 5]}"></span> Piloto ${pIdx + 1}
+                                    </h5>
+                                    <span class="text-[9px] font-black px-2 py-0.5 rounded bg-white/60">${pOrders.length} envíos</span>
+                                </div>
+                                <div class="overflow-x-auto custom-scroll">
+                                    <table class="w-full text-left text-[11px] border-collapse">
+                                        <thead class="bg-white/10 text-[9px] font-bold text-slate-400 border-b border-black/5 uppercase">
+                                            <tr><th class="p-2">ID</th><th class="p-2">Cliente</th><th class="p-2 text-center">Items</th><th class="p-2">Dirección</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            ${pOrders.map(o => `
+                                                <tr class="border-b border-black/5 last:border-0 hover:bg-white/40">
+                                                    <td class="p-2 font-mono text-slate-400">#${o.id}</td>
+                                                    <td class="p-2 font-bold">${o.client}</td>
+                                                    <td class="p-2 text-center">${o.items}</td>
+                                                    <td class="p-2 italic line-clamp-1">${o.address}
+                                                        <div class="flex gap-2 mt-1">
+                                                            <a href="https://waze.com/ul?q=${encodeURIComponent(o.address)}" target="_blank" class="text-cyan-600 font-bold">Waze</a>
+                                                            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.address)}" target="_blank" class="text-blue-600 font-bold">Maps</a>
+                                                        </div>
+                                                    </td>
+                                                </tr>`).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>`;
+                    });
+                    storeContent += `</div>`;
                 });
-                storeBlock.appendChild(content);
-                container.appendChild(storeBlock);
+                detail.innerHTML = `
+                    <summary class="p-4 flex justify-between items-center hover:bg-slate-50 transition-all font-bold italic uppercase tracking-widest text-[12px]">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-4 h-4 arrow-icon text-ps-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            ${STORES_CONFIG[sK].name}
+                        </div>
+                        <span class="bg-ps-500 text-white text-[9px] px-3 py-1 rounded-full shadow-lg shadow-ps-500/20">${orders.length} PEDIDOS</span>
+                    </summary>
+                    <div class="border-t border-slate-100 dark:border-slate-700">${storeContent}</div>`;
+                container.appendChild(detail);
             });
-            document.getElementById('totalOrdersBagde').textContent = `${total} pedidos`;
+            document.getElementById('totalOrdersBadge').textContent = `${total} pedidos`;
+            document.getElementById('resultsSection').classList.remove('hidden');
         }
 
-        function reassignOrder(sK, hr, fromP, oIdx, toP) {
-            const [order] = FINAL_ROUTES[sK][hr][fromP].splice(oIdx, 1);
-            FINAL_ROUTES[sK][hr][parseInt(toP)].push(order);
-            renderResults();
+        function limpiarDashboard() {
+            if (confirm("¿Borrar todo?")) location.reload();
         }
 
         function exportarExcel() {
-            if (Object.keys(FINAL_ROUTES).length === 0) return;
             const wb = XLSX.utils.book_new();
-            
-            // 1. Hoja Consolidada
-            let consolidado = [];
-            Object.entries(FINAL_ROUTES).forEach(([sK, hours]) => {
-                Object.entries(hours).forEach(([hr, pilots]) => {
-                    pilots.forEach((orders, pIdx) => {
-                        orders.forEach(o => consolidado.push({ 
-                            'Club': STORES_CONFIG[sK].name, 
-                            'Hora Inicio': hr + ':00', 
-                            'Piloto': 'Piloto ' + (pIdx + 1), 
-                            'ID': o.id, 
-                            'Cliente': o.client,
-                            'client_phone': o.phone || '', // Inclusión de teléfono
-                            'Items': o.items,
-                            'Dirección': o.address 
-                        }));
-                    });
-                });
+            Object.entries(GLOBAL_DATA.byStore).forEach(([sK, orders]) => {
+                const ws = XLSX.utils.json_to_sheet(orders.map(o => ({ 'Slot': o.hour+':00', 'Cliente': o.client, 'Dirección': o.address, 'Items': o.items })));
+                XLSX.utils.book_append_sheet(wb, ws, STORES_CONFIG[sK].name.substring(0,31));
             });
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(consolidado), "CONSOLIDADO");
-
-            // 2. Hoja por cada Club
-            Object.entries(FINAL_ROUTES).forEach(([sK, hours]) => {
-                let clubData = [];
-                Object.entries(hours).forEach(([hr, pilots]) => {
-                    pilots.forEach((orders, pIdx) => {
-                        orders.forEach(o => clubData.push({ 
-                            'Hora Inicio': hr + ':00', 
-                            'Piloto': 'Piloto ' + (pIdx + 1), 
-                            'ID': o.id, 
-                            'Cliente': o.client,
-                            'client_phone': o.phone || '', // Inclusión de teléfono
-                            'Items': o.items,
-                            'Dirección': o.address 
-                        }));
-                    });
-                });
-                
-                if (clubData.length > 0) {
-                    const ws = XLSX.utils.json_to_sheet(clubData);
-                    let clubName = STORES_CONFIG[sK].name.replace('PriceSmart ', '').substring(0, 31);
-                    XLSX.utils.book_append_sheet(wb, ws, clubName);
-                }
-            });
-
-            XLSX.writeFile(wb, `Rutas_PriceSmart_Clubes_${new Date().toISOString().split('T')[0]}.xlsx`);
+            XLSX.writeFile(wb, `Rutas_PriceSmart.xlsx`);
         }
-
-        function limpiar() { if (confirm("¿Reiniciar?")) location.reload(); }
-        document.getElementById('fileInput').addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
-        document.getElementById('themeBtn').addEventListener('click', () => document.documentElement.classList.toggle('dark'));
     </script>
 </body>
 </html>
