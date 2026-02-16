@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>PriceSmart Route Planner | Zubale CR Logistics</title>
+    <title>PriceSmart Route Planner | Logistics Control</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -26,7 +26,6 @@
         .glass { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(12px); border: 1px solid #E2E8F0; }
         .dark .glass { background: rgba(30, 41, 59, 0.7); border: 1px solid #334155; }
         
-        /* Acordeón */
         details > summary { list-style: none; cursor: pointer; outline: none; }
         details > summary::-webkit-details-marker { display: none; }
         details[open] .arrow-icon { transform: rotate(180deg); }
@@ -48,13 +47,21 @@
                 <div class="w-9 h-9 bg-gradient-to-br from-ps-500 to-ps-700 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-ps-500/20 text-sm">PS</div>
                 <div>
                     <h1 class="text-base md:text-lg font-bold tracking-tight text-slate-900 dark:text-white leading-none">PriceSmart Route Planner</h1>
-                    <span class="text-[10px] uppercase tracking-widest text-slate-500 font-semibold italic">Zubale CR Logistics</span>
+                    <span class="text-[10px] uppercase tracking-widest text-slate-500 font-semibold italic">Logistics Control Center</span>
                 </div>
             </div>
-            <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-            </button>
+            
+            <div class="flex items-center space-x-4">
+                <a href="index.html" class="px-4 py-2 text-[11px] font-bold uppercase tracking-widest bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-ps-500 hover:text-white transition-all flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                    Hub Principal
+                </a>
+
+                <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                    <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -67,7 +74,7 @@
             </h2>
             <div onclick="document.getElementById('fileInput').click()" class="group border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl p-8 text-center cursor-pointer hover:border-ps-500 hover:bg-ps-50/50 transition-all">
                 <input type="file" id="fileInput" class="hidden" accept=".xlsx,.xls,.csv" />
-                <p class="text-xs text-slate-500 font-medium">Click para cargar el archivo Excel</p>
+                <p class="text-xs text-slate-500 font-medium italic">Click para cargar el archivo Excel</p>
             </div>
             <p id="fileStatus" class="text-[11px] text-emerald-500 font-bold mt-4 hidden text-center italic"></p>
         </section>
@@ -90,7 +97,7 @@
                 <h3 class="font-bold text-slate-800 dark:text-white text-sm" id="totalOrdersBadge">0 Pedidos</h3>
                 <div class="flex gap-2">
                     <button onclick="exportarExcel()" class="px-4 py-2 text-xs font-semibold bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all shadow-md">Exportar Excel</button>
-                    <button onclick="limpiarDashboard()" class="px-4 py-2 text-xs font-semibold border border-red-300 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all">Reiniciar</button>
+                    <button onclick="limpiarHub()" class="px-4 py-2 text-xs font-semibold border border-red-300 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all">Reiniciar Hub</button>
                 </div>
             </div>
             <div id="routesContainer" class="space-y-4"></div>
@@ -124,7 +131,7 @@
                             <span class="font-bold text-xs uppercase text-ps-500 tracking-widest">${STORES_CONFIG[k].name}</span>
                             <span id="pCount-${k}" class="text-ps-600 font-black text-sm">3</span>
                         </div>
-                        <input type="range" id="pilots-${k}" min="1" max="5" value="3" step="1" list="tickmarks" class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-ps-500" oninput="document.getElementById('pCount-${k}').textContent = this.value">
+                        <input type="range" id="pilots-${k}" min="1" max="5" value="3" step="1" class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-ps-500" oninput="document.getElementById('pCount-${k}').textContent = this.value">
                         <div class="flex justify-between px-1 mt-1">
                             <span class="w-0.5 h-1.5 bg-slate-300 dark:bg-slate-600"></span>
                             <span class="w-0.5 h-1.5 bg-slate-300 dark:bg-slate-600"></span>
@@ -176,18 +183,8 @@
                 let storeContent = "";
                 Object.keys(byHour).sort((a,b)=>a-b).forEach(h => {
                     const hourOrders = byHour[h];
-                    const groups = {};
-                    hourOrders.forEach(o => {
-                        const addr = o.address.toUpperCase().trim();
-                        if (!groups[addr]) {
-                            const hash = addr.split('').reduce((a, b) => (a << 5) - a + b.charCodeAt(0), 0);
-                            groups[addr] = { bearing: getBearing(storeGeo.lat, storeGeo.lng, storeGeo.lat + (Math.sin(hash)*0.01), storeGeo.lng + (Math.cos(hash)*0.01)), orders: [] };
-                        }
-                        groups[addr].orders.push(o);
-                    });
-                    const sorted = Object.values(groups).sort((a, b) => a.bearing - b.bearing);
                     const pilotRoutes = Array.from({ length: pilotCount }, () => []);
-                    sorted.forEach((loc, i) => pilotRoutes[Math.floor((i * pilotCount) / sorted.length)].push(...loc.orders));
+                    hourOrders.forEach((o, i) => pilotRoutes[i % pilotCount].push(o));
                     storeContent += `<div class="p-3 bg-slate-50 dark:bg-slate-800/50 border-b dark:border-slate-700 text-[10px] font-bold uppercase text-slate-500 italic">Slot: ${h}:00</div>`;
                     storeContent += `<div class="p-4 space-y-4">`;
                     pilotRoutes.forEach((pOrders, pIdx) => {
@@ -212,12 +209,7 @@
                                                     <td class="p-2 font-mono text-slate-400">#${o.id}</td>
                                                     <td class="p-2 font-bold">${o.client}</td>
                                                     <td class="p-2 text-center">${o.items}</td>
-                                                    <td class="p-2 italic line-clamp-1">${o.address}
-                                                        <div class="flex gap-2 mt-1">
-                                                            <a href="https://waze.com/ul?q=${encodeURIComponent(o.address)}" target="_blank" class="text-cyan-600 font-bold">Waze</a>
-                                                            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.address)}" target="_blank" class="text-blue-600 font-bold">Maps</a>
-                                                        </div>
-                                                    </td>
+                                                    <td class="p-2 italic line-clamp-1">${o.address}</td>
                                                 </tr>`).join('')}
                                         </tbody>
                                     </table>
@@ -228,7 +220,7 @@
                 });
                 detail.innerHTML = `
                     <summary class="p-4 flex justify-between items-center hover:bg-slate-50 transition-all font-bold italic uppercase tracking-widest text-[12px]">
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-3 italic">
                             <svg class="w-4 h-4 arrow-icon text-ps-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             ${STORES_CONFIG[sK].name}
                         </div>
@@ -241,8 +233,8 @@
             document.getElementById('resultsSection').classList.remove('hidden');
         }
 
-        function limpiarDashboard() {
-            if (confirm("¿Borrar todo?")) location.reload();
+        function limpiarHub() {
+            if (confirm("¿Limpiar todo el Hub?")) location.reload();
         }
 
         function exportarExcel() {
