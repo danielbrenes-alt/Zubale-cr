@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>PriceSmart Route Planner | Logistics Control</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
@@ -14,236 +14,243 @@
                 extend: { 
                     fontFamily: { sans: ['Inter', 'sans-serif'] }, 
                     colors: { 
-                        ps: { 50: '#F0F4FF', 100: '#E0E7FF', 500: '#4F46E5', 600: '#4338CA', 700: '#3730A3' } 
+                        ps: { 50: '#F0F7FF', 100: '#E0EFFF', 500: '#4F46E5', 600: '#1D4ED8', 700: '#1E40AF', 900: '#1e3a8a' } 
                     } 
                 } 
             } 
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; background: #F8FAFC; transition: all .3s ease; }
-        .dark body { background: #0F172A; }
-        .glass { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(12px); border: 1px solid #E2E8F0; }
-        .dark .glass { background: rgba(30, 41, 59, 0.7); border: 1px solid #334155; }
-        
-        details > summary { list-style: none; cursor: pointer; outline: none; }
-        details > summary::-webkit-details-marker { display: none; }
-        details[open] .arrow-icon { transform: rotate(180deg); }
-        .arrow-icon { transition: transform .3s ease; }
-        
-        .pilot-card { transition: all .3s ease; border-left: 4px solid; }
-        .pilot-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12); }
-
-        .custom-scroll::-webkit-scrollbar { height: 8px; width: 6px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.1); border-radius: 10px; }
-        .dark .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); }
+        body { font-family: 'Inter', sans-serif; background: #f1f5f9; transition: all .4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .dark body { background: #020617; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03); }
+        .dark .glass { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .pilot-card { transition: all 0.3s ease; border-radius: 1.5rem; background: rgba(255, 255, 255, 0.5); }
+        .dark .pilot-card { background: rgba(30, 41, 59, 0.4); }
+        .pilot-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(37, 99, 235, 0.15); }
+        .progress-fill { transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        .custom-scroll::-webkit-scrollbar { height: 6px; width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="antialiased text-slate-800 dark:text-slate-100">
+<body class="antialiased text-slate-800 dark:text-slate-100 min-h-screen">
 
-    <header class="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
-        <div class="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-9 h-9 bg-gradient-to-br from-ps-500 to-ps-700 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-ps-500/20 text-sm">PS</div>
+    <header class="sticky top-0 z-50 w-full border-b border-white/20 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl">
+        <div class="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="w-11 h-11 bg-ps-600 rounded-xl flex items-center justify-center text-white font-black shadow-2xl italic">PS</div>
                 <div>
-                    <h1 class="text-base md:text-lg font-bold tracking-tight text-slate-900 dark:text-white leading-none">PriceSmart Route Planner</h1>
-                    <span class="text-[10px] uppercase tracking-widest text-slate-500 font-semibold italic">Logistics Control Center</span>
+                    <h1 class="text-xl font-black tracking-tight text-slate-900 dark:text-white leading-none">PriceSmart <span class="bg-ps-600 text-[10px] px-2 py-1 rounded-md text-white italic">COSTA RICA</span></h1>
+                    <span class="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold italic">Zubale Logistics (OSM + Time Slots)</span>
                 </div>
             </div>
-            
-            <div class="flex items-center space-x-4">
-                <a href="index.html" class="px-4 py-2 text-[11px] font-bold uppercase tracking-widest bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-ps-500 hover:text-white transition-all flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                    Hub Principal
-                </a>
-
-                <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                    <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                    <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                </button>
-            </div>
+            <button onclick="document.documentElement.classList.toggle('dark')" class="p-3 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700">🌓</button>
         </div>
     </header>
 
-    <main class="max-w-[1440px] mx-auto px-4 md:px-6 py-6 space-y-6">
+    <main class="max-w-[1440px] mx-auto px-4 md:px-8 py-8 space-y-8">
 
-        <section class="glass rounded-2xl p-6 shadow-sm">
-            <h2 class="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2 uppercase tracking-tighter">
-                <svg class="w-4 h-4 text-ps-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                1. Importación de Reporte
-            </h2>
-            <div onclick="document.getElementById('fileInput').click()" class="group border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl p-8 text-center cursor-pointer hover:border-ps-500 hover:bg-ps-50/50 transition-all">
-                <input type="file" id="fileInput" class="hidden" accept=".xlsx,.xls,.csv" />
-                <p class="text-xs text-slate-500 font-medium italic">Click para cargar el archivo Excel</p>
+        <section id="dropZone" class="glass rounded-[2.5rem] p-10 shadow-2xl text-center">
+            <input type="file" id="fileInput" class="hidden" accept=".xlsx,.xls,.csv" />
+            <div onclick="document.getElementById('fileInput').click()" class="cursor-pointer group">
+                <div class="mx-auto w-20 h-20 bg-ps-600/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-500 mb-4">
+                    <svg class="w-10 h-10 text-ps-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-width="2"></path></svg>
+                </div>
+                <p class="text-xl font-black text-slate-800 dark:text-white uppercase italic tracking-tighter">Cargar archivo PriceSmart</p>
+                <p class="text-xs text-slate-400 mt-1 italic tracking-widest uppercase">Geolocalización por Slot Horario</p>
             </div>
-            <p id="fileStatus" class="text-[11px] text-emerald-500 font-bold mt-4 hidden text-center italic"></p>
+            <p id="fileStatus" class="text-xs text-emerald-500 font-black mt-6 italic hidden"></p>
         </section>
 
-        <section id="configSection" class="hidden glass rounded-2xl p-6 shadow-sm">
-            <h2 class="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2 uppercase tracking-tighter">
-                <svg class="w-4 h-4 text-ps-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                2. Distribución de Flota
-            </h2>
-            <div id="storeConfigContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6"></div>
-            <div class="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
-                <button onclick="distribuirRutas()" class="px-6 py-2.5 bg-gradient-to-r from-ps-500 to-ps-700 text-white rounded-xl font-bold text-sm hover:shadow-lg transition-all active:scale-95">
-                    GENERAR RUTAS
-                </button>
+        <section id="geoProgress" class="hidden glass rounded-[2rem] p-8 shadow-xl">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-[10px] font-black uppercase text-ps-500 tracking-[0.2em] italic">Mapeando entregas por cercanía y horario...</span>
+                <span id="progressText" class="text-[10px] font-black text-slate-400 italic">0%</span>
+            </div>
+            <div class="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden shadow-inner">
+                <div id="progressBar" class="bg-gradient-to-r from-ps-500 to-ps-700 h-full w-0 progress-fill shadow-lg"></div>
             </div>
         </section>
 
-        <section id="resultsSection" class="hidden space-y-6">
-            <div class="flex items-center justify-between glass rounded-xl px-5 py-3 shadow-sm">
-                <h3 class="font-bold text-slate-800 dark:text-white text-sm" id="totalOrdersBadge">0 Pedidos</h3>
-                <div class="flex gap-2">
-                    <button onclick="exportarExcel()" class="px-4 py-2 text-xs font-semibold bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all shadow-md">Exportar Excel</button>
-                    <button onclick="limpiarHub()" class="px-4 py-2 text-xs font-semibold border border-red-300 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all">Reiniciar Hub</button>
+        <section id="configSection" class="hidden glass rounded-[2.5rem] p-10 shadow-2xl border-none">
+            <h2 class="text-xl font-black text-slate-800 dark:text-white mb-8 uppercase tracking-tighter italic flex items-center gap-3">
+                <span class="w-2 h-8 bg-ps-600 rounded-full"></span> Definir Flota por Club
+            </h2>
+            <div id="storeConfigContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10"></div>
+            <div class="flex justify-end pt-8 border-t border-slate-100 dark:border-slate-800">
+                <button onclick="optimizarRutasGeograficas()" class="px-10 py-4 bg-ps-600 text-white rounded-2xl font-black text-sm hover:scale-105 transition-all shadow-xl uppercase italic tracking-widest">Generar Rutas Inteligentes</button>
+            </div>
+        </section>
+
+        <section id="resultsSection" class="hidden space-y-8 animate-in fade-in slide-in-from-bottom-10">
+            <div class="flex items-center justify-between glass rounded-[2rem] px-8 py-4 shadow-xl">
+                <h3 class="font-black text-slate-800 dark:text-white text-lg tracking-tight italic" id="totalOrdersBadge">0 Pedidos</h3>
+                <div class="flex gap-4">
+                    <button onclick="exportarExcelPestañas()" class="px-8 py-3 bg-emerald-600 text-white rounded-xl font-black text-xs hover:bg-emerald-700 transition-all shadow-lg uppercase tracking-widest">Exportar Excel</button>
+                    <button onclick="location.reload()" class="px-8 py-3 border-2 border-slate-200 dark:border-slate-800 text-slate-500 font-black text-xs rounded-xl hover:bg-red-500 hover:text-white transition-all uppercase tracking-widest">Reiniciar</button>
                 </div>
             </div>
-            <div id="routesContainer" class="space-y-4"></div>
+            <div id="routesContainer" class="space-y-6"></div>
         </section>
     </main>
 
     <script>
-        const STORES_CONFIG = {
-            'alajuela': { name: 'Alajuela', lat: 10.016, lng: -84.214, aliases: ['ALAJUELA'] },
-            'cartago': { name: 'Cartago', lat: 9.864, lng: -83.919, aliases: ['CARTAGO'] },
-            'escazu': { name: 'Escazú', lat: 9.934, lng: -84.139, aliases: ['ESCAZU'] },
-            'heredia': { name: 'Heredia', lat: 9.998, lng: -84.120, aliases: ['HEREDIA'] },
-            'liberia': { name: 'Liberia', lat: 10.635, lng: -85.437, aliases: ['LIBERIA'] },
-            'llorente': { name: 'Llorente', lat: 9.964, lng: -84.079, aliases: ['LLORENTE'] },
-            'santa_ana': { name: 'Santa Ana', lat: 9.934, lng: -84.181, aliases: ['SANTA ANA'] },
-            'tres_rios': { name: 'Tres Ríos', lat: 9.905, lng: -83.987, aliases: ['TRES RIOS'] },
-            'zapote': { name: 'Zapote', lat: 9.925, lng: -84.055, aliases: ['ZAPOTE'] }
-        };
+        const CLUB_CENTERS = { 'ALAJUELA': [10.01, -84.21], 'ESCAZU': [9.93, -84.13], 'HEREDIA': [9.99, -84.12], 'SANTA ANA': [9.93, -84.18], 'TRES RIOS': [9.90, -83.98], 'ZAPOTE': [9.92, -84.05], 'LIBERIA': [10.63, -85.43], 'CARTAGO': [9.86, -83.91], 'LLORENTE': [9.96, -84.07] };
+        let RAW_DATA = [];
+        let FINAL_GROUPS = {};
+        const COLORS = ['bg-ps-600', 'bg-rose-500', 'bg-emerald-500', 'bg-amber-500', 'bg-violet-600'];
 
-        let GLOBAL_DATA = { byStore: {} };
-        const COLORS = ['bg-blue-500', 'bg-red-500', 'bg-emerald-500', 'bg-amber-500', 'bg-purple-500'];
-        const BGS = ['bg-blue-50', 'bg-red-50', 'bg-emerald-50', 'bg-amber-50', 'bg-purple-50'];
+        document.getElementById('fileInput').addEventListener('change', async function(e) {
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
+                const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1, defval: ""});
+                
+                RAW_DATA = [];
+                for (let i = 1; i < rows.length; i++) {
+                    const r = rows[i];
+                    if (!r[8]) continue;
+                    // Extraer hora de columna P (index 15)
+                    const h = String(r[15]).match(/(\d{1,2})/) ? String(r[15]).match(/(\d{1,2})/)[1] : "00";
+                    RAW_DATA.push({ 
+                        c: r[2], 
+                        i: r[8], 
+                        p: h + ":00", 
+                        k: r[10], 
+                        aa: r[26], 
+                        ab: r[27], 
+                        ac: r[28], 
+                        lat: null, 
+                        lon: null 
+                    });
+                }
+                await geocodificarOSM();
+            };
+            reader.readAsArrayBuffer(fileInput.files[0]);
+        });
 
-        function renderStoreConfigs() {
+        async function geocodificarOSM() {
+            document.getElementById('dropZone').classList.add('hidden');
+            document.getElementById('geoProgress').classList.remove('hidden');
+            
+            for (let i = 0; i < RAW_DATA.length; i++) {
+                const item = RAW_DATA[i];
+                try {
+                    const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(item.ab)}&limit=1`);
+                    const json = await resp.json();
+                    if (json && json[0]) { item.lat = parseFloat(json[0].lat); item.lon = parseFloat(json[0].lon); }
+                    else { item.lat = 9.93; item.lon = -84.13; }
+                } catch (e) { item.lat = 9.93; item.lon = -84.13; }
+
+                await new Promise(r => setTimeout(r, 850));
+                const pct = Math.round(((i + 1) / RAW_DATA.length) * 100);
+                document.getElementById('progressBar').style.width = pct + '%';
+                document.getElementById('progressText').textContent = `${pct}% - Ubicando entrega ${i+1} de ${RAW_DATA.length}`;
+            }
+            renderConfigs();
+        }
+
+        function renderConfigs() {
+            document.getElementById('geoProgress').classList.add('hidden');
+            document.getElementById('configSection').classList.remove('hidden');
             const container = document.getElementById('storeConfigContainer');
             container.innerHTML = '';
-            Object.keys(GLOBAL_DATA.byStore).sort().forEach(k => {
+            
+            const clubs = [...new Set(RAW_DATA.map(d => d.i.split('-').pop().trim().toUpperCase()))];
+            clubs.forEach(c => {
                 container.innerHTML += `
-                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
-                        <div class="flex justify-between items-center mb-4">
-                            <span class="font-bold text-xs uppercase text-ps-500 tracking-widest">${STORES_CONFIG[k].name}</span>
-                            <span id="pCount-${k}" class="text-ps-600 font-black text-sm">3</span>
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800">
+                        <div class="flex justify-between items-center mb-6">
+                            <span class="font-black text-[11px] uppercase text-ps-600 tracking-widest italic">${c}</span>
+                            <span id="val-${c}" class="bg-slate-900 text-white text-[10px] font-black px-3 py-1 rounded-full">2 PILOTOS</span>
                         </div>
-                        <input type="range" id="pilots-${k}" min="1" max="5" value="3" step="1" class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-ps-500" oninput="document.getElementById('pCount-${k}').textContent = this.value">
-                        <div class="flex justify-between px-1 mt-1">
-                            <span class="w-0.5 h-1.5 bg-slate-300 dark:bg-slate-600"></span>
-                            <span class="w-0.5 h-1.5 bg-slate-300 dark:bg-slate-600"></span>
-                            <span class="w-0.5 h-1.5 bg-slate-300 dark:bg-slate-600"></span>
-                            <span class="w-0.5 h-1.5 bg-slate-300 dark:bg-slate-600"></span>
-                            <span class="w-0.5 h-1.5 bg-slate-300 dark:bg-slate-600"></span>
-                        </div>
+                        <input type="range" id="p-${c}" min="1" max="6" value="2" class="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-ps-500" oninput="document.getElementById('val-${c}').textContent = this.value + ' PILOTOS'">
                     </div>`;
             });
         }
 
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
-                const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1, defval: ""});
-                GLOBAL_DATA.byStore = {};
-                for (let i = 1; i < rows.length; i++) {
-                    const r = rows[i];
-                    if (!r[8]) continue;
-                    const cell = String(r[8]).toUpperCase();
-                    const key = Object.keys(STORES_CONFIG).find(k => STORES_CONFIG[k].aliases.some(a => cell.includes(a)));
-                    if (key) {
-                        const h = !r[15] ? "Manual" : String(r[15]).match(/(\d{1,2})/) ? String(r[15]).match(/(\d{1,2})/)[1] : "Manual";
-                        if (!GLOBAL_DATA.byStore[key]) GLOBAL_DATA.byStore[key] = [];
-                        GLOBAL_DATA.byStore[key].push({ id: r[2], client: r[26], address: r[27], hour: h, items: r[19] || 1 });
-                    }
-                }
-                renderStoreConfigs();
-                document.getElementById('configSection').classList.remove('hidden');
-                document.getElementById('fileStatus').textContent = `✓ Reporte cargado.`;
-                document.getElementById('fileStatus').classList.remove('hidden');
-            };
-            reader.readAsArrayBuffer(file);
-        });
+        function optimizarRutasGeograficas() {
+            FINAL_GROUPS = {};
+            const clubs = [...new Set(RAW_DATA.map(d => d.i.split('-').pop().trim().toUpperCase()))];
+            let total = 0;
 
-        function distribuirRutas() {
+            clubs.forEach(club => {
+                const nP = parseInt(document.getElementById(`p-${club}`).value) || 1;
+                let orders = RAW_DATA.filter(d => d.i.toUpperCase().includes(club));
+                const center = CLUB_CENTERS[club] || [9.93, -84.13];
+
+                orders.forEach(o => { o.angle = Math.atan2(o.lat - center[0], o.lon - center[1]); });
+                // ORDENAR POR SLOT Y LUEGO ÁNGULO
+                orders.sort((a,b) => a.p.localeCompare(b.p) || a.angle - b.angle);
+                orders.forEach((o, idx) => { o.piloto = (idx % nP) + 1; total++; });
+
+                FINAL_GROUPS[club] = orders;
+            });
+
+            renderResultados(total);
+        }
+
+        function renderResultados(total) {
             const container = document.getElementById('routesContainer');
             container.innerHTML = '';
-            let total = 0;
-            Object.entries(GLOBAL_DATA.byStore).sort().forEach(([sK, orders]) => {
-                const pilotCount = parseInt(document.getElementById(`pilots-${sK}`).value);
-                const storeGeo = STORES_CONFIG[sK];
-                const byHour = {};
-                orders.forEach(o => { if(!byHour[o.hour]) byHour[o.hour] = []; byHour[o.hour].push(o); });
+            Object.entries(FINAL_GROUPS).forEach(([club, orders]) => {
                 const detail = document.createElement('details');
-                detail.className = "border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm bg-white dark:bg-slate-900";
-                let storeContent = "";
-                Object.keys(byHour).sort((a,b)=>a-b).forEach(h => {
-                    const hourOrders = byHour[h];
-                    const pilotRoutes = Array.from({ length: pilotCount }, () => []);
-                    hourOrders.forEach((o, i) => pilotRoutes[i % pilotCount].push(o));
-                    storeContent += `<div class="p-3 bg-slate-50 dark:bg-slate-800/50 border-b dark:border-slate-700 text-[10px] font-bold uppercase text-slate-500 italic">Slot: ${h}:00</div>`;
-                    storeContent += `<div class="p-4 space-y-4">`;
-                    pilotRoutes.forEach((pOrders, pIdx) => {
-                        if(pOrders.length === 0) return;
-                        total += pOrders.length;
-                        storeContent += `
-                            <div class="pilot-card rounded-xl overflow-hidden ${BGS[pIdx % 5]} dark:bg-slate-800/20">
-                                <div class="px-5 py-2.5 flex items-center justify-between border-b border-black/5 bg-white/40">
-                                    <h5 class="font-bold text-slate-800 dark:text-white text-[11px] flex items-center gap-2">
-                                        <span class="w-2.5 h-2.5 rounded-sm rotate-45 ${COLORS[pIdx % 5]}"></span> Piloto ${pIdx + 1}
-                                    </h5>
-                                    <span class="text-[9px] font-black px-2 py-0.5 rounded bg-white/60">${pOrders.length} envíos</span>
-                                </div>
-                                <div class="overflow-x-auto custom-scroll">
-                                    <table class="w-full text-left text-[11px] border-collapse">
-                                        <thead class="bg-white/10 text-[9px] font-bold text-slate-400 border-b border-black/5 uppercase">
-                                            <tr><th class="p-2">ID</th><th class="p-2">Cliente</th><th class="p-2 text-center">Items</th><th class="p-2">Dirección</th></tr>
-                                        </thead>
-                                        <tbody>
-                                            ${pOrders.map(o => `
-                                                <tr class="border-b border-black/5 last:border-0 hover:bg-white/40">
-                                                    <td class="p-2 font-mono text-slate-400">#${o.id}</td>
-                                                    <td class="p-2 font-bold">${o.client}</td>
-                                                    <td class="p-2 text-center">${o.items}</td>
-                                                    <td class="p-2 italic line-clamp-1">${o.address}</td>
-                                                </tr>`).join('')}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>`;
-                    });
-                    storeContent += `</div>`;
+                detail.className = "glass rounded-[2.5rem] overflow-hidden shadow-xl mb-6";
+                
+                let content = `<div class="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
+                const pilots = [...new Set(orders.map(o => o.piloto))];
+                
+                pilots.forEach(pNum => {
+                    const pOrders = orders.filter(o => o.piloto === pNum);
+                    content += `
+                        <div class="pilot-card p-6 border-l-8 ${COLORS[(pNum-1)%5]} border-opacity-40">
+                            <h5 class="font-black text-xs mb-4 uppercase italic">PILOTO ${pNum} (${pOrders.length} PEDIDOS)</h5>
+                            <div class="space-y-4">
+                                ${pOrders.map(o => `
+                                    <div class="text-[11px]">
+                                        <div class="flex justify-between mb-1">
+                                            <span class="font-black text-ps-600">#${o.c}</span>
+                                            <span class="bg-slate-200 dark:bg-slate-700 px-2 py-0.5 rounded font-black text-[9px] text-slate-600 dark:text-slate-300">SLOT: ${o.p}</span>
+                                        </div>
+                                        <p class="font-bold uppercase text-slate-800 dark:text-white line-clamp-1">${o.aa}</p>
+                                        <p class="text-[10px] text-slate-400 italic">${o.ab}</p>
+                                    </div>`).join('<hr class="my-2 border-slate-100 dark:border-slate-800">')}
+                            </div>
+                        </div>`;
                 });
+                content += `</div>`;
+
                 detail.innerHTML = `
-                    <summary class="p-4 flex justify-between items-center hover:bg-slate-50 transition-all font-bold italic uppercase tracking-widest text-[12px]">
-                        <div class="flex items-center gap-3 italic">
-                            <svg class="w-4 h-4 arrow-icon text-ps-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            ${STORES_CONFIG[sK].name}
+                    <summary class="p-6 flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-ps-600 rounded-2xl flex items-center justify-center text-white font-black italic shadow-lg">PS</div>
+                            <h3 class="font-black text-base uppercase italic tracking-tighter">${club}</h3>
                         </div>
-                        <span class="bg-ps-500 text-white text-[9px] px-3 py-1 rounded-full shadow-lg shadow-ps-500/20">${orders.length} PEDIDOS</span>
-                    </summary>
-                    <div class="border-t border-slate-100 dark:border-slate-700">${storeContent}</div>`;
+                        <div class="bg-slate-900 text-white font-black text-[10px] px-6 py-2 rounded-2xl">${orders.length} ENTREGAS</div>
+                    </summary>${content}`;
                 container.appendChild(detail);
             });
-            document.getElementById('totalOrdersBadge').textContent = `${total} pedidos`;
+            document.getElementById('totalOrdersBadge').textContent = `${total} Pedidos Procesados`;
             document.getElementById('resultsSection').classList.remove('hidden');
         }
 
-        function limpiarHub() {
-            if (confirm("¿Limpiar todo el Hub?")) location.reload();
-        }
-
-        function exportarExcel() {
+        function exportarExcelPestañas() {
             const wb = XLSX.utils.book_new();
-            Object.entries(GLOBAL_DATA.byStore).forEach(([sK, orders]) => {
-                const ws = XLSX.utils.json_to_sheet(orders.map(o => ({ 'Slot': o.hour+':00', 'Cliente': o.client, 'Dirección': o.address, 'Items': o.items })));
-                XLSX.utils.book_append_sheet(wb, ws, STORES_CONFIG[sK].name.substring(0,31));
+            Object.keys(FINAL_GROUPS).forEach(club => {
+                const data = FINAL_GROUPS[club].map(o => ({ 
+                    'PILOTO': o.piloto, 
+                    'ID (C)': o.c, 
+                    'CLUB (I)': o.i, 
+                    'SLOT (P)': o.p, 
+                    'DISTANCIA (K)': o.k, 
+                    'CLIENTE (AA)': o.aa, 
+                    'DIRECCIÓN (AB)': o.ab, 
+                    'TELÉFONO (AC)': o.ac 
+                }));
+                const ws = XLSX.utils.json_to_sheet(data);
+                XLSX.utils.book_append_sheet(wb, ws, club.substring(0,31));
             });
-            XLSX.writeFile(wb, `Rutas_PriceSmart.xlsx`);
+            XLSX.writeFile(wb, `Logistica_PS_Mapeo_Slots.xlsx`);
         }
     </script>
 </body>
