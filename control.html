@@ -40,31 +40,38 @@
             <div class="flex items-center space-x-4">
                 <div class="w-11 h-11 bg-ps-600 rounded-xl flex items-center justify-center text-white font-black shadow-2xl italic">PS</div>
                 <div>
-                    <h1 class="text-xl font-black tracking-tight text-slate-900 dark:text-white leading-none">PriceSmart <span class="bg-ps-600 text-[10px] px-2 py-1 rounded-md text-white italic">COSTA RICA</span></h1>
-                    <span class="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold italic">Zubale Logistics (OSM + Time Slots)</span>
+                    <h1 class="text-xl font-black tracking-tight text-slate-900 dark:text-white leading-none italic uppercase">pricemart</h1>
+                    <span class="text-[10px] uppercase tracking-[0.2em] text-ps-600 font-bold italic">zubale cr systems</span>
                 </div>
             </div>
-            <button onclick="document.documentElement.classList.toggle('dark')" class="p-3 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700">🌓</button>
+            
+            <div class="flex items-center space-x-3">
+                <a href="index.html" class="px-4 py-2 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-ps-600 hover:text-white transition-all shadow-sm border border-slate-200 dark:border-slate-700 flex items-center gap-2 italic">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                    Hub
+                </a>
+                <button onclick="document.documentElement.classList.toggle('dark')" class="p-3 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700">🌓</button>
+            </div>
         </div>
     </header>
 
     <main class="max-w-[1440px] mx-auto px-4 md:px-8 py-8 space-y-8">
 
-        <section id="dropZone" class="glass rounded-[2.5rem] p-10 shadow-2xl text-center">
+        <section id="dropZone" class="glass rounded-[2.5rem] p-10 shadow-2xl text-center border-none">
             <input type="file" id="fileInput" class="hidden" accept=".xlsx,.xls,.csv" />
             <div onclick="document.getElementById('fileInput').click()" class="cursor-pointer group">
                 <div class="mx-auto w-20 h-20 bg-ps-600/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-500 mb-4">
                     <svg class="w-10 h-10 text-ps-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-width="2"></path></svg>
                 </div>
-                <p class="text-xl font-black text-slate-800 dark:text-white uppercase italic tracking-tighter">Cargar archivo PriceSmart</p>
-                <p class="text-xs text-slate-400 mt-1 italic tracking-widest uppercase">Geolocalización por Slot Horario</p>
+                <p class="text-xl font-black text-slate-800 dark:text-white uppercase italic tracking-tighter">Cargar Reporte PriceSmart</p>
+                <p class="text-xs text-slate-400 mt-1 italic tracking-widest uppercase font-bold italic">Rutas Geográficas + Reporte por Slot</p>
             </div>
             <p id="fileStatus" class="text-xs text-emerald-500 font-black mt-6 italic hidden"></p>
         </section>
 
-        <section id="geoProgress" class="hidden glass rounded-[2rem] p-8 shadow-xl">
+        <section id="geoProgress" class="hidden glass rounded-[2rem] p-8 shadow-xl border-none">
             <div class="flex justify-between items-center mb-4">
-                <span class="text-[10px] font-black uppercase text-ps-500 tracking-[0.2em] italic">Mapeando entregas por cercanía y horario...</span>
+                <span class="text-[10px] font-black uppercase text-ps-500 tracking-[0.2em] italic text-ps-600">Calculando cercanía de puntos verdes...</span>
                 <span id="progressText" class="text-[10px] font-black text-slate-400 italic">0%</span>
             </div>
             <div class="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden shadow-inner">
@@ -74,20 +81,20 @@
 
         <section id="configSection" class="hidden glass rounded-[2.5rem] p-10 shadow-2xl border-none">
             <h2 class="text-xl font-black text-slate-800 dark:text-white mb-8 uppercase tracking-tighter italic flex items-center gap-3">
-                <span class="w-2 h-8 bg-ps-600 rounded-full"></span> Definir Flota por Club
+                <span class="w-2 h-8 bg-ps-600 rounded-full"></span> Configurar Pilotos
             </h2>
             <div id="storeConfigContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10"></div>
             <div class="flex justify-end pt-8 border-t border-slate-100 dark:border-slate-800">
-                <button onclick="optimizarRutasGeograficas()" class="px-10 py-4 bg-ps-600 text-white rounded-2xl font-black text-sm hover:scale-105 transition-all shadow-xl uppercase italic tracking-widest">Generar Rutas Inteligentes</button>
+                <button onclick="optimizarRutasGeograficas()" class="px-10 py-4 bg-ps-600 text-white rounded-2xl font-black text-sm hover:scale-105 transition-all shadow-xl uppercase italic tracking-widest">Optimizar Rutas por Zona</button>
             </div>
         </section>
 
         <section id="resultsSection" class="hidden space-y-8 animate-in fade-in slide-in-from-bottom-10">
-            <div class="flex items-center justify-between glass rounded-[2rem] px-8 py-4 shadow-xl">
+            <div class="flex items-center justify-between glass rounded-[2rem] px-8 py-4 shadow-xl border-none">
                 <h3 class="font-black text-slate-800 dark:text-white text-lg tracking-tight italic" id="totalOrdersBadge">0 Pedidos</h3>
                 <div class="flex gap-4">
-                    <button onclick="exportarExcelPestañas()" class="px-8 py-3 bg-emerald-600 text-white rounded-xl font-black text-xs hover:bg-emerald-700 transition-all shadow-lg uppercase tracking-widest">Exportar Excel</button>
-                    <button onclick="location.reload()" class="px-8 py-3 border-2 border-slate-200 dark:border-slate-800 text-slate-500 font-black text-xs rounded-xl hover:bg-red-500 hover:text-white transition-all uppercase tracking-widest">Reiniciar</button>
+                    <button onclick="exportarExcelPestañas()" class="px-8 py-3 bg-emerald-600 text-white rounded-xl font-black text-xs hover:bg-emerald-700 transition-all shadow-lg uppercase tracking-widest">Descargar Excel (Orden Slot)</button>
+                    <button onclick="location.reload()" class="px-8 py-3 border-2 border-slate-200 dark:border-slate-800 text-slate-500 font-black text-xs rounded-xl hover:bg-red-500 hover:text-white transition-all uppercase tracking-widest italic tracking-tighter">Limpiar</button>
                 </div>
             </div>
             <div id="routesContainer" class="space-y-6"></div>
@@ -105,24 +112,12 @@
             reader.onload = async function(e) {
                 const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
                 const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1, defval: ""});
-                
                 RAW_DATA = [];
                 for (let i = 1; i < rows.length; i++) {
                     const r = rows[i];
                     if (!r[8]) continue;
-                    // Extraer hora de columna P (index 15)
                     const h = String(r[15]).match(/(\d{1,2})/) ? String(r[15]).match(/(\d{1,2})/)[1] : "00";
-                    RAW_DATA.push({ 
-                        c: r[2], 
-                        i: r[8], 
-                        p: h + ":00", 
-                        k: r[10], 
-                        aa: r[26], 
-                        ab: r[27], 
-                        ac: r[28], 
-                        lat: null, 
-                        lon: null 
-                    });
+                    RAW_DATA.push({ c: r[2], i: r[8], p: h.padStart(2, '0') + ":00", k: r[10], aa: r[26], ab: r[27], ac: r[28], lat: null, lon: null });
                 }
                 await geocodificarOSM();
             };
@@ -132,7 +127,6 @@
         async function geocodificarOSM() {
             document.getElementById('dropZone').classList.add('hidden');
             document.getElementById('geoProgress').classList.remove('hidden');
-            
             for (let i = 0; i < RAW_DATA.length; i++) {
                 const item = RAW_DATA[i];
                 try {
@@ -141,11 +135,10 @@
                     if (json && json[0]) { item.lat = parseFloat(json[0].lat); item.lon = parseFloat(json[0].lon); }
                     else { item.lat = 9.93; item.lon = -84.13; }
                 } catch (e) { item.lat = 9.93; item.lon = -84.13; }
-
                 await new Promise(r => setTimeout(r, 850));
                 const pct = Math.round(((i + 1) / RAW_DATA.length) * 100);
                 document.getElementById('progressBar').style.width = pct + '%';
-                document.getElementById('progressText').textContent = `${pct}% - Ubicando entrega ${i+1} de ${RAW_DATA.length}`;
+                document.getElementById('progressText').textContent = `${pct}% - Geoubicación: ${i+1}/${RAW_DATA.length}`;
             }
             renderConfigs();
         }
@@ -155,14 +148,13 @@
             document.getElementById('configSection').classList.remove('hidden');
             const container = document.getElementById('storeConfigContainer');
             container.innerHTML = '';
-            
             const clubs = [...new Set(RAW_DATA.map(d => d.i.split('-').pop().trim().toUpperCase()))];
             clubs.forEach(c => {
                 container.innerHTML += `
                     <div class="bg-white dark:bg-slate-800 p-6 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800">
                         <div class="flex justify-between items-center mb-6">
                             <span class="font-black text-[11px] uppercase text-ps-600 tracking-widest italic">${c}</span>
-                            <span id="val-${c}" class="bg-slate-900 text-white text-[10px] font-black px-3 py-1 rounded-full">2 PILOTOS</span>
+                            <span id="val-${c}" class="bg-slate-900 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg italic">2 PILOTOS</span>
                         </div>
                         <input type="range" id="p-${c}" min="1" max="6" value="2" class="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-ps-500" oninput="document.getElementById('val-${c}').textContent = this.value + ' PILOTOS'">
                     </div>`;
@@ -180,13 +172,15 @@
                 const center = CLUB_CENTERS[club] || [9.93, -84.13];
 
                 orders.forEach(o => { o.angle = Math.atan2(o.lat - center[0], o.lon - center[1]); });
-                // ORDENAR POR SLOT Y LUEGO ÁNGULO
-                orders.sort((a,b) => a.p.localeCompare(b.p) || a.angle - b.angle);
-                orders.forEach((o, idx) => { o.piloto = (idx % nP) + 1; total++; });
+                orders.sort((a,b) => a.angle - b.angle);
 
+                const perPilot = Math.ceil(orders.length / nP);
+                orders.forEach((o, idx) => {
+                    o.piloto = Math.min(Math.floor(idx / perPilot) + 1, nP);
+                    total++;
+                });
                 FINAL_GROUPS[club] = orders;
             });
-
             renderResultados(total);
         }
 
@@ -195,38 +189,24 @@
             container.innerHTML = '';
             Object.entries(FINAL_GROUPS).forEach(([club, orders]) => {
                 const detail = document.createElement('details');
-                detail.className = "glass rounded-[2.5rem] overflow-hidden shadow-xl mb-6";
-                
+                detail.className = "glass rounded-[2.5rem] overflow-hidden shadow-xl mb-6 border-none";
                 let content = `<div class="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
-                const pilots = [...new Set(orders.map(o => o.piloto))];
-                
+                const pilots = [...new Set(orders.map(o => o.piloto))].sort((a,b)=>a-b);
                 pilots.forEach(pNum => {
                     const pOrders = orders.filter(o => o.piloto === pNum);
                     content += `
                         <div class="pilot-card p-6 border-l-8 ${COLORS[(pNum-1)%5]} border-opacity-40">
                             <h5 class="font-black text-xs mb-4 uppercase italic">PILOTO ${pNum} (${pOrders.length} PEDIDOS)</h5>
                             <div class="space-y-4">
-                                ${pOrders.map(o => `
-                                    <div class="text-[11px]">
-                                        <div class="flex justify-between mb-1">
-                                            <span class="font-black text-ps-600">#${o.c}</span>
-                                            <span class="bg-slate-200 dark:bg-slate-700 px-2 py-0.5 rounded font-black text-[9px] text-slate-600 dark:text-slate-300">SLOT: ${o.p}</span>
-                                        </div>
-                                        <p class="font-bold uppercase text-slate-800 dark:text-white line-clamp-1">${o.aa}</p>
-                                        <p class="text-[10px] text-slate-400 italic">${o.ab}</p>
-                                    </div>`).join('<hr class="my-2 border-slate-100 dark:border-slate-800">')}
+                                ${pOrders.map(o => `<div class="text-[11px]"><div class="flex justify-between mb-1"><span class="font-black text-ps-600">#${o.c}</span><span class="bg-slate-900 text-white px-2 py-0.5 rounded font-black text-[9px]">SLOT: ${o.p}</span></div><p class="font-bold uppercase text-slate-800 dark:text-white line-clamp-1">${o.aa}</p><p class="text-[10px] text-slate-400 italic font-medium leading-tight">${o.ab}</p></div>`).join('<hr class="my-2 border-slate-100 dark:border-slate-800">')}
                             </div>
                         </div>`;
                 });
                 content += `</div>`;
-
                 detail.innerHTML = `
                     <summary class="p-6 flex justify-between items-center cursor-pointer">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-ps-600 rounded-2xl flex items-center justify-center text-white font-black italic shadow-lg">PS</div>
-                            <h3 class="font-black text-base uppercase italic tracking-tighter">${club}</h3>
-                        </div>
-                        <div class="bg-slate-900 text-white font-black text-[10px] px-6 py-2 rounded-2xl">${orders.length} ENTREGAS</div>
+                        <div class="flex items-center gap-4"><div class="w-10 h-10 bg-ps-600 rounded-2xl flex items-center justify-center text-white font-black italic shadow-lg">PS</div><h3 class="font-black text-base uppercase italic tracking-tighter">${club}</h3></div>
+                        <div class="bg-slate-900 text-white font-black text-[10px] px-6 py-2 rounded-2xl shadow-xl italic tracking-[0.2em]">${orders.length} ENTREGAS TOTALES</div>
                     </summary>${content}`;
                 container.appendChild(detail);
             });
@@ -237,7 +217,10 @@
         function exportarExcelPestañas() {
             const wb = XLSX.utils.book_new();
             Object.keys(FINAL_GROUPS).forEach(club => {
-                const data = FINAL_GROUPS[club].map(o => ({ 
+                const orders = FINAL_GROUPS[club];
+                
+                // MAPEO Y ORDENAMIENTO POR SLOT (FRANJA HORARIA)
+                const data = orders.map(o => ({ 
                     'PILOTO': o.piloto, 
                     'ID (C)': o.c, 
                     'CLUB (I)': o.i, 
@@ -246,11 +229,12 @@
                     'CLIENTE (AA)': o.aa, 
                     'DIRECCIÓN (AB)': o.ab, 
                     'TELÉFONO (AC)': o.ac 
-                }));
+                })).sort((a, b) => a['SLOT (P)'].localeCompare(b['SLOT (P)']));
+
                 const ws = XLSX.utils.json_to_sheet(data);
                 XLSX.utils.book_append_sheet(wb, ws, club.substring(0,31));
             });
-            XLSX.writeFile(wb, `Logistica_PS_Mapeo_Slots.xlsx`);
+            XLSX.writeFile(wb, `Plan_Rutas_PS_Orden_Slot.xlsx`);
         }
     </script>
 </body>
