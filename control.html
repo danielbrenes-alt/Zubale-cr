@@ -3,34 +3,32 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>PriceSmart Route Planner | Logistics Control</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <title>PriceSmart Route Planner Pro | Navigation Sync</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet" />
+
     <script>
         tailwind.config = { 
             darkMode: 'class', 
-            theme: { 
-                extend: { 
-                    fontFamily: { sans: ['Inter', 'sans-serif'] }, 
-                    colors: { 
-                        ps: { 50: '#F0F7FF', 100: '#E0EFFF', 500: '#4F46E5', 600: '#1D4ED8', 700: '#1E40AF', 900: '#1e3a8a' } 
-                    } 
-                } 
-            } 
+            theme: { extend: { colors: { ps: { 500: '#4F46E5', 600: '#4338CA', 700: '#3730A3' } } } } 
         }
     </script>
+
     <style>
-        body { font-family: 'Inter', sans-serif; background: #f1f5f9; transition: all .4s cubic-bezier(0.4, 0, 0.2, 1); }
+        body { font-family: 'Inter', sans-serif; background: #f1f5f9; transition: all .4s ease; }
         .dark body { background: #020617; }
-        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03); }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.4); }
         .dark .glass { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .pilot-card { transition: all 0.3s ease; border-radius: 1.5rem; background: rgba(255, 255, 255, 0.5); }
-        .dark .pilot-card { background: rgba(30, 41, 59, 0.4); }
-        .pilot-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(37, 99, 235, 0.15); }
-        .progress-fill { transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        #map { height: 450px; border-radius: 2rem; z-index: 1; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+        .pilot-card { border-left: 6px solid; transition: transform 0.3s; }
         .custom-scroll::-webkit-scrollbar { height: 6px; width: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .nav-btn { transition: all 0.2s ease; }
+        .nav-btn:active { scale: 0.92; }
     </style>
 </head>
 <body class="antialiased text-slate-800 dark:text-slate-100 min-h-screen">
@@ -40,201 +38,197 @@
             <div class="flex items-center space-x-4">
                 <div class="w-11 h-11 bg-ps-600 rounded-xl flex items-center justify-center text-white font-black shadow-2xl italic">PS</div>
                 <div>
-                    <h1 class="text-xl font-black tracking-tight text-slate-900 dark:text-white leading-none italic uppercase">pricemart</h1>
-                    <span class="text-[10px] uppercase tracking-[0.2em] text-ps-600 font-bold italic">zubale cr systems</span>
+                    <h1 class="text-xl font-black tracking-tight text-slate-900 dark:text-white leading-none uppercase italic tracking-tighter">Zubale Logistic</h1>
+                    <span class="text-[10px] uppercase tracking-[0.2em] text-ps-500 font-bold italic">Mapeo inteligente de rutas </span>
                 </div>
             </div>
-            
-            <div class="flex items-center space-x-3">
-                <a href="index.html" class="px-4 py-2 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-ps-600 hover:text-white transition-all shadow-sm border border-slate-200 dark:border-slate-700 flex items-center gap-2 italic">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                    Hub
-                </a>
+            <div class="flex gap-3">
+                <a href="index.html" class="px-4 py-2 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-ps-600 hover:text-white transition-all shadow-sm border border-slate-200 dark:border-slate-700 flex items-center gap-2 italic">Hub</a>
                 <button onclick="document.documentElement.classList.toggle('dark')" class="p-3 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700">🌓</button>
             </div>
         </div>
     </header>
 
-    <main class="max-w-[1440px] mx-auto px-4 md:px-8 py-8 space-y-8">
+    <main class="max-w-[1440px] mx-auto px-6 py-8 space-y-8">
 
-        <section id="dropZone" class="glass rounded-[2.5rem] p-10 shadow-2xl text-center border-none">
+        <section id="dropZone" class="glass rounded-[2.5rem] p-10 shadow-2xl text-center border-none transition-all hover:scale-[1.01]">
             <input type="file" id="fileInput" class="hidden" accept=".xlsx,.xls,.csv" />
             <div onclick="document.getElementById('fileInput').click()" class="cursor-pointer group">
-                <div class="mx-auto w-20 h-20 bg-ps-600/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-500 mb-4">
-                    <svg class="w-10 h-10 text-ps-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-width="2"></path></svg>
+                <div class="mx-auto w-16 h-16 bg-ps-600/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-all duration-500 mb-4">
+                    <svg class="w-8 h-8 text-ps-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-width="2"></path></svg>
                 </div>
-                <p class="text-xl font-black text-slate-800 dark:text-white uppercase italic tracking-tighter">Cargar Reporte PriceSmart</p>
-                <p class="text-xs text-slate-400 mt-1 italic tracking-widest uppercase font-bold italic">Rutas Geográficas + Reporte por Slot</p>
+                <p class="text-lg font-black text-slate-800 dark:text-white uppercase italic tracking-tighter italic">Cargar archivo PriceSmart</p>
+                <p class="text-[10px] text-slate-400 mt-1 uppercase font-bold italic">Optimización con enlaces de navegación</p>
             </div>
             <p id="fileStatus" class="text-xs text-emerald-500 font-black mt-6 italic hidden"></p>
         </section>
 
         <section id="geoProgress" class="hidden glass rounded-[2rem] p-8 shadow-xl border-none">
-            <div class="flex justify-between items-center mb-4">
-                <span class="text-[10px] font-black uppercase text-ps-500 tracking-[0.2em] italic text-ps-600">Calculando cercanía de puntos verdes...</span>
-                <span id="progressText" class="text-[10px] font-black text-slate-400 italic">0%</span>
-            </div>
             <div class="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden shadow-inner">
-                <div id="progressBar" class="bg-gradient-to-r from-ps-500 to-ps-700 h-full w-0 progress-fill shadow-lg"></div>
+                <div id="progressBar" class="bg-ps-600 h-full w-0 transition-all duration-500 shadow-lg"></div>
             </div>
+            <p id="progressText" class="text-[10px] font-black text-slate-400 italic text-center mt-3">0%</p>
         </section>
 
-        <section id="configSection" class="hidden glass rounded-[2.5rem] p-10 shadow-2xl border-none">
-            <h2 class="text-xl font-black text-slate-800 dark:text-white mb-8 uppercase tracking-tighter italic flex items-center gap-3">
-                <span class="w-2 h-8 bg-ps-600 rounded-full"></span> Configurar Pilotos
-            </h2>
-            <div id="storeConfigContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10"></div>
-            <div class="flex justify-end pt-8 border-t border-slate-100 dark:border-slate-800">
-                <button onclick="optimizarRutasGeograficas()" class="px-10 py-4 bg-ps-600 text-white rounded-2xl font-black text-sm hover:scale-105 transition-all shadow-xl uppercase italic tracking-widest">Optimizar Rutas por Zona</button>
+        <div id="mainUI" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-8">
+                <div id="map"></div>
+                <div id="routesContainer" class="mt-8 space-y-6"></div>
             </div>
-        </section>
-
-        <section id="resultsSection" class="hidden space-y-8 animate-in fade-in slide-in-from-bottom-10">
-            <div class="flex items-center justify-between glass rounded-[2rem] px-8 py-4 shadow-xl border-none">
-                <h3 class="font-black text-slate-800 dark:text-white text-lg tracking-tight italic" id="totalOrdersBadge">0 Pedidos</h3>
-                <div class="flex gap-4">
-                    <button onclick="exportarExcelPestañas()" class="px-8 py-3 bg-emerald-600 text-white rounded-xl font-black text-xs hover:bg-emerald-700 transition-all shadow-lg uppercase tracking-widest">Descargar Excel (Orden Slot)</button>
-                    <button onclick="location.reload()" class="px-8 py-3 border-2 border-slate-200 dark:border-slate-800 text-slate-500 font-black text-xs rounded-xl hover:bg-red-500 hover:text-white transition-all uppercase tracking-widest italic tracking-tighter">Limpiar</button>
+            
+            <div class="lg:col-span-4 space-y-6">
+                <div class="glass p-8 rounded-[2.5rem] shadow-xl border-none sticky top-24">
+                    <h2 class="text-xs font-black text-slate-800 dark:text-white mb-6 uppercase italic tracking-widest flex items-center gap-2">
+                        <span class="w-1.5 h-5 bg-ps-600 rounded-full"></span> Panel de Control
+                    </h2>
+                    <div id="storeSettings" class="space-y-4 mb-6"></div>
+                    <button onclick="optimizarRutas()" class="w-full py-4 bg-ps-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:bg-ps-700 transition-all active:scale-95 italic">Generar Rutas con GPS</button>
+                    <button onclick="exportarExcel()" class="w-full mt-3 py-4 bg-emerald-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:bg-emerald-700 transition-all active:scale-95 italic">Descargar Reporte</button>
                 </div>
             </div>
-            <div id="routesContainer" class="space-y-6"></div>
-        </section>
+        </div>
     </main>
 
     <script>
         const CLUB_CENTERS = { 'ALAJUELA': [10.01, -84.21], 'ESCAZU': [9.93, -84.13], 'HEREDIA': [9.99, -84.12], 'SANTA ANA': [9.93, -84.18], 'TRES RIOS': [9.90, -83.98], 'ZAPOTE': [9.92, -84.05], 'LIBERIA': [10.63, -85.43], 'CARTAGO': [9.86, -83.91], 'LLORENTE': [9.96, -84.07] };
+        const COLORS = ["#4F46E5", "#EF4444", "#10B981", "#F59E0B", "#8B5CF6", "#EC4899", "#06B6D4"];
         let RAW_DATA = [];
-        let FINAL_GROUPS = {};
-        const COLORS = ['bg-ps-600', 'bg-rose-500', 'bg-emerald-500', 'bg-amber-500', 'bg-violet-600'];
+        let map = L.map('map').setView([9.93, -84.08], 11);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
         document.getElementById('fileInput').addEventListener('change', async function(e) {
             const reader = new FileReader();
             reader.onload = async function(e) {
                 const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
-                const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1, defval: ""});
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(sheet, {header: 1, defval: ""});
                 RAW_DATA = [];
                 for (let i = 1; i < rows.length; i++) {
                     const r = rows[i];
-                    if (!r[8]) continue;
+                    if (!r[8] || !r[27]) continue;
                     const h = String(r[15]).match(/(\d{1,2})/) ? String(r[15]).match(/(\d{1,2})/)[1] : "00";
-                    RAW_DATA.push({ c: r[2], i: r[8], p: h.padStart(2, '0') + ":00", k: r[10], aa: r[26], ab: r[27], ac: r[28], lat: null, lon: null });
+                    RAW_DATA.push({
+                        c: r[2], i: r[8], p: h.padStart(2, '0') + ":00", k: r[10], aa: r[26], ab: r[27], ac: r[28],
+                        lat: null, lon: null
+                    });
                 }
-                await geocodificarOSM();
+                if (RAW_DATA.length > 0) await geocodeAll();
             };
-            reader.readAsArrayBuffer(fileInput.files[0]);
+            reader.readAsArrayBuffer(e.target.files[0]);
         });
 
-        async function geocodificarOSM() {
-            document.getElementById('dropZone').classList.add('hidden');
-            document.getElementById('geoProgress').classList.remove('hidden');
+        async function geocodeAll() {
+            document.getElementById("geoProgress").classList.remove("hidden");
             for (let i = 0; i < RAW_DATA.length; i++) {
                 const item = RAW_DATA[i];
-                try {
-                    const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(item.ab)}&limit=1`);
-                    const json = await resp.json();
-                    if (json && json[0]) { item.lat = parseFloat(json[0].lat); item.lon = parseFloat(json[0].lon); }
-                    else { item.lat = 9.93; item.lon = -84.13; }
-                } catch (e) { item.lat = 9.93; item.lon = -84.13; }
-                await new Promise(r => setTimeout(r, 850));
+                const cached = localStorage.getItem(item.ab);
+                if (cached) {
+                    const c = JSON.parse(cached);
+                    item.lat = c.lat; item.lon = c.lon;
+                } else {
+                    try {
+                        const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(item.ab)}&limit=1`);
+                        const j = await r.json();
+                        if (j[0]) {
+                            item.lat = parseFloat(j[0].lat); item.lon = parseFloat(j[0].lon);
+                            localStorage.setItem(item.ab, JSON.stringify({lat: item.lat, lon: item.lon}));
+                        } else { item.lat = 9.93; item.lon = -84.08; }
+                    } catch (e) {}
+                    await new Promise(r => setTimeout(r, 850));
+                }
                 const pct = Math.round(((i + 1) / RAW_DATA.length) * 100);
-                document.getElementById('progressBar').style.width = pct + '%';
-                document.getElementById('progressText').textContent = `${pct}% - Geoubicación: ${i+1}/${RAW_DATA.length}`;
+                document.getElementById("progressBar").style.width = pct + "%";
+                document.getElementById("progressText").textContent = `${pct}% - Geocodificando: ${i+1}/${RAW_DATA.length}`;
             }
             renderConfigs();
         }
 
         function renderConfigs() {
-            document.getElementById('geoProgress').classList.add('hidden');
-            document.getElementById('configSection').classList.remove('hidden');
-            const container = document.getElementById('storeConfigContainer');
+            document.getElementById("geoProgress").classList.add("hidden");
+            document.getElementById("mainUI").classList.remove("hidden");
+            const container = document.getElementById("storeSettings");
             container.innerHTML = '';
             const clubs = [...new Set(RAW_DATA.map(d => d.i.split('-').pop().trim().toUpperCase()))];
             clubs.forEach(c => {
                 container.innerHTML += `
-                    <div class="bg-white dark:bg-slate-800 p-6 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800">
-                        <div class="flex justify-between items-center mb-6">
-                            <span class="font-black text-[11px] uppercase text-ps-600 tracking-widest italic">${c}</span>
-                            <span id="val-${c}" class="bg-slate-900 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg italic">2 PILOTOS</span>
-                        </div>
-                        <input type="range" id="p-${c}" min="1" max="6" value="2" class="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-ps-500" oninput="document.getElementById('val-${c}').textContent = this.value + ' PILOTOS'">
+                    <div class="bg-slate-100 dark:bg-slate-800/50 p-4 rounded-2xl">
+                        <div class="flex justify-between mb-2 italic"><span class="text-[10px] font-black uppercase text-ps-500">${c}</span><span id="v-${c}" class="text-[10px] font-bold">2 Pilotos</span></div>
+                        <input type="range" id="p-${c}" min="1" max="6" value="2" class="w-full accent-ps-500" oninput="document.getElementById('v-${c}').textContent = this.value + ' Pilotos'">
                     </div>`;
             });
         }
 
-        function optimizarRutasGeograficas() {
-            FINAL_GROUPS = {};
-            const clubs = [...new Set(RAW_DATA.map(d => d.i.split('-').pop().trim().toUpperCase()))];
-            let total = 0;
-
-            clubs.forEach(club => {
-                const nP = parseInt(document.getElementById(`p-${club}`).value) || 1;
-                let orders = RAW_DATA.filter(d => d.i.toUpperCase().includes(club));
-                const center = CLUB_CENTERS[club] || [9.93, -84.13];
-
-                orders.forEach(o => { o.angle = Math.atan2(o.lat - center[0], o.lon - center[1]); });
-                orders.sort((a,b) => a.angle - b.angle);
-
-                const perPilot = Math.ceil(orders.length / nP);
-                orders.forEach((o, idx) => {
-                    o.piloto = Math.min(Math.floor(idx / perPilot) + 1, nP);
-                    total++;
-                });
-                FINAL_GROUPS[club] = orders;
-            });
-            renderResultados(total);
-        }
-
-        function renderResultados(total) {
+        function optimizarRutas() {
+            map.eachLayer(l => { if (l instanceof L.CircleMarker) map.removeLayer(l); });
             const container = document.getElementById('routesContainer');
-            container.innerHTML = '';
-            Object.entries(FINAL_GROUPS).forEach(([club, orders]) => {
+            container.innerHTML = "";
+            const clubs = [...new Set(RAW_DATA.map(d => d.i.split('-').pop().trim().toUpperCase()))];
+            
+            clubs.forEach(clubName => {
+                const nP = parseInt(document.getElementById(`p-${clubName}`).value);
+                let clubOrders = RAW_DATA.filter(d => d.i.toUpperCase().includes(clubName));
+                const center = CLUB_CENTERS[clubName] || [9.93, -84.13];
+
+                clubOrders.forEach(o => { o.angle = Math.atan2(o.lat - center[0], o.lon - center[1]); });
+                clubOrders.sort((a,b) => a.angle - b.angle);
+
+                const perPilot = Math.ceil(clubOrders.length / nP);
                 const detail = document.createElement('details');
                 detail.className = "glass rounded-[2.5rem] overflow-hidden shadow-xl mb-6 border-none";
-                let content = `<div class="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
-                const pilots = [...new Set(orders.map(o => o.piloto))].sort((a,b)=>a-b);
-                pilots.forEach(pNum => {
-                    const pOrders = orders.filter(o => o.piloto === pNum);
-                    content += `
-                        <div class="pilot-card p-6 border-l-8 ${COLORS[(pNum-1)%5]} border-opacity-40">
-                            <h5 class="font-black text-xs mb-4 uppercase italic">PILOTO ${pNum} (${pOrders.length} PEDIDOS)</h5>
-                            <div class="space-y-4">
-                                ${pOrders.map(o => `<div class="text-[11px]"><div class="flex justify-between mb-1"><span class="font-black text-ps-600">#${o.c}</span><span class="bg-slate-900 text-white px-2 py-0.5 rounded font-black text-[9px]">SLOT: ${o.p}</span></div><p class="font-bold uppercase text-slate-800 dark:text-white line-clamp-1">${o.aa}</p><p class="text-[10px] text-slate-400 italic font-medium leading-tight">${o.ab}</p></div>`).join('<hr class="my-2 border-slate-100 dark:border-slate-800">')}
+                let storeContent = `<div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">`;
+
+                for (let pIdx = 0; pIdx < nP; pIdx++) {
+                    const pOrders = clubOrders.slice(pIdx * perPilot, (pIdx + 1) * perPilot);
+                    if (pOrders.length === 0) continue;
+                    const color = COLORS[pIdx % COLORS.length];
+                    
+                    pOrders.forEach(o => { 
+                        o.piloto = pIdx + 1; 
+                        L.circleMarker([o.lat, o.lon], { radius: 7, color: color, fillOpacity: 0.9 }).addTo(map);
+                    });
+
+                    storeContent += `
+                        <div class="pilot-card p-6 bg-white dark:bg-slate-800/40 rounded-3xl border-l-8 shadow-sm" style="border-color: ${color}">
+                            <h5 class="font-black text-xs mb-5 uppercase italic tracking-tighter">Piloto ${pIdx+1} (${pOrders.length} Pedidos)</h5>
+                            <div class="space-y-6">
+                                ${pOrders.map(o => `
+                                    <div class="text-[11px] group">
+                                        <div class="flex justify-between mb-2">
+                                            <span class="font-black text-ps-600">ID: #${o.c}</span>
+                                            <span class="bg-slate-900 text-white px-2 py-0.5 rounded font-black text-[9px] italic">Slot: ${o.p}</span>
+                                        </div>
+                                        <p class="font-black text-[12px] uppercase leading-none mb-1 text-slate-800 dark:text-white">${o.aa}</p>
+                                        <p class="text-[10px] text-slate-400 italic font-medium leading-tight mb-3 line-clamp-1">${o.ab}</p>
+                                        
+                                        <div class="flex gap-2">
+                                            <a href="https://waze.com/ul?ll=${o.lat},${o.lon}&navigate=yes" target="_blank" class="nav-btn flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-xl text-center font-black text-[9px] uppercase tracking-widest shadow-lg shadow-emerald-500/20">Waze</a>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=${o.lat},${o.lon}" target="_blank" class="nav-btn flex-1 bg-ps-600 hover:bg-ps-700 text-white py-2 rounded-xl text-center font-black text-[9px] uppercase tracking-widest shadow-lg shadow-ps-500/20">Google Maps</a>
+                                        </div>
+                                    </div>`).join('<hr class="my-6 border-slate-100 dark:border-slate-700">')}
                             </div>
                         </div>`;
-                });
-                content += `</div>`;
+                }
+                storeContent += `</div>`;
                 detail.innerHTML = `
-                    <summary class="p-6 flex justify-between items-center cursor-pointer">
-                        <div class="flex items-center gap-4"><div class="w-10 h-10 bg-ps-600 rounded-2xl flex items-center justify-center text-white font-black italic shadow-lg">PS</div><h3 class="font-black text-base uppercase italic tracking-tighter">${club}</h3></div>
-                        <div class="bg-slate-900 text-white font-black text-[10px] px-6 py-2 rounded-2xl shadow-xl italic tracking-[0.2em]">${orders.length} ENTREGAS TOTALES</div>
-                    </summary>${content}`;
+                    <summary class="p-6 flex justify-between items-center cursor-pointer hover:bg-white/50 transition-all italic">
+                        <div class="flex items-center gap-4"><div class="w-10 h-10 bg-ps-600 rounded-2xl flex items-center justify-center text-white font-black italic shadow-lg italic text-xs">PS</div><h3 class="font-black text-base uppercase tracking-tighter">${clubName}</h3></div>
+                        <div class="bg-slate-900 text-white font-black text-[10px] px-6 py-2 rounded-2xl uppercase tracking-widest shadow-lg">${clubOrders.length} Envios</div>
+                    </summary>${storeContent}`;
                 container.appendChild(detail);
             });
-            document.getElementById('totalOrdersBadge').textContent = `${total} Pedidos Procesados`;
-            document.getElementById('resultsSection').classList.remove('hidden');
         }
 
-        function exportarExcelPestañas() {
+        function exportarExcel() {
             const wb = XLSX.utils.book_new();
-            Object.keys(FINAL_GROUPS).forEach(club => {
-                const orders = FINAL_GROUPS[club];
-                
-                // MAPEO Y ORDENAMIENTO POR SLOT (FRANJA HORARIA)
-                const data = orders.map(o => ({ 
-                    'PILOTO': o.piloto, 
-                    'ID (C)': o.c, 
-                    'CLUB (I)': o.i, 
-                    'SLOT (P)': o.p, 
-                    'DISTANCIA (K)': o.k, 
-                    'CLIENTE (AA)': o.aa, 
-                    'DIRECCIÓN (AB)': o.ab, 
-                    'TELÉFONO (AC)': o.ac 
-                })).sort((a, b) => a['SLOT (P)'].localeCompare(b['SLOT (P)']));
-
+            const clubs = [...new Set(RAW_DATA.map(d => d.i.split('-').pop().trim().toUpperCase()))];
+            clubs.forEach(cName => {
+                const data = RAW_DATA.filter(d => d.i.toUpperCase().includes(cName))
+                    .map(o => ({ 'PILOTO': o.piloto, 'ID (C)': o.c, 'CLUB (I)': o.i, 'SLOT (P)': o.p, 'DISTANCIA (K)': o.k, 'CLIENTE (AA)': o.aa, 'DIRECCIÓN (AB)': o.ab, 'TELÉFONO (AC)': o.ac }))
+                    .sort((a,b) => a['SLOT (P)'].localeCompare(b['SLOT (P)']));
                 const ws = XLSX.utils.json_to_sheet(data);
-                XLSX.utils.book_append_sheet(wb, ws, club.substring(0,31));
+                XLSX.utils.book_append_sheet(wb, ws, cName.substring(0,31));
             });
-            XLSX.writeFile(wb, `Plan_Rutas_PS_Orden_Slot.xlsx`);
+            XLSX.writeFile(wb, `PriceSmart_Nav_Ready.xlsx`);
         }
     </script>
 </body>
