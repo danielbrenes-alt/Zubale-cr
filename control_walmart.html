@@ -46,10 +46,6 @@
         .dark .glass-card { background: rgba(30, 41, 59, 0.7); border: 1px solid #334155; }
         .stat-card-gradient { background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); }
         .dark .stat-card-gradient { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
-        .file-btn-wrapper { position: relative; overflow: hidden; display: inline-flex; }
-        .file-btn-wrapper input[type=file] { position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; width: 100%; }
-        .modal-backdrop { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); }
-        .slot-indicator { transition: background-color 0.3s ease; }
         .toast { animation: slideInRight 0.4s ease, fadeOut 0.4s ease 2.6s forwards; }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
@@ -67,22 +63,15 @@
     <header class="sticky top-0 z-40 w-full border-b border-enterprise-200 dark:border-enterprise-800 bg-white/80 dark:bg-enterprise-900/80 backdrop-blur-md">
         <div class="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-8">
-                <a href="index.html" class="flex items-center space-x-4 cursor-pointer hover:opacity-80 transition-opacity">
+                <div class="flex items-center space-x-4">
                     <div class="w-8 h-8 bg-accent-500 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-accent-500/20">Z</div>
                     <div>
                         <h1 class="text-lg font-bold tracking-tight text-enterprise-900 dark:text-white leading-none">Zubale CR Systems</h1>
                         <span class="text-[10px] uppercase tracking-widest text-enterprise-600 font-semibold">Logistics Control Center</span>
                     </div>
-                </a>
+                </div>
             </div>
             <div class="flex items-center space-x-4">
-                <a href="index.html" class="flex items-center space-x-2 px-3 py-2 text-xs font-semibold text-enterprise-600 dark:text-enterprise-300 hover:bg-enterprise-100 dark:hover:bg-enterprise-800 rounded-lg transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
-                    <span>Volver al Hub</span>
-                </a>
-
-                <div class="h-6 w-[1px] bg-enterprise-200 dark:bg-enterprise-800"></div>
-
                 <button class="p-2 rounded-full hover:bg-enterprise-100 dark:hover:bg-enterprise-800 transition-colors" id="themeToggle">
                     <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
                     <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
@@ -114,13 +103,11 @@
         <section class="mb-8">
             <div class="bg-indigo-50/50 dark:bg-enterprise-800/50 border border-indigo-100 dark:border-enterprise-700 p-6 rounded-xl shadow-md">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div class="flex items-center space-x-3">
-                        <h2 class="text-sm font-bold text-enterprise-900 dark:text-white">Centro de Acciones</h2>
-                    </div>
+                    <h2 class="text-sm font-bold text-enterprise-900 dark:text-white uppercase tracking-wider">Centro de Acciones</h2>
                     <div class="flex flex-wrap items-center gap-3">
-                        <button onclick="document.getElementById('input-inyectar').click()" class="px-4 py-2 text-xs font-semibold bg-enterprise-800 dark:bg-enterprise-700 text-white rounded-lg hover:bg-enterprise-900 transition-all shadow-md">Inyectar Turno</button>
+                        <button onclick="document.getElementById('input-inyectar').click()" class="px-4 py-2 text-xs font-semibold bg-enterprise-800 dark:bg-enterprise-700 text-white rounded-lg hover:bg-enterprise-900 transition-all shadow-md">Inyectar Turno Anterior</button>
                         <button onclick="document.getElementById('input-soluciones').click()" class="px-4 py-2 text-xs font-semibold bg-white dark:bg-enterprise-800 text-enterprise-700 dark:text-enterprise-200 border border-enterprise-200 dark:border-enterprise-700 rounded-lg hover:bg-enterprise-50 transition-all">Cargar Soluciones</button>
-                        <div class="flex items-center space-x-1">
+                        <div class="flex items-center">
                             <select id="slot-selector" onchange="actualizarEstadoBoton()" class="px-3 py-2 text-xs font-medium bg-white dark:bg-enterprise-800 border border-enterprise-200 dark:border-enterprise-700 rounded-l-lg outline-none text-enterprise-700 dark:text-white">
                                 <option value="1">Slot 1</option><option value="2">Slot 2</option><option value="3">Slot 3</option><option value="4">Slot 4</option>
                                 <option value="5">Slot 5</option><option value="6">Slot 6</option><option value="7">Slot 7</option><option value="8">Slot 8</option>
@@ -166,33 +153,41 @@
             return null;
         }
 
+        // --- FUNCIÓN CORREGIDA: INYECTAR TURNO (CON CONSOLIDADO DE SOLUCIONES) ---
         function inyectarTurno(input) {
             const file = input.files[0]; if (!file) return;
             const reader = new FileReader();
             reader.onload = (e) => {
-                const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
-                const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                data.forEach(fila => {
-                    const tE = buscarTiendaEnFila(fila);
-                    if (tE) {
-                        for (let i = 1; i <= 8; i++) {
-                            const val = parseInt(fila[`Slot ${i}`] || fila[`SLOT ${i}`] || 0);
-                            if (!isNaN(val)) db[tE].slots[i-1] += val;
+                try {
+                    const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
+                    const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                    
+                    data.forEach(fila => {
+                        const tE = buscarTiendaEnFila(fila);
+                        if (tE) {
+                            // Sumar Slots
+                            for (let i = 1; i <= 8; i++) {
+                                const val = parseInt(fila[`Slot ${i}`] || fila[`SLOT ${i}`] || 0);
+                                if (!isNaN(val)) db[tE].slots[i-1] += val;
+                            }
+                            // CONTEO AUTOMÁTICO DE SOLUCIONES:
+                            // Buscamos columnas comunes como "Sol", "SOL", "Soluciones" o "SOLUCIONES"
+                            const sVal = parseInt(fila["Sol"] || fila["SOL"] || fila["Soluciones"] || fila["SOLUCIONES"] || 0);
+                            if (!isNaN(sVal)) db[tE].sol += sVal;
                         }
-                        const sVal = parseInt(fila["Sol"] || fila["SOL"] || 0);
-                        if (!isNaN(sVal)) db[tE].sol += sVal;
-                    }
-                });
-                guardar();
-                mostrarToast(`⚡ Turno inyectado con éxito`, 'success');
-                input.value = "";
+                    });
+                    guardar();
+                    mostrarToast(`⚡ Turno y Soluciones inyectados con éxito`, 'success');
+                    input.value = "";
+                } catch (err) {
+                    mostrarToast(`❌ Error al procesar archivo`, 'error');
+                }
             };
             reader.readAsArrayBuffer(file);
         }
 
         function procesarArchivoGeneral(input, tipo, slotIdx = null) {
             const file = input.files[0]; if (!file) return;
-
             if (tipo === 'slots' && slotIdx !== null) {
                 const numSlot = slotIdx + 1;
                 if ((locks[numSlot] || 0) >= 2) {
@@ -201,7 +196,6 @@
                     return;
                 }
             }
-
             const reader = new FileReader();
             reader.onload = (e) => {
                 const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
@@ -234,9 +228,8 @@
                 });
                 const ws = XLSX.utils.json_to_sheet(dataExport);
                 const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Reporte_General");
-                XLSX.writeFile(wb, `Zubale_Reporte_${new Date().toISOString().slice(0, 10)}.xlsx`);
-                mostrarToast("💾 Reporte exportado correctamente", "success");
+                XLSX.utils.book_append_sheet(wb, ws, "Reporte");
+                XLSX.writeFile(wb, `Zubale_Reporte_${new Date().toLocaleDateString()}.xlsx`);
             } catch (error) { mostrarToast("❌ Error al exportar", "error"); }
         }
 
@@ -313,5 +306,4 @@
         actualizarUI();
     </script>
 </body>
-
 </html>
