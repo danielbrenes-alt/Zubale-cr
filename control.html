@@ -3,116 +3,121 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>PriceSmart Route Planner Pro | Navigation Sync</title>
+    <title>Zubale | Optimización Geo-Radial</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet" />
 
     <script>
-        tailwind.config = { 
-            darkMode: 'class', 
-            theme: { extend: { colors: { ps: { 500: '#4F46E5', 600: '#4338CA', 700: '#3730A3' } } } } 
-        }
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { ps: { 500: '#4F46E5', 600: '#4338CA' } } } } }
     </script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; background: #f1f5f9; transition: all .4s ease; }
-        .dark body { background: #020617; }
-        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.4); }
+        body { font-family: 'Inter', sans-serif; transition: all .4s ease; }
+        .dark body { background: #020617; color: white; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
         .dark .glass { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.05); }
-        #map { height: 450px; border-radius: 2rem; z-index: 1; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
-        .pilot-card { border-left: 6px solid; transition: transform 0.3s; }
-        .custom-scroll::-webkit-scrollbar { height: 6px; width: 4px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .nav-btn { transition: all 0.2s ease; }
-        .nav-btn:active { scale: 0.92; }
+        #map { height: 450px; border-radius: 2rem; z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .pilot-card { border-left: 8px solid; transition: all 0.3s; }
+        summary::-webkit-details-marker { display: none; }
+        summary { list-style: none; }
     </style>
 </head>
-<body class="antialiased text-slate-800 dark:text-slate-100 min-h-screen">
+<body class="bg-slate-50 min-h-screen antialiased">
 
-    <header class="sticky top-0 z-50 w-full border-b border-white/20 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl">
-        <div class="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-                <div class="w-11 h-11 bg-ps-600 rounded-xl flex items-center justify-center text-white font-black shadow-2xl italic">PS</div>
+    <header class="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
+        <div class="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-ps-600 rounded-lg flex items-center justify-center text-white font-black italic shadow-lg">PS</div>
                 <div>
-                    <h1 class="text-xl font-black tracking-tight text-slate-900 dark:text-white leading-none uppercase italic tracking-tighter">Zubale Logistic</h1>
-                    <span class="text-[10px] uppercase tracking-[0.2em] text-ps-500 font-bold italic">Mapeo inteligente de rutas </span>
+                    <h1 class="font-black uppercase tracking-tighter text-lg italic leading-none">Zubale Logistic</h1>
+                    <span class="text-[8px] uppercase font-bold text-ps-500 tracking-widest">Geo-Radial Slicing Engine</span>
                 </div>
             </div>
-            <div class="flex gap-3">
-                <a href="index.html" class="px-4 py-2 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-ps-600 hover:text-white transition-all shadow-sm border border-slate-200 dark:border-slate-700 flex items-center gap-2 italic">Hub</a>
-                <button onclick="document.documentElement.classList.toggle('dark')" class="p-3 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700">🌓</button>
+            <div class="flex items-center gap-2">
+                <button onclick="location.reload()" class="px-4 py-2 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-ps-600 hover:text-white border border-slate-200 dark:border-slate-700 italic">Reiniciar</button>
+                <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">🌓</button>
             </div>
         </div>
     </header>
 
-    <main class="max-w-[1440px] mx-auto px-6 py-8 space-y-8">
-
-        <section id="dropZone" class="glass rounded-[2.5rem] p-10 shadow-2xl text-center border-none transition-all hover:scale-[1.01]">
-            <input type="file" id="fileInput" class="hidden" accept=".xlsx,.xls,.csv" />
-            <div onclick="document.getElementById('fileInput').click()" class="cursor-pointer group">
-                <div class="mx-auto w-16 h-16 bg-ps-600/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-all duration-500 mb-4">
-                    <svg class="w-8 h-8 text-ps-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-width="2"></path></svg>
+    <main class="max-w-[1440px] mx-auto px-6 py-8 space-y-6">
+        <section id="dropZone" class="glass rounded-[2.5rem] p-12 text-center border-2 border-dashed border-ps-500/20 hover:border-ps-500/50 transition-all cursor-pointer shadow-xl" onclick="document.getElementById('fileInput').click()">
+            <input type="file" id="fileInput" class="hidden" accept=".xlsx,.xls" />
+            <div class="space-y-4">
+                <div class="w-16 h-16 bg-ps-600/10 rounded-full flex items-center justify-center mx-auto text-ps-600">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-width="2"></path></svg>
                 </div>
-                <p class="text-lg font-black text-slate-800 dark:text-white uppercase italic tracking-tighter italic">Cargar archivo PriceSmart</p>
-                <p class="text-[10px] text-slate-400 mt-1 uppercase font-bold italic">Optimización con enlaces de navegación</p>
+                <h2 class="font-black text-xl uppercase italic tracking-tighter">Cargar Reporte</h2>
+                <p class="text-slate-400 text-[10px] uppercase font-bold tracking-widest italic">Optimización de sectores por Piloto</p>
             </div>
-            <p id="fileStatus" class="text-xs text-emerald-500 font-black mt-6 italic hidden"></p>
         </section>
 
-        <section id="geoProgress" class="hidden glass rounded-[2rem] p-8 shadow-xl border-none">
-            <div class="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden shadow-inner">
-                <div id="progressBar" class="bg-ps-600 h-full w-0 transition-all duration-500 shadow-lg"></div>
+        <div id="geoProgress" class="hidden glass rounded-3xl p-8 shadow-2xl">
+            <div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+                <div id="progressBar" class="bg-ps-600 h-full w-0 transition-all duration-500"></div>
             </div>
-            <p id="progressText" class="text-[10px] font-black text-slate-400 italic text-center mt-3">0%</p>
-        </section>
+            <p id="progressText" class="text-center text-[9px] font-black uppercase mt-3 text-ps-600 italic">Agrupando por cercanía geográfica...</p>
+        </div>
 
         <div id="mainUI" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div class="lg:col-span-8">
+            <div class="lg:col-span-8 space-y-6">
                 <div id="map"></div>
-                <div id="routesContainer" class="mt-8 space-y-6"></div>
+                <div id="routesContainer" class="space-y-4"></div>
             </div>
             
-            <div class="lg:col-span-4 space-y-6">
-                <div class="glass p-8 rounded-[2.5rem] shadow-xl border-none sticky top-24">
-                    <h2 class="text-xs font-black text-slate-800 dark:text-white mb-6 uppercase italic tracking-widest flex items-center gap-2">
-                        <span class="w-1.5 h-5 bg-ps-600 rounded-full"></span> Panel de Control
-                    </h2>
-                    <div id="storeSettings" class="space-y-4 mb-6"></div>
-                    <button onclick="optimizarRutas()" class="w-full py-4 bg-ps-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:bg-ps-700 transition-all active:scale-95 italic">Generar Rutas con GPS</button>
-                    <button onclick="exportarExcel()" class="w-full mt-3 py-4 bg-emerald-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:bg-emerald-700 transition-all active:scale-95 italic">Descargar Reporte</button>
+            <div class="lg:col-span-4">
+                <div class="glass p-8 rounded-[2.5rem] sticky top-24 space-y-6 shadow-2xl">
+                    <h3 class="font-black text-xs uppercase tracking-widest text-ps-600 italic">Fuerza de Pilotos</h3>
+                    <div id="storeSettings" class="space-y-3"></div>
+                    <div class="pt-6 border-t border-slate-200 dark:border-slate-800 space-y-3">
+                        <button onclick="optimizarRutas()" class="w-full py-4 bg-ps-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:brightness-110 active:scale-95 italic shadow-lg">Recalcular Zonas</button>
+                        <button onclick="exportarExcel()" class="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:brightness-110 active:scale-95 italic shadow-lg">Descargar Reporte</button>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
     <script>
-        const CLUB_CENTERS = { 'ALAJUELA': [10.01, -84.21], 'ESCAZU': [9.93, -84.13], 'HEREDIA': [9.99, -84.12], 'SANTA ANA': [9.93, -84.18], 'TRES RIOS': [9.90, -83.98], 'ZAPOTE': [9.92, -84.05], 'LIBERIA': [10.63, -85.43], 'CARTAGO': [9.86, -83.91], 'LLORENTE': [9.96, -84.07] };
-        const COLORS = ["#4F46E5", "#EF4444", "#10B981", "#F59E0B", "#8B5CF6", "#EC4899", "#06B6D4"];
+        const CLUB_CENTERS = { 'ALAJUELA': [10.012, -84.212], 'ESCAZU': [9.936, -84.131], 'HEREDIA': [9.998, -84.127], 'SANTA ANA': [9.932, -84.183], 'TRES RIOS': [9.905, -83.987], 'ZAPOTE': [9.921, -84.053], 'LIBERIA': [10.631, -85.438], 'CARTAGO': [9.863, -83.911], 'LLORENTE': [9.962, -84.072] };
+        const COLORS = ["#4F46E5", "#EF4444", "#10B981", "#F59E0B", "#8B5CF6", "#EC4899", "#06B6D4", "#14B8A6"];
         let RAW_DATA = [];
-        let map = L.map('map').setView([9.93, -84.08], 11);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        let map;
 
-        document.getElementById('fileInput').addEventListener('change', async function(e) {
+        function getDistanceKM(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(2);
+        }
+
+        window.onload = () => {
+            map = L.map('map').setView([9.93, -84.08], 11);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        };
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
             const reader = new FileReader();
-            reader.onload = async function(e) {
+            reader.onload = async (e) => {
                 const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
-                const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                const rows = XLSX.utils.sheet_to_json(sheet, {header: 1, defval: ""});
+                const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1, defval: ""});
                 RAW_DATA = [];
                 for (let i = 1; i < rows.length; i++) {
                     const r = rows[i];
-                    if (!r[8] || !r[27]) continue;
+                    if (!r[2]) continue;
                     const h = String(r[15]).match(/(\d{1,2})/) ? String(r[15]).match(/(\d{1,2})/)[1] : "00";
                     RAW_DATA.push({
-                        c: r[2], i: r[8], p: h.padStart(2, '0') + ":00", k: r[10], aa: r[26], ab: r[27], ac: r[28],
-                        lat: null, lon: null
+                        id: String(r[2]), club: r[8], slot: h.padStart(2, '0') + ":00",
+                        cliente: r[26], direccion: r[27], telf: r[28], lat: null, lon: null, piloto: 0, dist: 0
                     });
                 }
-                if (RAW_DATA.length > 0) await geocodeAll();
+                document.getElementById('dropZone').classList.add('hidden');
+                await geocodeAll();
             };
             reader.readAsArrayBuffer(e.target.files[0]);
         });
@@ -121,24 +126,25 @@
             document.getElementById("geoProgress").classList.remove("hidden");
             for (let i = 0; i < RAW_DATA.length; i++) {
                 const item = RAW_DATA[i];
-                const cached = localStorage.getItem(item.ab);
+                const cached = localStorage.getItem(item.direccion);
                 if (cached) {
                     const c = JSON.parse(cached);
                     item.lat = c.lat; item.lon = c.lon;
                 } else {
                     try {
-                        const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(item.ab)}&limit=1`);
+                        const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(item.direccion)}&limit=1`);
                         const j = await r.json();
                         if (j[0]) {
                             item.lat = parseFloat(j[0].lat); item.lon = parseFloat(j[0].lon);
-                            localStorage.setItem(item.ab, JSON.stringify({lat: item.lat, lon: item.lon}));
+                            localStorage.setItem(item.direccion, JSON.stringify({lat: item.lat, lon: item.lon}));
                         } else { item.lat = 9.93; item.lon = -84.08; }
-                    } catch (e) {}
-                    await new Promise(r => setTimeout(r, 850));
+                    } catch (e) { item.lat = 9.93; item.lon = -84.08; }
+                    await new Promise(r => setTimeout(r, 450));
                 }
-                const pct = Math.round(((i + 1) / RAW_DATA.length) * 100);
-                document.getElementById("progressBar").style.width = pct + "%";
-                document.getElementById("progressText").textContent = `${pct}% - Geocodificando: ${i+1}/${RAW_DATA.length}`;
+                const clubName = item.club.split('-').pop().trim().toUpperCase();
+                const center = CLUB_CENTERS[clubName] || [9.93, -84.13];
+                item.dist = getDistanceKM(center[0], center[1], item.lat, item.lon);
+                document.getElementById("progressBar").style.width = Math.round(((i + 1) / RAW_DATA.length) * 100) + "%";
             }
             renderConfigs();
         }
@@ -146,89 +152,128 @@
         function renderConfigs() {
             document.getElementById("geoProgress").classList.add("hidden");
             document.getElementById("mainUI").classList.remove("hidden");
+            setTimeout(() => map.invalidateSize(), 400);
             const container = document.getElementById("storeSettings");
             container.innerHTML = '';
-            const clubs = [...new Set(RAW_DATA.map(d => d.i.split('-').pop().trim().toUpperCase()))];
+            const clubs = [...new Set(RAW_DATA.map(d => d.club.split('-').pop().trim().toUpperCase()))];
             clubs.forEach(c => {
                 container.innerHTML += `
-                    <div class="bg-slate-100 dark:bg-slate-800/50 p-4 rounded-2xl">
-                        <div class="flex justify-between mb-2 italic"><span class="text-[10px] font-black uppercase text-ps-500">${c}</span><span id="v-${c}" class="text-[10px] font-bold">2 Pilotos</span></div>
-                        <input type="range" id="p-${c}" min="1" max="6" value="2" class="w-full accent-ps-500" oninput="document.getElementById('v-${c}').textContent = this.value + ' Pilotos'">
+                    <div class="bg-slate-100 dark:bg-slate-800/50 p-3 rounded-xl">
+                        <div class="flex justify-between mb-1 italic font-black text-[9px] uppercase">
+                            <span class="text-ps-600">${c}</span>
+                            <span id="v-${c}">2 Pilotos</span>
+                        </div>
+                        <input type="range" id="p-${c}" min="1" max="10" value="2" class="w-full accent-ps-600" oninput="document.getElementById('v-${c}').textContent = this.value + ' Pilotos'">
                     </div>`;
             });
+            optimizarRutas(); 
         }
 
         function optimizarRutas() {
             map.eachLayer(l => { if (l instanceof L.CircleMarker) map.removeLayer(l); });
             const container = document.getElementById('routesContainer');
             container.innerHTML = "";
-            const clubs = [...new Set(RAW_DATA.map(d => d.i.split('-').pop().trim().toUpperCase()))];
+            const clubs = [...new Set(RAW_DATA.map(d => d.club.split('-').pop().trim().toUpperCase()))];
             
             clubs.forEach(clubName => {
                 const nP = parseInt(document.getElementById(`p-${clubName}`).value);
-                let clubOrders = RAW_DATA.filter(d => d.i.toUpperCase().includes(clubName));
+                let clubOrders = RAW_DATA.filter(d => d.club.toUpperCase().includes(clubName));
                 const center = CLUB_CENTERS[clubName] || [9.93, -84.13];
 
-                clubOrders.forEach(o => { o.angle = Math.atan2(o.lat - center[0], o.lon - center[1]); });
-                clubOrders.sort((a,b) => a.angle - b.angle);
+                const ordersBySlot = {};
+                clubOrders.forEach(o => {
+                    if (!ordersBySlot[o.slot]) ordersBySlot[o.slot] = [];
+                    o.angle = Math.atan2(o.lat - center[0], o.lon - center[1]);
+                    ordersBySlot[o.slot].push(o);
+                });
 
-                const perPilot = Math.ceil(clubOrders.length / nP);
+                const pilotRoutes = Array.from({ length: nP }, () => []);
+                const sortedSlots = Object.keys(ordersBySlot).sort();
+
+                sortedSlots.forEach(slotKey => {
+                    const slotOrders = ordersBySlot[slotKey];
+                    // Ordenar por ángulo (barrido circular)
+                    slotOrders.sort((a, b) => a.angle - b.angle);
+
+                    // REPARTO POR BLOQUES (SLICING): Esto evita que se crucen
+                    const total = slotOrders.length;
+                    const size = Math.floor(total / nP);
+                    let extra = total % nP;
+
+                    let current = 0;
+                    for (let pIdx = 0; pIdx < nP; pIdx++) {
+                        const batchSize = size + (extra > 0 ? 1 : 0);
+                        extra--;
+                        
+                        const pBatch = slotOrders.slice(current, current + batchSize);
+                        pBatch.forEach(o => {
+                            o.piloto = pIdx + 1;
+                            pilotRoutes[pIdx].push(o);
+                        });
+                        current += batchSize;
+                    }
+                });
+
                 const detail = document.createElement('details');
-                detail.className = "glass rounded-[2.5rem] overflow-hidden shadow-xl mb-6 border-none";
-                let storeContent = `<div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">`;
+                detail.className = "glass rounded-[2rem] overflow-hidden shadow-xl border-none mb-4";
+                let storeContent = `<div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 bg-white/20 dark:bg-slate-900/40">`;
 
-                for (let pIdx = 0; pIdx < nP; pIdx++) {
-                    const pOrders = clubOrders.slice(pIdx * perPilot, (pIdx + 1) * perPilot);
-                    if (pOrders.length === 0) continue;
+                pilotRoutes.forEach((pOrders, pIdx) => {
+                    if (pOrders.length === 0) return;
                     const color = COLORS[pIdx % COLORS.length];
-                    
-                    pOrders.forEach(o => { 
-                        o.piloto = pIdx + 1; 
-                        L.circleMarker([o.lat, o.lon], { radius: 7, color: color, fillOpacity: 0.9 }).addTo(map);
+                    pOrders.forEach(o => {
+                        L.circleMarker([o.lat, o.lon], { radius: 7, color: color, fillOpacity: 0.9, weight: 2 }).addTo(map);
                     });
 
                     storeContent += `
-                        <div class="pilot-card p-6 bg-white dark:bg-slate-800/40 rounded-3xl border-l-8 shadow-sm" style="border-color: ${color}">
-                            <h5 class="font-black text-xs mb-5 uppercase italic tracking-tighter">Piloto ${pIdx+1} (${pOrders.length} Pedidos)</h5>
-                            <div class="space-y-6">
+                        <div class="pilot-card p-5 bg-white dark:bg-slate-800 rounded-3xl border-l-8 shadow-sm italic" style="border-color: ${color}">
+                            <h5 class="font-black text-[10px] uppercase mb-4 text-slate-400">Piloto ${pIdx+1} (${pOrders.length})</h5>
+                            <div class="space-y-4">
                                 ${pOrders.map(o => `
-                                    <div class="text-[11px] group">
-                                        <div class="flex justify-between mb-2">
-                                            <span class="font-black text-ps-600">ID: #${o.c}</span>
-                                            <span class="bg-slate-900 text-white px-2 py-0.5 rounded font-black text-[9px] italic">Slot: ${o.p}</span>
+                                    <div class="text-[11px]">
+                                        <div class="flex justify-between mb-1">
+                                            <span class="font-black text-ps-600">#${o.id}</span>
+                                            <span class="text-[9px] font-bold text-slate-400">${o.slot} ${clubName === 'LIBERIA' ? '| ' + o.dist + ' km' : ''}</span>
                                         </div>
-                                        <p class="font-black text-[12px] uppercase leading-none mb-1 text-slate-800 dark:text-white">${o.aa}</p>
-                                        <p class="text-[10px] text-slate-400 italic font-medium leading-tight mb-3 line-clamp-1">${o.ab}</p>
-                                        
+                                        <p class="font-black text-[12px] uppercase leading-none mb-1">${o.cliente}</p>
+                                        <p class="text-[9px] text-slate-400 italic mb-3 line-clamp-1">${o.direccion}</p>
                                         <div class="flex gap-2">
-                                            <a href="https://waze.com/ul?ll=${o.lat},${o.lon}&navigate=yes" target="_blank" class="nav-btn flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-xl text-center font-black text-[9px] uppercase tracking-widest shadow-lg shadow-emerald-500/20">Waze</a>
-                                            <a href="https://www.google.com/maps/search/?api=1&query=${o.lat},${o.lon}" target="_blank" class="nav-btn flex-1 bg-ps-600 hover:bg-ps-700 text-white py-2 rounded-xl text-center font-black text-[9px] uppercase tracking-widest shadow-lg shadow-ps-500/20">Google Maps</a>
+                                            <a href="https://waze.com/ul?ll=${o.lat},${o.lon}&navigate=yes" target="_blank" class="flex-1 bg-sky-400 text-white py-2 rounded-xl text-center font-black text-[8px] uppercase tracking-widest">Waze</a>
+                                            <a href="https://www.google.com/maps?q=${o.lat},${o.lon}" target="_blank" class="flex-1 bg-ps-600 text-white py-2 rounded-xl text-center font-black text-[8px] uppercase tracking-widest">Maps</a>
                                         </div>
-                                    </div>`).join('<hr class="my-6 border-slate-100 dark:border-slate-700">')}
+                                    </div>`).join('<hr class="my-4 border-slate-100 dark:border-slate-700/50">')}
                             </div>
                         </div>`;
-                }
+                });
+
                 storeContent += `</div>`;
-                detail.innerHTML = `
-                    <summary class="p-6 flex justify-between items-center cursor-pointer hover:bg-white/50 transition-all italic">
-                        <div class="flex items-center gap-4"><div class="w-10 h-10 bg-ps-600 rounded-2xl flex items-center justify-center text-white font-black italic shadow-lg italic text-xs">PS</div><h3 class="font-black text-base uppercase tracking-tighter">${clubName}</h3></div>
-                        <div class="bg-slate-900 text-white font-black text-[10px] px-6 py-2 rounded-2xl uppercase tracking-widest shadow-lg">${clubOrders.length} Envios</div>
-                    </summary>${storeContent}`;
+                detail.innerHTML = `<summary class="p-6 flex justify-between items-center cursor-pointer italic select-none">
+                    <div class="flex items-center gap-4">
+                        <div class="w-11 h-11 bg-ps-600 rounded-2xl flex items-center justify-center text-white font-black">PS</div>
+                        <h3 class="font-black text-lg uppercase tracking-tighter">${clubName}</h3>
+                    </div>
+                    <div class="bg-slate-900 text-white font-black text-[9px] px-5 py-2 rounded-2xl uppercase tracking-widest">${clubOrders.length} Envios</div>
+                </summary>${storeContent}`;
                 container.appendChild(detail);
             });
+            const group = new L.featureGroup(Object.values(map._layers).filter(l => l instanceof L.CircleMarker));
+            if (group.getLayers().length > 0) map.fitBounds(group.getBounds().pad(0.1));
         }
 
         function exportarExcel() {
             const wb = XLSX.utils.book_new();
-            const clubs = [...new Set(RAW_DATA.map(d => d.i.split('-').pop().trim().toUpperCase()))];
+            const clubs = [...new Set(RAW_DATA.map(d => d.club.split('-').pop().trim().toUpperCase()))];
             clubs.forEach(cName => {
-                const data = RAW_DATA.filter(d => d.i.toUpperCase().includes(cName))
-                    .map(o => ({ 'PILOTO': o.piloto, 'ID (C)': o.c, 'CLUB (I)': o.i, 'SLOT (P)': o.p, 'DISTANCIA (K)': o.k, 'CLIENTE (AA)': o.aa, 'DIRECCIÓN (AB)': o.ab, 'TELÉFONO (AC)': o.ac }))
-                    .sort((a,b) => a['SLOT (P)'].localeCompare(b['SLOT (P)']));
-                const ws = XLSX.utils.json_to_sheet(data);
-                XLSX.utils.book_append_sheet(wb, ws, cName.substring(0,31));
+                const data = RAW_DATA.filter(d => d.club.toUpperCase().includes(cName))
+                    .sort((a,b) => a.slot.localeCompare(b.slot) || a.piloto - b.piloto)
+                    .map(o => {
+                        let row = { 'PILOTO': o.piloto, 'ID': o.id, 'SLOT': o.slot, 'CLIENTE': o.cliente, 'DIRECCION': o.direccion, 'TEL': o.telf };
+                        if (cName === 'LIBERIA') row['DISTANCIA_KM'] = parseFloat(o.dist);
+                        return row;
+                    });
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), cName.substring(0,31));
             });
-            XLSX.writeFile(wb, `PriceSmart_Nav_Ready.xlsx`);
+            XLSX.writeFile(wb, `PriceSmart_Rutas_Optimizadas.xlsx`);
         }
     </script>
 </body>
