@@ -31,29 +31,19 @@
     <header class="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
         <div class="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <a href="index.html" class="flex items-center justify-center px-4 h-10 bg-ps-600 hover:bg-ps-700 text-white font-black italic rounded-xl shadow-lg transition-all active:scale-95 cursor-pointer no-underline group">
-                    <span class="mr-2 opacity-70 group-hover:opacity-100">🏠</span>
-                    HUB
+                <a href="index.html" class="flex items-center justify-center px-4 h-10 bg-ps-600 hover:bg-ps-700 text-white font-black italic rounded-xl shadow-lg transition-all active:scale-95 no-underline group">
+                    <span class="mr-2">🏠</span> HUB
                 </a>
-
                 <div class="h-8 w-[1px] bg-slate-200 dark:bg-slate-700 mx-1"></div>
-
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-slate-800 dark:bg-white dark:text-slate-900 rounded-lg flex items-center justify-center text-white font-black italic shadow-lg">PS</div>
-                    <div>
-                        <h1 class="font-black uppercase tracking-tighter text-lg italic leading-none text-slate-800 dark:text-white">Zubale Logistic</h1>
-                        <span class="text-[8px] uppercase font-bold text-ps-500 tracking-widest">Geo-Radial Slicing Engine</span>
-                    </div>
+                <div>
+                    <h1 class="font-black uppercase tracking-tighter text-lg italic leading-none text-slate-800 dark:text-white">Zubale Logistic</h1>
+                    <span class="text-[8px] uppercase font-bold text-ps-500 tracking-widest text-ps-500">Geo-Radial Slicing Engine</span>
                 </div>
             </div>
 
             <div class="flex items-center gap-2">
-                <button onclick="location.reload()" class="px-4 py-2 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-ps-600 hover:text-white border border-slate-200 dark:border-slate-700 italic transition-all">
-                    Reiniciar
-                </button>
-                <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 w-10 h-10 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-                    🌓
-                </button>
+                <button onclick="location.reload()" class="px-4 py-2 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-ps-600 hover:text-white border border-slate-200 dark:border-slate-700 italic transition-all">Reiniciar</button>
+                <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 w-10 h-10 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">🌓</button>
             </div>
         </div>
     </header>
@@ -64,16 +54,16 @@
                 <p class="text-[9px] font-black uppercase text-slate-400 italic">Total Pedidos</p>
                 <h4 id="totalOrdersCount" class="text-3xl font-black text-ps-600 leading-none">0</h4>
             </div>
-            <div class="glass p-5 rounded-[2rem] text-center shadow-lg">
-                <p class="text-[9px] font-black uppercase text-slate-400 italic">Clubes Activos</p>
+            <div class="glass p-5 rounded-[2rem] text-center shadow-lg text-slate-800 dark:text-white">
+                <p class="text-[9px] font-black uppercase text-slate-400 italic">Clubes</p>
                 <h4 id="totalClubsCount" class="text-3xl font-black text-ps-600 leading-none">0</h4>
             </div>
             <div class="glass p-5 rounded-[2rem] text-center shadow-lg">
-                <p class="text-[9px] font-black uppercase text-slate-400 italic">Total Pilotos</p>
+                <p class="text-[9px] font-black uppercase text-slate-400 italic">Pilotos Hoy</p>
                 <h4 id="totalPilotsCount" class="text-3xl font-black text-ps-600 leading-none">0</h4>
             </div>
             <div class="glass p-5 rounded-[2rem] text-center shadow-lg">
-                <p class="text-[9px] font-black uppercase text-slate-400 italic">Promedio x Piloto</p>
+                <p class="text-[9px] font-black uppercase text-slate-400 italic">Eficiencia</p>
                 <h4 id="avgOrdersCount" class="text-3xl font-black text-ps-600 leading-none">0</h4>
             </div>
         </div>
@@ -93,7 +83,7 @@
             <div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
                 <div id="progressBar" class="bg-ps-600 h-full w-0 transition-all duration-500"></div>
             </div>
-            <p id="progressText" class="text-center text-[9px] font-black uppercase mt-3 text-ps-600 italic">Calculando métricas y posiciones...</p>
+            <p id="progressText" class="text-center text-[9px] font-black uppercase mt-3 text-ps-600 italic">Calculando métricas...</p>
         </div>
 
         <div id="mainUI" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -104,11 +94,11 @@
             
             <div class="lg:col-span-4">
                 <div class="glass p-8 rounded-[2.5rem] sticky top-24 space-y-6 shadow-2xl">
-                    <h3 class="font-black text-xs uppercase tracking-widest text-ps-600 italic">Asignación de Pilotos</h3>
+                    <h3 class="font-black text-xs uppercase tracking-widest text-ps-600 italic">Ajuste de Flota</h3>
                     <div id="storeSettings" class="space-y-3"></div>
                     <div class="pt-6 border-t border-slate-200 dark:border-slate-800 space-y-3">
                         <button onclick="optimizarRutas()" class="w-full py-4 bg-ps-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:brightness-110 active:scale-95 italic shadow-lg">Recalcular Zonas</button>
-                        <button onclick="exportarExcel()" class="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:brightness-110 active:scale-95 italic shadow-lg">Descargar Reporte</button>
+                        <button onclick="exportarExcel()" class="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:brightness-110 active:scale-95 italic shadow-lg">Descargar Excel</button>
                     </div>
                 </div>
             </div>
@@ -211,6 +201,7 @@
         function updatePilotCount(club, val) {
             document.getElementById(`v-${club}`).textContent = val + ' Pilotos';
             updateStats();
+            optimizarRutas(); // RECALCULA CADA VEZ QUE MUEVES EL SLIDER
         }
 
         function updateStats() {
@@ -227,12 +218,15 @@
         }
 
         function optimizarRutas() {
+            // 1. Limpiar Mapa
             map.eachLayer(l => { if (l instanceof L.CircleMarker) map.removeLayer(l); });
+            
             const container = document.getElementById('routesContainer');
             container.innerHTML = "";
             const clubs = [...new Set(RAW_DATA.map(d => d.club.split('-').pop().trim().toUpperCase()))];
             
             clubs.forEach(clubName => {
+                // LEER VALOR ACTUAL DEL SLIDER
                 const nP = parseInt(document.getElementById(`p-${clubName}`).value);
                 let clubOrders = RAW_DATA.filter(d => d.club.toUpperCase().includes(clubName));
                 const center = CLUB_CENTERS[clubName] || [9.93, -84.13];
@@ -276,7 +270,7 @@
                     if (pOrders.length === 0) return;
                     const color = COLORS[pIdx % COLORS.length];
                     pOrders.forEach(o => {
-                        L.circleMarker([o.lat, o.lon], { radius: 7, color: color, fillOpacity: 0.9, weight: 2 }).addTo(map);
+                        L.circleMarker([o.lat, o.lon], { radius: 7, color: color, fillColor: color, fillOpacity: 0.9, weight: 2 }).addTo(map);
                     });
 
                     storeContent += `
@@ -323,14 +317,12 @@
             clubs.forEach(cName => {
                 const data = RAW_DATA.filter(d => d.club.toUpperCase().includes(cName))
                     .sort((a,b) => a.slot.localeCompare(b.slot) || a.piloto - b.piloto)
-                    .map(o => {
-                        let row = { 'PILOTO': o.piloto, 'ID': o.id, 'SLOT': o.slot, 'CLIENTE': o.cliente, 'DIRECCION': o.direccion, 'TEL': o.telf };
-                        if (cName === 'LIBERIA') row['DISTANCIA_KM'] = parseFloat(o.dist);
-                        return row;
-                    });
+                    .map(o => ({
+                        'PILOTO': o.piloto, 'ID': o.id, 'SLOT': o.slot, 'CLIENTE': o.cliente, 'DIRECCION': o.direccion, 'TEL': o.telf, 'DIST_KM': o.dist
+                    }));
                 XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), cName.substring(0,31));
             });
-            XLSX.writeFile(wb, `PriceSmart_Rutas_Optimizadas.xlsx`);
+            XLSX.writeFile(wb, `Rutas_Zubale_Final.xlsx`);
         }
     </script>
 </body>
