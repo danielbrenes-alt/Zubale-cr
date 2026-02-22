@@ -7,7 +7,8 @@
     <title>Zubale CR Systems | Logistics Control Center</title>
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,0,0" rel="stylesheet"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
@@ -20,19 +21,11 @@
                     },
                     colors: {
                         enterprise: {
-                            50: '#F8FAFC',
-                            100: '#F1F5F9',
-                            200: '#E2E8F0',
-                            300: '#CBD5E1',
-                            400: '#94A3B8',
-                            600: '#475569',
-                            700: '#334155',
-                            800: '#1E293B',
-                            900: '#0F172A',
+                            50: '#F8FAFC', 100: '#F1F5F9', 200: '#E2E8F0', 300: '#CBD5E1',
+                            400: '#94A3B8', 600: '#475569', 700: '#334155', 800: '#1E293B', 900: '#0F172A',
                         },
                         accent: {
-                            500: '#4F46E2',
-                            600: '#4338CA',
+                            500: '#4F46E2', 600: '#4338CA',
                         }
                     }
                 }
@@ -52,7 +45,7 @@
     </style>
 </head>
 
-<body class="font-sans antialiased bg-[#F8FAFC] text-enterprise-800 dark:bg-enterprise-900 dark:text-enterprise-100 transition-colors duration-200">
+<body class="font-sans antialiased bg-[#F8FAFC] text-enterprise-800 dark:bg-enterprise-900 dark:text-enterprise-100 transition-colors duration-200" onload="initTheme()">
 
     <input type="file" id="input-inyectar" class="hidden" accept=".xlsx,.xls,.csv" />
     <input type="file" id="input-soluciones" class="hidden" accept=".xlsx,.xls,.csv" />
@@ -62,27 +55,26 @@
 
     <header class="sticky top-0 z-40 w-full border-b border-enterprise-200 dark:border-enterprise-800 bg-white/80 dark:bg-enterprise-900/80 backdrop-blur-md">
         <div class="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-8">
+            <div class="flex items-center space-x-6">
+                <a href="index.html" class="flex items-center gap-2 px-4 py-2 bg-accent-500/10 text-accent-500 border border-accent-500/20 rounded-xl font-black text-[10px] uppercase tracking-wider hover:bg-accent-500 hover:text-white transition-all shadow-sm">
+                    <span class="material-symbols-outlined text-sm">grid_view</span>
+                    Hub Central
+                </a>
+
+                <div class="h-6 w-[1px] bg-enterprise-200 dark:bg-enterprise-800"></div>
+
                 <div class="flex items-center space-x-4">
                     <div class="w-8 h-8 bg-accent-500 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-accent-500/20">Z</div>
                     <div>
-                        <h1 class="text-lg font-bold tracking-tight text-enterprise-900 dark:text-white leading-none">Zubale CR Systems</h1>
-                        <span class="text-[10px] uppercase tracking-widest text-enterprise-600 font-semibold">Logistics Control Center</span>
+                        <h1 class="text-lg font-bold tracking-tight text-enterprise-900 dark:text-white leading-none italic">Zubale <span class="text-accent-500">CR</span></h1>
+                        <span class="text-[9px] uppercase tracking-widest text-enterprise-500 font-black">Control Center v2.0</span>
                     </div>
                 </div>
             </div>
             
             <div class="flex items-center space-x-3">
-                <a href="index.html" class="flex items-center space-x-2 px-3 py-2 text-xs font-bold uppercase tracking-wider text-enterprise-600 dark:text-enterprise-300 hover:bg-enterprise-100 dark:hover:bg-enterprise-800 rounded-lg transition-all border border-transparent hover:border-enterprise-200 dark:hover:border-enterprise-700">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
-                    <span>Hub</span>
-                </a>
-
-                <div class="h-6 w-[1px] bg-enterprise-200 dark:bg-enterprise-800"></div>
-
-                <button class="p-2 rounded-full hover:bg-enterprise-100 dark:hover:bg-enterprise-800 transition-colors" id="themeToggle">
-                    <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
-                    <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                <button class="p-2 w-10 h-10 flex items-center justify-center rounded-xl bg-enterprise-100 dark:bg-enterprise-800 border border-enterprise-200 dark:border-enterprise-700 text-lg hover:scale-105 transition-all shadow-sm" id="themeToggle">
+                    🌓
                 </button>
             </div>
         </div>
@@ -90,57 +82,73 @@
 
     <main class="max-w-[1440px] mx-auto px-6 py-8">
         <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="stat-card-gradient p-5 rounded-xl border border-enterprise-200 dark:border-enterprise-800 shadow-sm">
-                <span class="text-xs font-semibold text-enterprise-600 uppercase tracking-wider">Batch 1</span>
-                <div id="total-b1" class="text-3xl font-bold text-enterprise-900 dark:text-white">0</div>
+            <div class="stat-card-gradient p-5 rounded-2xl border border-enterprise-200 dark:border-enterprise-800 shadow-sm">
+                <span class="text-[10px] font-black text-enterprise-500 uppercase tracking-widest">Batch 1</span>
+                <div id="total-b1" class="text-3xl font-black text-enterprise-900 dark:text-white mt-1">0</div>
             </div>
-            <div class="stat-card-gradient p-5 rounded-xl border border-enterprise-200 dark:border-enterprise-800 shadow-sm">
-                <span class="text-xs font-semibold text-enterprise-600 uppercase tracking-wider">Batch 2</span>
-                <div id="total-b2" class="text-3xl font-bold text-enterprise-900 dark:text-white">0</div>
+            <div class="stat-card-gradient p-5 rounded-2xl border border-enterprise-200 dark:border-enterprise-800 shadow-sm">
+                <span class="text-[10px] font-black text-enterprise-500 uppercase tracking-widest">Batch 2</span>
+                <div id="total-b2" class="text-3xl font-black text-enterprise-900 dark:text-white mt-1">0</div>
             </div>
-            <div class="stat-card-gradient p-5 rounded-xl border border-enterprise-200 dark:border-enterprise-800 shadow-sm">
-                <span class="text-xs font-semibold text-enterprise-600 uppercase tracking-wider">Soluciones</span>
-                <div id="total-sols" class="text-2xl font-bold text-enterprise-900 dark:text-white">0</div>
+            <div class="stat-card-gradient p-5 rounded-2xl border border-enterprise-200 dark:border-enterprise-800 shadow-sm">
+                <span class="text-[10px] font-black text-enterprise-500 uppercase tracking-widest">Soluciones</span>
+                <div id="total-sols" class="text-2xl font-black text-enterprise-900 dark:text-white mt-1">0</div>
             </div>
-            <div class="bg-enterprise-900 dark:bg-enterprise-800 p-5 rounded-xl border border-enterprise-800 shadow-lg">
-                <span class="text-xs font-semibold text-enterprise-300 uppercase tracking-wider">Total General</span>
-                <div id="gran-total" class="text-3xl font-bold text-white mt-1">0</div>
+            <div class="bg-enterprise-900 dark:bg-accent-600 p-5 rounded-2xl border border-enterprise-800 shadow-lg">
+                <span class="text-[10px] font-black text-white/70 uppercase tracking-widest">Total General</span>
+                <div id="gran-total" class="text-3xl font-black text-white mt-1">0</div>
             </div>
         </section>
 
         <section class="mb-8">
-            <div class="bg-indigo-50/50 dark:bg-enterprise-800/50 border border-indigo-100 dark:border-enterprise-700 p-6 rounded-xl shadow-md">
+            <div class="glass-card p-6 rounded-[2rem] shadow-xl">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <h2 class="text-sm font-bold text-enterprise-900 dark:text-white uppercase tracking-wider">Centro de Acciones</h2>
+                    <h2 class="text-xs font-black text-enterprise-900 dark:text-white uppercase tracking-[0.2em] italic">Centro de Acciones</h2>
                     <div class="flex flex-wrap items-center gap-3">
-                        <button onclick="document.getElementById('input-inyectar').click()" class="px-4 py-2 text-xs font-semibold bg-enterprise-800 dark:bg-enterprise-700 text-white rounded-lg hover:bg-enterprise-900 transition-all shadow-md">Inyectar Turno Anterior</button>
-                        <button onclick="document.getElementById('input-soluciones').click()" class="px-4 py-2 text-xs font-semibold bg-white dark:bg-enterprise-800 text-enterprise-700 dark:text-enterprise-200 border border-enterprise-200 dark:border-enterprise-700 rounded-lg hover:bg-enterprise-50 transition-all">Cargar Soluciones</button>
+                        <button onclick="document.getElementById('input-inyectar').click()" class="px-5 py-3 text-[10px] font-black bg-enterprise-800 dark:bg-enterprise-700 text-white rounded-xl hover:bg-enterprise-900 transition-all shadow-md uppercase tracking-wider">Inyectar Turno Anterior</button>
+                        <button onclick="document.getElementById('input-soluciones').click()" class="px-5 py-3 text-[10px] font-black bg-white dark:bg-enterprise-800 text-enterprise-700 dark:text-enterprise-200 border border-enterprise-200 dark:border-enterprise-700 rounded-xl hover:bg-enterprise-50 transition-all uppercase tracking-wider">Cargar Soluciones</button>
                         <div class="flex items-center">
-                            <select id="slot-selector" onchange="actualizarEstadoBoton()" class="px-3 py-2 text-xs font-medium bg-white dark:bg-enterprise-800 border border-enterprise-200 dark:border-enterprise-700 rounded-l-lg outline-none text-enterprise-700 dark:text-white">
+                            <select id="slot-selector" onchange="actualizarEstadoBoton()" class="px-3 py-3 text-[10px] font-black bg-white dark:bg-enterprise-800 border border-enterprise-200 dark:border-enterprise-700 rounded-l-xl outline-none text-enterprise-700 dark:text-white uppercase">
                                 <option value="1">Slot 1</option><option value="2">Slot 2</option><option value="3">Slot 3</option><option value="4">Slot 4</option>
                                 <option value="5">Slot 5</option><option value="6">Slot 6</option><option value="7">Slot 7</option><option value="8">Slot 8</option>
                             </select>
-                            <button onclick="document.getElementById('input-slot').click()" class="px-4 py-2 text-xs font-semibold bg-accent-500 text-white rounded-r-lg hover:bg-accent-600 transition-all">Subir Slot</button>
+                            <button onclick="document.getElementById('input-slot').click()" class="px-5 py-3 text-[10px] font-black bg-accent-500 text-white rounded-r-xl hover:bg-accent-600 transition-all uppercase tracking-wider">Subir Slot</button>
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center justify-between mt-3 pt-3 border-t border-indigo-100 dark:border-enterprise-700">
-                    <p id="msg-bloqueo" class="text-[11px] font-semibold text-enterprise-500 uppercase tracking-wider">Slot 1: 0/2 Cargados</p>
+                <div class="flex items-center justify-between mt-6 pt-4 border-t border-enterprise-100 dark:border-enterprise-700">
+                    <p id="msg-bloqueo" class="text-[10px] font-black text-accent-500 uppercase tracking-widest italic">Slot 1: 0/2 Cargados</p>
                     <div class="flex items-center gap-3">
-                        <button onclick="exportarExcel()" class="px-4 py-2 text-xs font-semibold bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all">Exportar Reporte</button>
-                        <button onclick="limpiarTodo()" class="px-4 py-2 text-xs font-semibold border border-red-300 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all">Reiniciar Todo</button>
+                        <button onclick="exportarExcel()" class="px-5 py-3 text-[10px] font-black bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all uppercase tracking-wider shadow-lg">Exportar Reporte</button>
+                        <button onclick="limpiarTodo()" class="px-5 py-3 text-[10px] font-black border-2 border-red-500/20 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all uppercase tracking-wider">Reiniciar</button>
                     </div>
                 </div>
             </div>
         </section>
 
         <section>
-            <h3 class="text-sm font-bold uppercase tracking-wider text-enterprise-600 mb-5">Estado de Tiendas</h3>
+            <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-enterprise-400 mb-6 italic">Estado de Tiendas</h3>
             <div id="tiendas-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
         </section>
     </main>
 
     <script>
+        // --- GESTIÓN DE TEMA PERSISTENTE ---
+        function initTheme() {
+            const saved = localStorage.getItem('zubale_theme');
+            if(saved === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('zubale_theme', isDark ? 'dark' : 'light');
+        });
+
+        // --- LÓGICA DE NEGOCIO ---
         const allStores = ["Wm Alajuela", "Wm Heredia", "Wm Heredia Este", "Wm Tibas", "Wm Escazu", "Wm Santa Ana", "Wm Guadalupe", "Wm Desamparados"];
         const batch1Stores = ["Wm Alajuela", "Wm Heredia", "Wm Heredia Este", "Wm Tibas"];
         let db = JSON.parse(localStorage.getItem('zubale_db')) || {};
@@ -168,7 +176,6 @@
                 try {
                     const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
                     const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                    
                     data.forEach(fila => {
                         const tE = buscarTiendaEnFila(fila);
                         if (tE) {
@@ -181,11 +188,9 @@
                         }
                     });
                     guardar();
-                    mostrarToast(`⚡ Turno y Soluciones inyectados con éxito`, 'success');
+                    mostrarToast(`⚡ Turno y Soluciones inyectados`, 'success');
                     input.value = "";
-                } catch (err) {
-                    mostrarToast(`❌ Error al procesar archivo`, 'error');
-                }
+                } catch (err) { mostrarToast(`❌ Error de archivo`, 'error'); }
             };
             reader.readAsArrayBuffer(file);
         }
@@ -193,11 +198,9 @@
         function procesarArchivoGeneral(input, tipo, slotIdx = null) {
             const file = input.files[0]; if (!file) return;
             if (tipo === 'slots' && slotIdx !== null) {
-                const numSlot = slotIdx + 1;
-                if ((locks[numSlot] || 0) >= 2) {
-                    mostrarToast(`❌ Límite alcanzado: Slot ${numSlot} ya tiene 2 archivos.`, 'error');
-                    input.value = "";
-                    return;
+                if ((locks[slotIdx + 1] || 0) >= 2) {
+                    mostrarToast(`❌ Slot ${slotIdx + 1} bloqueado (2/2)`, 'error');
+                    input.value = ""; return;
                 }
             }
             const reader = new FileReader();
@@ -215,26 +218,10 @@
                 });
                 if (tipo === 'slots' && count > 0) locks[slotIdx + 1]++;
                 guardar();
-                mostrarToast(`✅ Procesados ${count} registros`, 'success');
+                mostrarToast(`✅ ${count} registros cargados`, 'success');
                 input.value = "";
             };
             reader.readAsArrayBuffer(file);
-        }
-
-        function exportarExcel() {
-            try {
-                const dataExport = allStores.map(name => {
-                    const row = { "Tienda": name };
-                    db[name].slots.forEach((val, i) => { row[`Slot ${i+1}`] = val; });
-                    row["Soluciones"] = db[name].sol;
-                    row["Total"] = db[name].slots.reduce((a, b) => a + b, 0) + db[name].sol;
-                    return row;
-                });
-                const ws = XLSX.utils.json_to_sheet(dataExport);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Reporte");
-                XLSX.writeFile(wb, `Zubale_Reporte_${new Date().toLocaleDateString()}.xlsx`);
-            } catch (error) { mostrarToast("❌ Error al exportar", "error"); }
         }
 
         function guardar() {
@@ -263,16 +250,32 @@
             container.innerHTML = allStores.map(name => {
                 const storeData = db[name];
                 const total = storeData.slots.reduce((a, b) => a + b, 0) + storeData.sol;
-                return `<div class="bg-white dark:bg-enterprise-800 p-4 rounded-xl border border-enterprise-200 dark:border-enterprise-700 shadow-sm">
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="font-bold text-sm text-enterprise-900 dark:text-white">${name}</span>
-                        <span class="text-xs font-bold text-accent-500">${total}</span>
+                return `<div class="bg-white dark:bg-enterprise-800 p-5 rounded-2xl border border-enterprise-200 dark:border-enterprise-700 shadow-sm transition-all hover:shadow-md">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="font-black text-[11px] text-enterprise-900 dark:text-white uppercase tracking-tighter italic">${name}</span>
+                        <span class="text-xs font-black px-2 py-1 bg-accent-500/10 text-accent-500 rounded-lg">${total}</span>
                     </div>
                     <div class="grid grid-cols-4 gap-2">
-                        ${storeData.slots.map((v, i) => `<div class="text-[9px] text-center p-1 rounded font-medium ${v > 0 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400 dark:bg-enterprise-700'}">S${i+1}</div>`).join('')}
+                        ${storeData.slots.map((v, i) => `<div class="text-[9px] text-center p-1.5 rounded-lg font-black ${v > 0 ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' : 'bg-gray-50 text-gray-400 dark:bg-enterprise-900/50'}">S${i+1}</div>`).join('')}
                     </div>
                 </div>`;
             }).join('');
+        }
+
+        function exportarExcel() {
+            try {
+                const dataExport = allStores.map(name => {
+                    const row = { "Tienda": name };
+                    db[name].slots.forEach((val, i) => { row[`Slot ${i+1}`] = val; });
+                    row["Soluciones"] = db[name].sol;
+                    row["Total"] = db[name].slots.reduce((a, b) => a + b, 0) + db[name].sol;
+                    return row;
+                });
+                const ws = XLSX.utils.json_to_sheet(dataExport);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Reporte");
+                XLSX.writeFile(wb, `Reporte_Control_${new Date().toLocaleDateString()}.xlsx`);
+            } catch (error) { mostrarToast("❌ Error al exportar", "error"); }
         }
 
         function actualizarEstadoBoton() {
@@ -281,19 +284,20 @@
         }
 
         function limpiarTodo() {
-            if(confirm("¿Borrar todos los datos actuales?")) {
-                localStorage.clear();
+            if(confirm("¿Reiniciar sistema?")) {
+                localStorage.removeItem('zubale_db');
+                localStorage.removeItem('zubale_locks');
                 db = {}; locks = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0};
                 allStores.forEach(name => db[name] = { slots: Array(8).fill(0), sol: 0 });
                 guardar();
-                mostrarToast("🧹 Sistema reiniciado", "success");
+                mostrarToast("🧹 Sistema limpio", "success");
             }
         }
 
         function mostrarToast(msg, type) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = `toast ${type === 'success' ? 'bg-green-600' : 'bg-red-600'} text-white px-5 py-3 rounded-lg text-xs font-semibold shadow-lg`;
+            toast.className = `toast ${type === 'success' ? 'bg-emerald-600' : 'bg-red-600'} text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-2xl`;
             toast.textContent = msg;
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
@@ -305,7 +309,6 @@
             const slotIdx = parseInt(document.getElementById('slot-selector').value) - 1;
             procesarArchivoGeneral(this, 'slots', slotIdx); 
         });
-        document.getElementById('themeToggle').addEventListener('click', () => document.documentElement.classList.toggle('dark'));
 
         actualizarUI();
     </script>
