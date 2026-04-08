@@ -48,9 +48,9 @@
 
 <body class="font-sans antialiased bg-[#F8FAFC] text-enterprise-800 dark:bg-enterprise-900 dark:text-enterprise-100 transition-colors duration-200" onload="initApp()">
     
-    <input type="file" id="input-slot" class="hidden" accept=".xlsx,.xls,.csv" />
-    <input type="file" id="input-soluciones" class="hidden" accept=".xlsx,.xls,.csv" />
-    <input type="file" id="input-inyectar" class="hidden" accept=".xlsx,.xls,.csv" />
+    <input type="file" id="input-slot" class="hidden" accept=".xlsx,.xls,.csv" multiple />
+    <input type="file" id="input-soluciones" class="hidden" accept=".xlsx,.xls,.csv" multiple />
+    <input type="file" id="input-inyectar" class="hidden" accept=".xlsx,.xls,.csv" multiple />
 
     <div id="toast-container" class="fixed top-20 right-6 z-[100] flex flex-col gap-2"></div>
 
@@ -299,48 +299,71 @@
             }
         }
 
-        async function procesarArchivo(input, tipo, slotIdx = null) {
-            const file = input.files[0]; if (!file) return;
+        // --- FUNCIÓN MODIFICADA PARA SOPORTAR MÚLTIPLES ARCHIVOS ---
+        async function procesarMultiplesArchivos(input, tipo, slotIdx = null) {
+            const files = input.files;
+            if (files.length === 0) return;
+            
             setCargando(true);
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
-                const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                let nuevosPedidos = [];
-                let tiendasMod = new Set();
+            let totalGeneralNuevos = 0;
+            let tiendasImpactadas = new Set();
+
+            // Procesar cada archivo seleccionado
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                
+                // Usamos una promesa para leer el archivo de forma síncrona en el bucle
+                const data = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
+                        resolve(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]));
+                    };
+                    reader.readAsArrayBuffer(file);
+                });
+
+                let nuevosPedidosDelArchivo = [];
 
                 for (const fila of data) {
                     const tienda = buscarTienda(fila);
                     const idPedido = fila.ID || fila.id || fila.Pedido || fila.PEDIDO;
+                    
                     if (tienda && idPedido) {
                         const { data: existe } = await _supabase.from('ZCR_PEDIDOS_PROCESADOS').select('id_pedido').eq('id_pedido', idPedido).single();
                         if (!existe) {
-                            tiendasMod.add(tienda);
+                            tiendasImpactadas.add(tienda);
                             if (tipo === 'slots') db[tienda].slots[slotIdx]++; else db[tienda].sol++;
-                            nuevosPedidos.push({ id_pedido: idPedido, tienda: tienda, fecha: obtenerFechaHoy() });
+                            nuevosPedidosDelArchivo.push({ id_pedido: idPedido, tienda: tienda, fecha: obtenerFechaHoy() });
                         }
                     }
                 }
 
-                if (nuevosPedidos.length > 0) {
-                    await _supabase.from('ZCR_PEDIDOS_PROCESADOS').insert(nuevosPedidos);
-                    for (let t of tiendasMod) {
-                        const storeTotal = db[t].slots.reduce((a,b)=>a+b, 0) + db[t].sol;
-                        await _supabase.from('ZCR_LOGISTICS').upsert({
-                            tienda: t, fecha_reporte: obtenerFechaHoy(),
-                            slot_1: db[t].slots[0], slot_2: db[t].slots[1], slot_3: db[t].slots[2], slot_4: db[t].slots[3],
-                            slot_5: db[t].slots[4], slot_6: db[t].slots[5], slot_7: db[t].slots[6], slot_8: db[t].slots[7],
-                            soluciones: db[t].sol, total: storeTotal, ultimo_editor: "Control Web"
-                        }, { onConflict: 'tienda, fecha_reporte' });
-                    }
-                    mostrarToast(`${nuevosPedidos.length} pedidos sincronizados`, 'success');
-                } else { mostrarToast("Sin pedidos nuevos (duplicados)", 'error'); }
-                input.value = "";
-                actualizarUI();
-                ejecutarComparativa();
-                setCargando(false);
-            };
-            reader.readAsArrayBuffer(file);
+                if (nuevosPedidosDelArchivo.length > 0) {
+                    await _supabase.from('ZCR_PEDIDOS_PROCESADOS').insert(nuevosPedidosDelArchivo);
+                    totalGeneralNuevos += nuevosPedidosDelArchivo.length;
+                }
+            }
+
+            // Actualizar la base de datos solo para las tiendas que cambiaron
+            if (tiendasImpactadas.size > 0) {
+                for (let t of tiendasImpactadas) {
+                    const storeTotal = db[t].slots.reduce((a,b)=>a+b, 0) + db[t].sol;
+                    await _supabase.from('ZCR_LOGISTICS').upsert({
+                        tienda: t, fecha_reporte: obtenerFechaHoy(),
+                        slot_1: db[t].slots[0], slot_2: db[t].slots[1], slot_3: db[t].slots[2], slot_4: db[t].slots[3],
+                        slot_5: db[t].slots[4], slot_6: db[t].slots[5], slot_7: db[t].slots[6], slot_8: db[t].slots[7],
+                        soluciones: db[t].sol, total: storeTotal, ultimo_editor: "Control Web"
+                    }, { onConflict: 'tienda, fecha_reporte' });
+                }
+                mostrarToast(`${totalGeneralNuevos} pedidos totales sincronizados`, 'success');
+            } else {
+                mostrarToast("No se encontraron pedidos nuevos en los archivos", 'error');
+            }
+
+            input.value = ""; // Limpiar input para permitir re-subida
+            actualizarUI();
+            ejecutarComparativa();
+            setCargando(false);
         }
 
         function buscarTienda(fila) {
@@ -405,7 +428,6 @@
             }
         }
 
-        // --- NUEVA FUNCIÓN EXPORTAR EXCEL ---
         function exportarExcel() {
             const dataExport = allStores.map(name => {
                 const s = db[name];
@@ -426,12 +448,13 @@
             XLSX.writeFile(wb, `Zubale_CR_Reporte_${fechaActualVista}.xlsx`);
         }
 
+        // --- LISTENERS ACTUALIZADOS PARA LA CARGA MÚLTIPLE ---
         document.getElementById('input-slot').addEventListener('change', function() { 
             const idx = parseInt(document.getElementById('slot-selector').value) - 1;
-            procesarArchivo(this, 'slots', idx); 
+            procesarMultiplesArchivos(this, 'slots', idx); 
         });
-        document.getElementById('input-soluciones').addEventListener('change', function() { procesarArchivo(this, 'sol'); });
-        document.getElementById('input-inyectar').addEventListener('change', function() { procesarArchivo(this, 'inyectar'); });
+        document.getElementById('input-soluciones').addEventListener('change', function() { procesarMultiplesArchivos(this, 'sol'); });
+        document.getElementById('input-inyectar').addEventListener('change', function() { procesarMultiplesArchivos(this, 'inyectar'); });
     </script>
 </body>
 </html>
