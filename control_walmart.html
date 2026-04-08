@@ -11,28 +11,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,0,0" rel="stylesheet"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        enterprise: {
-                            50: '#F8FAFC', 100: '#F1F5F9', 200: '#E2E8F0', 300: '#CBD5E1',
-                            400: '#94A3B8', 600: '#475569', 700: '#334155', 800: '#1E293B', 900: '#0F172A',
-                        },
-                        accent: {
-                            500: '#4F46E2', 600: '#4338CA',
-                        }
+                        enterprise: { 50: '#F8FAFC', 100: '#F1F5F9', 200: '#E2E8F0', 300: '#CBD5E1', 400: '#94A3B8', 600: '#475569', 700: '#334155', 800: '#1E293B', 900: '#0F172A' },
+                        accent: { 500: '#4F46E2', 600: '#4338CA' }
                     }
                 }
             }
         }
     </script>
-    <style data-purpose="custom-ui-refinement">
+    <style>
         body { background-color: #F8FAFC; }
         .dark body { background-color: #0F172A; }
         .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border: 1px solid #E2E8F0; }
@@ -42,10 +36,13 @@
         .toast { animation: slideInRight 0.4s ease, fadeOut 0.4s ease 2.6s forwards; }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        #panel-analitica { transition: max-height 0.3s ease-out, opacity 0.3s ease; overflow: hidden; }
+        .collapsed { max-height: 0; opacity: 0; pointer-events: none; margin-bottom: 0; }
+        .expanded { max-height: 1000px; opacity: 1; margin-bottom: 2rem; }
     </style>
 </head>
 
-<body class="font-sans antialiased bg-[#F8FAFC] text-enterprise-800 dark:bg-enterprise-900 dark:text-enterprise-100 transition-colors duration-200" onload="initTheme()">
+<body class="font-sans antialiased bg-[#F8FAFC] text-enterprise-800 dark:bg-enterprise-900 dark:text-enterprise-100 transition-colors duration-200" onload="initApp()">
 
     <input type="file" id="input-inyectar" class="hidden" accept=".xlsx,.xls,.csv" />
     <input type="file" id="input-soluciones" class="hidden" accept=".xlsx,.xls,.csv" />
@@ -56,32 +53,28 @@
     <header class="sticky top-0 z-40 w-full border-b border-enterprise-200 dark:border-enterprise-800 bg-white/80 dark:bg-enterprise-900/80 backdrop-blur-md">
         <div class="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-6">
-                <a href="index.html" class="flex items-center gap-2 px-4 py-2 bg-accent-500/10 text-accent-500 border border-accent-500/20 rounded-xl font-black text-[10px] uppercase tracking-wider hover:bg-accent-500 hover:text-white transition-all shadow-sm">
-                    <span class="material-symbols-outlined text-sm">grid_view</span>
-                    Hub Central
-                </a>
-
-                <div class="h-6 w-[1px] bg-enterprise-200 dark:bg-enterprise-800"></div>
-
                 <div class="flex items-center space-x-4">
                     <div class="w-8 h-8 bg-accent-500 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-accent-500/20">Z</div>
                     <div>
                         <h1 class="text-lg font-bold tracking-tight text-enterprise-900 dark:text-white leading-none italic">Zubale <span class="text-accent-500">CR</span></h1>
-                        <span class="text-[9px] uppercase tracking-widest text-enterprise-500 font-black">Control Center v2.0</span>
+                        <div class="flex items-center gap-2">
+                            <span id="label-hoy" class="text-[9px] uppercase tracking-widest text-emerald-500 font-black italic">Operando Hoy</span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="flex items-center space-x-3">
-                <button class="p-2 w-10 h-10 flex items-center justify-center rounded-xl bg-enterprise-100 dark:bg-enterprise-800 border border-enterprise-200 dark:border-enterprise-700 text-lg hover:scale-105 transition-all shadow-sm" id="themeToggle">
-                    🌓
+            <div class="flex items-center space-x-4">
+                <button onclick="toggleAnalitica()" class="flex items-center gap-2 px-4 py-2 bg-enterprise-100 dark:bg-enterprise-800 text-enterprise-600 dark:text-enterprise-300 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-accent-500 hover:text-white transition-all">
+                    <span class="material-symbols-outlined text-sm">history</span> Analítica e Historial
                 </button>
+                <button class="p-2 w-10 h-10 flex items-center justify-center rounded-xl bg-enterprise-100 dark:bg-enterprise-800 border border-enterprise-200 dark:border-enterprise-700 text-lg hover:scale-105 transition-all shadow-sm" id="themeToggle">🌓</button>
             </div>
         </div>
     </header>
 
     <main class="max-w-[1440px] mx-auto px-6 py-8">
-        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 text-center">
             <div class="stat-card-gradient p-5 rounded-2xl border border-enterprise-200 dark:border-enterprise-800 shadow-sm">
                 <span class="text-[10px] font-black text-enterprise-500 uppercase tracking-widest">Batch 1</span>
                 <div id="total-b1" class="text-3xl font-black text-enterprise-900 dark:text-white mt-1">0</div>
@@ -100,17 +93,44 @@
             </div>
         </section>
 
+        <section id="panel-analitica" class="collapsed grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="glass-card p-6 rounded-[2rem] shadow-xl flex flex-col justify-center border-accent-500/30">
+                <h3 class="text-[10px] font-black uppercase tracking-widest text-accent-500 mb-3 italic underline">Consulta Histórica</h3>
+                <div class="flex items-center gap-3">
+                    <input type="date" id="fecha-historico" class="bg-white dark:bg-enterprise-800 border-enterprise-200 dark:border-enterprise-700 rounded-xl text-xs font-bold p-3 outline-none w-full text-enterprise-900 dark:text-white">
+                    <button onclick="cargarDiaEspecifico()" class="p-3 bg-accent-500 text-white rounded-xl hover:bg-accent-600 transition-all flex items-center justify-center">
+                        <span class="material-symbols-outlined text-sm text-white">search</span>
+                    </button>
+                </div>
+            </div>
+            <div class="lg:col-span-2 glass-card p-6 rounded-[2rem] shadow-xl border-enterprise-300 dark:border-enterprise-700">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-[10px] font-black uppercase tracking-widest text-enterprise-500 italic">Comparativa Mensual</h3>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-enterprise-50 dark:bg-enterprise-900/40 p-4 rounded-xl text-center">
+                        <p id="label-mes-ant" class="text-[9px] font-bold text-enterprise-400 uppercase">Mes Anterior</p>
+                        <div id="val-mes-ant" class="text-2xl font-black text-enterprise-600 dark:text-enterprise-300">---</div>
+                    </div>
+                    <div class="bg-accent-500/5 p-4 rounded-xl text-center">
+                        <p class="text-[9px] font-bold text-accent-500 uppercase">Diferencia neta</p>
+                        <div id="val-dif" class="text-2xl font-black text-accent-500">---</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="mb-8">
             <div class="glass-card p-6 rounded-[2rem] shadow-xl">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <h2 class="text-xs font-black text-enterprise-900 dark:text-white uppercase tracking-[0.2em] italic">Centro de Acciones</h2>
-                    <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex wrap items-center gap-3">
                         <button onclick="document.getElementById('input-inyectar').click()" class="px-5 py-3 text-[10px] font-black bg-enterprise-800 dark:bg-enterprise-700 text-white rounded-xl hover:bg-enterprise-900 transition-all shadow-md uppercase tracking-wider">Inyectar Turno Anterior</button>
                         <button onclick="document.getElementById('input-soluciones').click()" class="px-5 py-3 text-[10px] font-black bg-white dark:bg-enterprise-800 text-enterprise-700 dark:text-enterprise-200 border border-enterprise-200 dark:border-enterprise-700 rounded-xl hover:bg-enterprise-50 transition-all uppercase tracking-wider">Cargar Soluciones</button>
                         <div class="flex items-center">
-                            <select id="slot-selector" onchange="actualizarEstadoBoton()" class="px-3 py-3 text-[10px] font-black bg-white dark:bg-enterprise-800 border border-enterprise-200 dark:border-enterprise-700 rounded-l-xl outline-none text-enterprise-700 dark:text-white uppercase">
-                                <option value="1">Slot 1</option><option value="2">Slot 2</option><option value="3">Slot 3</option><option value="4">Slot 4</option>
-                                <option value="5">Slot 5</option><option value="6">Slot 6</option><option value="7">Slot 7</option><option value="8">Slot 8</option>
+                            <select id="slot-selector" onchange="actualizarEstadoBoton()" class="px-3 py-3 text-[10px] font-black bg-white dark:bg-enterprise-800 border border-enterprise-200 dark:border-enterprise-700 rounded-l-xl outline-none text-enterprise-700 dark:text-white uppercase tracking-tighter">
+                                <option value="1">S1</option><option value="2">S2</option><option value="3">S3</option><option value="4">S4</option>
+                                <option value="5">S5</option><option value="6">S6</option><option value="7">S7</option><option value="8">S8</option>
                             </select>
                             <button onclick="document.getElementById('input-slot').click()" class="px-5 py-3 text-[10px] font-black bg-accent-500 text-white rounded-r-xl hover:bg-accent-600 transition-all uppercase tracking-wider">Subir Slot</button>
                         </div>
@@ -133,14 +153,28 @@
     </main>
 
     <script>
-        // --- GESTIÓN DE TEMA PERSISTENTE ---
+        // --- SUPABASE CONFIG ---
+        const SUPABASE_URL = 'https://wuslgkvzkbqlzzmbrkkl.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_JgDL7NGH4Y4Awof_kQwZ_A_wN7SAjDtesta';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const allStores = ["Wm Alajuela", "Wm Heredia", "Wm Heredia Este", "Wm Tibas", "Wm Escazu", "Wm Santa Ana", "Wm Guadalupe", "Wm Desamparados"];
+        const batch1Stores = ["Wm Alajuela", "Wm Heredia", "Wm Heredia Este", "Wm Tibas"];
+        let db = {};
+        let locks = JSON.parse(localStorage.getItem('zubale_locks')) || {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0};
+
+        function obtenerFechaHoy() { return new Date().toISOString().split('T')[0]; }
+
+        async function initApp() {
+            initTheme();
+            allStores.forEach(name => db[name] = { slots: Array(8).fill(0), sol: 0 });
+            await sincronizarDesdeNube();
+            ejecutarComparativa();
+            document.getElementById('label-hoy').innerText = "Hoy: " + obtenerFechaHoy();
+        }
+
         function initTheme() {
-            const saved = localStorage.getItem('zubale_theme');
-            if(saved === 'dark') {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
+            if(localStorage.getItem('zubale_theme') === 'dark') document.documentElement.classList.add('dark');
         }
 
         document.getElementById('themeToggle').addEventListener('click', () => {
@@ -148,14 +182,101 @@
             localStorage.setItem('zubale_theme', isDark ? 'dark' : 'light');
         });
 
-        // --- LÓGICA DE NEGOCIO ---
-        const allStores = ["Wm Alajuela", "Wm Heredia", "Wm Heredia Este", "Wm Tibas", "Wm Escazu", "Wm Santa Ana", "Wm Guadalupe", "Wm Desamparados"];
-        const batch1Stores = ["Wm Alajuela", "Wm Heredia", "Wm Heredia Este", "Wm Tibas"];
-        let db = JSON.parse(localStorage.getItem('zubale_db')) || {};
-        let locks = JSON.parse(localStorage.getItem('zubale_locks')) || {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0};
+        function toggleAnalitica() {
+            const p = document.getElementById('panel-analitica');
+            p.classList.toggle('collapsed'); p.classList.toggle('expanded');
+        }
 
-        allStores.forEach(name => { if (!db[name]) db[name] = { slots: Array(8).fill(0), sol: 0 }; });
+        // --- RENDERIZADO DE LAS TARJETAS (FICHA TÉCNICA) ---
+        function actualizarUI() {
+            let b1 = 0, b2 = 0, solTotal = 0;
+            allStores.forEach(name => {
+                const sSum = db[name].slots.reduce((a, b) => a + b, 0);
+                if (batch1Stores.includes(name)) b1 += sSum; else b2 += sSum;
+                solTotal += db[name].sol;
+            });
+            document.getElementById('total-b1').innerText = b1.toLocaleString();
+            document.getElementById('total-b2').innerText = b2.toLocaleString();
+            document.getElementById('total-sols').innerText = solTotal.toLocaleString();
+            document.getElementById('gran-total').innerText = (b1 + b2 + solTotal).toLocaleString();
+            
+            renderTiendas();
+            actualizarEstadoBoton();
+        }
 
+        function renderTiendas() {
+            const container = document.getElementById('tiendas-container');
+            container.innerHTML = allStores.map(name => {
+                const storeData = db[name];
+                const total = storeData.slots.reduce((a, b) => a + b, 0) + storeData.sol;
+                return `<div class="bg-white dark:bg-enterprise-800 p-5 rounded-2xl border border-enterprise-200 dark:border-enterprise-700 shadow-sm transition-all hover:shadow-md text-center">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="font-black text-[11px] text-enterprise-900 dark:text-white uppercase tracking-tighter italic">${name}</span>
+                        <span class="text-xs font-black px-2 py-1 bg-accent-500/10 text-accent-500 rounded-lg">${total}</span>
+                    </div>
+                    <div class="grid grid-cols-4 gap-2">
+                        ${storeData.slots.map((v, i) => `<div class="text-[9px] text-center p-1.5 rounded-lg font-black ${v > 0 ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' : 'bg-gray-50 text-gray-400 dark:bg-enterprise-900/50'}">S${i+1}</div>`).join('')}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // --- FUNCIONES NUBE ---
+        async function sincronizarDesdeNube() {
+            const hoy = obtenerFechaHoy();
+            const { data } = await _supabase.from('ZCR_LOGISTICS').select('*').eq('fecha_reporte', hoy);
+            if (data && data.length > 0) {
+                data.forEach(row => {
+                    if (db[row.tienda]) {
+                        db[row.tienda].slots = [row.slot_1, row.slot_2, row.slot_3, row.slot_4, row.slot_5, row.slot_6, row.slot_7, row.slot_8];
+                        db[row.tienda].sol = row.soluciones;
+                    }
+                });
+            }
+            actualizarUI();
+        }
+
+        async function actualizarNube(tienda) {
+            const store = db[tienda];
+            const hoy = obtenerFechaHoy();
+            await _supabase.from('ZCR_LOGISTICS').upsert({
+                tienda: tienda, fecha_reporte: hoy,
+                slot_1: store.slots[0], slot_2: store.slots[1], slot_3: store.slots[2], slot_4: store.slots[3],
+                slot_5: store.slots[4], slot_6: store.slots[5], slot_7: store.slots[6], slot_8: store.slots[7],
+                soluciones: store.sol, total: store.slots.reduce((a, b) => a + b, 0) + store.sol
+            }, { onConflict: 'tienda, fecha_reporte' });
+        }
+
+        async function cargarDiaEspecifico() {
+            const fecha = document.getElementById('fecha-historico').value;
+            if (!fecha) return mostrarToast("Selecciona fecha", "error");
+            const { data } = await _supabase.from('ZCR_LOGISTICS').select('*').eq('fecha_reporte', fecha);
+            allStores.forEach(name => db[name] = { slots: Array(8).fill(0), sol: 0 });
+            if (data && data.length > 0) {
+                data.forEach(row => {
+                    if (db[row.tienda]) {
+                        db[row.tienda].slots = [row.slot_1, row.slot_2, row.slot_3, row.slot_4, row.slot_5, row.slot_6, row.slot_7, row.slot_8];
+                        db[row.tienda].sol = row.soluciones;
+                    }
+                });
+                mostrarToast(`Historial de ${fecha} cargado`, "success");
+            } else { mostrarToast("Sin datos", "error"); }
+            actualizarUI();
+        }
+
+        async function ejecutarComparativa() {
+            const { data } = await _supabase.from('ZCR_LOGISTICS').select('total, fecha_reporte');
+            if (data) {
+                const hoy = new Date(); const mesActual = hoy.getMonth();
+                const tActual = data.filter(r => new Date(r.fecha_reporte).getMonth() === mesActual).reduce((a, b) => a + b.total, 0);
+                const tAnt = data.filter(r => new Date(r.fecha_reporte).getMonth() === mesActual - 1).reduce((a, b) => a + b.total, 0);
+                document.getElementById('val-mes-ant').innerText = tAnt.toLocaleString();
+                const d = tActual - tAnt;
+                document.getElementById('val-dif').innerText = (d >= 0 ? "+" : "") + d.toLocaleString();
+            }
+        }
+
+        // --- LÓGICA ARCHIVOS ---
         function buscarTiendaEnFila(fila) {
             const txt = Object.values(fila).join("|").toUpperCase();
             if (txt.includes("HEREDIA ESTE")) return "Wm Heredia Este";
@@ -169,148 +290,108 @@
             return null;
         }
 
-        function inyectarTurno(input) {
+        async function inyectarTurno(input) {
             const file = input.files[0]; if (!file) return;
             const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
-                    const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                    data.forEach(fila => {
-                        const tE = buscarTiendaEnFila(fila);
-                        if (tE) {
-                            for (let i = 1; i <= 8; i++) {
-                                const val = parseInt(fila[`Slot ${i}`] || fila[`SLOT ${i}`] || 0);
-                                if (!isNaN(val)) db[tE].slots[i-1] += val;
-                            }
-                            const sVal = parseInt(fila["Sol"] || fila["SOL"] || fila["Soluciones"] || fila["SOLUCIONES"] || 0);
-                            if (!isNaN(sVal)) db[tE].sol += sVal;
-                        }
-                    });
-                    guardar();
-                    mostrarToast(`⚡ Turno y Soluciones inyectados`, 'success');
-                    input.value = "";
-                } catch (err) { mostrarToast(`❌ Error de archivo`, 'error'); }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        function procesarArchivoGeneral(input, tipo, slotIdx = null) {
-            const file = input.files[0]; if (!file) return;
-            if (tipo === 'slots' && slotIdx !== null) {
-                if ((locks[slotIdx + 1] || 0) >= 2) {
-                    mostrarToast(`❌ Slot ${slotIdx + 1} bloqueado (2/2)`, 'error');
-                    input.value = ""; return;
-                }
-            }
-            const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = async (e) => {
                 const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
                 const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                let count = 0;
+                let modif = new Set();
                 data.forEach(fila => {
                     const tE = buscarTiendaEnFila(fila);
                     if (tE) {
-                        if (tipo === 'slots') db[tE].slots[slotIdx]++;
-                        else db[tE].sol++;
-                        count++;
+                        modif.add(tE);
+                        for (let i = 1; i <= 8; i++) {
+                            const val = parseInt(fila[`Slot ${i}`] || fila[`SLOT ${i}`] || 0);
+                            db[tE].slots[i-1] += isNaN(val) ? 0 : val;
+                        }
+                        const sVal = parseInt(fila["Sol"] || fila["SOL"] || fila["Soluciones"] || fila["SOLUCIONES"] || 0);
+                        db[tE].sol += isNaN(sVal) ? 0 : sVal;
                     }
                 });
-                if (tipo === 'slots' && count > 0) locks[slotIdx + 1]++;
-                guardar();
-                mostrarToast(`✅ ${count} registros cargados`, 'success');
+                for (let t of modif) await actualizarNube(t);
+                actualizarUI();
+                mostrarToast("⚡ Datos sincronizados", 'success');
                 input.value = "";
+                ejecutarComparativa();
             };
             reader.readAsArrayBuffer(file);
         }
 
-        function guardar() {
-            localStorage.setItem('zubale_db', JSON.stringify(db));
-            localStorage.setItem('zubale_locks', JSON.stringify(locks));
-            actualizarUI();
-        }
-
-        function actualizarUI() {
-            let b1 = 0, b2 = 0, solTotal = 0;
-            allStores.forEach(name => {
-                const sSum = db[name].slots.reduce((a, b) => a + b, 0);
-                if (batch1Stores.includes(name)) b1 += sSum; else b2 += sSum;
-                solTotal += db[name].sol;
-            });
-            document.getElementById('total-b1').innerText = b1.toLocaleString();
-            document.getElementById('total-b2').innerText = b2.toLocaleString();
-            document.getElementById('total-sols').innerText = solTotal.toLocaleString();
-            document.getElementById('gran-total').innerText = (b1 + b2 + solTotal).toLocaleString();
-            renderTiendas();
-            actualizarEstadoBoton();
-        }
-
-        function renderTiendas() {
-            const container = document.getElementById('tiendas-container');
-            container.innerHTML = allStores.map(name => {
-                const storeData = db[name];
-                const total = storeData.slots.reduce((a, b) => a + b, 0) + storeData.sol;
-                return `<div class="bg-white dark:bg-enterprise-800 p-5 rounded-2xl border border-enterprise-200 dark:border-enterprise-700 shadow-sm transition-all hover:shadow-md">
-                    <div class="flex justify-between items-center mb-4">
-                        <span class="font-black text-[11px] text-enterprise-900 dark:text-white uppercase tracking-tighter italic">${name}</span>
-                        <span class="text-xs font-black px-2 py-1 bg-accent-500/10 text-accent-500 rounded-lg">${total}</span>
-                    </div>
-                    <div class="grid grid-cols-4 gap-2">
-                        ${storeData.slots.map((v, i) => `<div class="text-[9px] text-center p-1.5 rounded-lg font-black ${v > 0 ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' : 'bg-gray-50 text-gray-400 dark:bg-enterprise-900/50'}">S${i+1}</div>`).join('')}
-                    </div>
-                </div>`;
-            }).join('');
+        async function procesarArchivoGeneral(input, tipo, slotIdx = null) {
+            const file = input.files[0]; if (!file) return;
+            if (tipo === 'slots' && (locks[slotIdx + 1] || 0) >= 2) return mostrarToast(`❌ Slot bloqueado`, 'error');
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
+                const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                let modif = new Set();
+                data.forEach(fila => {
+                    const tE = buscarTiendaEnFila(fila);
+                    if (tE) {
+                        modif.add(tE);
+                        if (tipo === 'slots') db[tE].slots[slotIdx]++;
+                        else db[tE].sol++;
+                    }
+                });
+                for (let t of modif) await actualizarNube(t);
+                if (tipo === 'slots' && modif.size > 0) {
+                    locks[slotIdx + 1]++;
+                    localStorage.setItem('zubale_locks', JSON.stringify(locks));
+                }
+                actualizarUI();
+                mostrarToast(`✅ Guardado exitosamente`, 'success');
+                input.value = "";
+                ejecutarComparativa();
+            };
+            reader.readAsArrayBuffer(file);
         }
 
         function exportarExcel() {
-            try {
-                const dataExport = allStores.map(name => {
-                    const row = { "Tienda": name };
-                    db[name].slots.forEach((val, i) => { row[`Slot ${i+1}`] = val; });
-                    row["Soluciones"] = db[name].sol;
-                    row["Total"] = db[name].slots.reduce((a, b) => a + b, 0) + db[name].sol;
-                    return row;
-                });
-                const ws = XLSX.utils.json_to_sheet(dataExport);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Reporte");
-                XLSX.writeFile(wb, `Reporte_Control_${new Date().toLocaleDateString()}.xlsx`);
-            } catch (error) { mostrarToast("❌ Error al exportar", "error"); }
+            const dataExport = allStores.map(name => {
+                const row = { "Tienda": name };
+                db[name].slots.forEach((val, i) => { row[`Slot ${i+1}`] = val; });
+                row["Soluciones"] = db[name].sol;
+                row["Total"] = db[name].slots.reduce((a, b) => a + b, 0) + db[name].sol;
+                return row;
+            });
+            const ws = XLSX.utils.json_to_sheet(dataExport);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Reporte");
+            XLSX.writeFile(wb, `Reporte_Zubale_${new Date().toLocaleDateString()}.xlsx`);
         }
 
         function actualizarEstadoBoton() {
-            const slot = document.getElementById('slot-selector').value;
-            document.getElementById('msg-bloqueo').innerText = `Slot ${slot}: ${locks[slot] || 0}/2 Cargados`;
+            const s = document.getElementById('slot-selector').value;
+            document.getElementById('msg-bloqueo').innerText = `Slot ${s}: ${locks[s] || 0}/2 Cargados`;
         }
 
-        function limpiarTodo() {
-            if(confirm("¿Reiniciar sistema?")) {
-                localStorage.removeItem('zubale_db');
+        async function limpiarTodo() {
+            if(confirm("¿Limpiar sistema?")) {
                 localStorage.removeItem('zubale_locks');
-                db = {}; locks = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0};
+                locks = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0};
                 allStores.forEach(name => db[name] = { slots: Array(8).fill(0), sol: 0 });
-                guardar();
-                mostrarToast("🧹 Sistema limpio", "success");
+                for (let t of allStores) await actualizarNube(t);
+                actualizarUI();
+                mostrarToast("🧹 Limpio", "success");
             }
         }
 
         function mostrarToast(msg, type) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type === 'success' ? 'bg-emerald-600' : 'bg-red-600'} text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-2xl`;
-            toast.textContent = msg;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = `toast ${type === 'success' ? 'bg-emerald-600' : 'bg-red-600'} text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-2xl`;
+            t.textContent = msg;
+            c.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
         }
 
         document.getElementById('input-inyectar').addEventListener('change', function() { inyectarTurno(this); });
         document.getElementById('input-soluciones').addEventListener('change', function() { procesarArchivoGeneral(this, 'sol'); });
         document.getElementById('input-slot').addEventListener('change', function() { 
-            const slotIdx = parseInt(document.getElementById('slot-selector').value) - 1;
-            procesarArchivoGeneral(this, 'slots', slotIdx); 
+            const idx = parseInt(document.getElementById('slot-selector').value) - 1;
+            procesarArchivoGeneral(this, 'slots', idx); 
         });
-
-        actualizarUI();
     </script>
 </body>
 </html>
