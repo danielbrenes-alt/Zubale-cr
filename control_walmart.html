@@ -24,8 +24,7 @@
         }
     </script>
     <style>
-        body { background-color: #F8FAFC; transition: background 0.3s, color 0.3s; }
-        .dark body { background-color: #0F172A; }
+        body { transition: background-color 0.3s; }
         .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border: 1px solid #E2E8F0; }
         .dark .glass-card { background: rgba(30, 41, 59, 0.7); border: 1px solid #334155; }
         .stat-card-gradient { background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); }
@@ -33,16 +32,13 @@
         .toast { animation: slideInRight 0.4s ease, fadeOut 0.4s ease 2.6s forwards; position: relative; z-index: 100; }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-        
-        .alerta-exceso { animation: pulse-red 2s infinite; background-color: rgba(239, 68, 68, 0.15) !important; color: #ef4444 !important; border: 1px solid #ef4444 !important; }
-        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-        
-        .loader { width: 14px; height: 14px; border: 2px solid #4F46E2; border-bottom-color: transparent; border-radius: 50%; display: inline-block; box-sizing: border-box; animation: rotation 1s linear infinite; }
+        .loader { width: 14px; height: 14px; border: 2px solid #4F46E2; border-bottom-color: transparent; border-radius: 50%; display: inline-block; animation: rotation 1s linear infinite; }
         @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
         #panel-analitica { transition: max-height 0.4s ease-in-out, opacity 0.3s; overflow: hidden; }
         .collapsed { max-height: 0; opacity: 0; pointer-events: none; }
-        .expanded { max-height: 600px; opacity: 1; margin-bottom: 2rem; }
+        .expanded { max-height: 800px; opacity: 1; margin-bottom: 2rem; }
+        .alerta-exceso { animation: pulse-red 2s infinite; background-color: rgba(239, 68, 68, 0.15) !important; color: #ef4444 !important; border: 1px solid #ef4444 !important; }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
     </style>
 </head>
 
@@ -57,78 +53,69 @@
     <header class="sticky top-0 z-40 w-full border-b border-enterprise-200 dark:border-enterprise-800 bg-white/80 dark:bg-enterprise-900/80 backdrop-blur-md">
         <div class="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-6">
-                <a href="index.html" class="flex items-center justify-center px-4 h-10 bg-accent-500 text-white font-black italic rounded-xl shadow-lg hover:brightness-110 hover:-translate-y-0.5 transition-all active:scale-95 group">
-                    <span class="mr-2 group-hover:rotate-12 transition-transform">🏠</span> HUB
-                </a>
-                <div class="h-8 w-[1px] bg-enterprise-200 dark:bg-enterprise-800 mx-1"></div>
                 <div class="flex items-center space-x-4">
                     <div class="w-8 h-8 bg-accent-500 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-accent-500/20">Z</div>
-                    <div>
-                        <h1 class="text-lg font-bold tracking-tight text-enterprise-900 dark:text-white leading-none italic">Zubale <span class="text-accent-500">CR</span></h1>
-                        <div class="flex items-center gap-2">
-                            <span id="label-hoy" class="text-[9px] uppercase tracking-widest text-emerald-500 font-black italic">Operando Hoy</span>
-                        </div>
-                    </div>
+                    <h1 class="text-lg font-bold tracking-tight text-enterprise-900 dark:text-white leading-none italic">Zubale <span class="text-accent-500">CR</span></h1>
                 </div>
             </div>
             <div class="flex items-center space-x-4">
                 <div id="sync-status" class="flex items-center gap-3 px-4 py-2 bg-enterprise-100 dark:bg-enterprise-800 rounded-xl">
                     <div id="loading-spinner" class="hidden"><span class="loader"></span></div>
-                    <span id="sync-text" class="text-[10px] font-black uppercase tracking-widest text-enterprise-500">Sincronizado</span>
+                    <span id="sync-text" class="text-[10px] font-black uppercase tracking-widest text-enterprise-500 dark:text-enterprise-400">Sincronizado</span>
                     <span id="sync-dot" class="w-2 h-2 bg-emerald-500 rounded-full"></span>
                 </div>
                 <button onclick="toggleAnalitica()" class="p-2 w-10 h-10 flex items-center justify-center rounded-xl bg-enterprise-100 dark:bg-enterprise-800 border border-enterprise-200 dark:border-enterprise-700 hover:scale-105 transition-all shadow-sm">
                     <span class="material-symbols-outlined text-lg">history</span>
                 </button>
-                <button class="p-2 w-10 h-10 flex items-center justify-center rounded-xl bg-enterprise-100 dark:bg-enterprise-800 border border-enterprise-200 dark:border-enterprise-700 text-lg hover:scale-105 transition-all shadow-sm" id="themeToggle">🌓</button>
+                <button onclick="toggleTheme()" class="p-2 w-10 h-10 flex items-center justify-center rounded-xl bg-enterprise-100 dark:bg-enterprise-800 border border-enterprise-200 dark:border-enterprise-700 text-lg hover:scale-105 transition-all shadow-sm">🌓</button>
             </div>
         </div>
     </header>
 
     <main class="max-w-[1440px] mx-auto px-6 py-8">
-        <section class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 text-center">
-            <div class="stat-card-gradient p-5 rounded-2xl border border-enterprise-200 dark:border-enterprise-800 shadow-sm">
-                <span class="text-[10px] font-black text-enterprise-500 uppercase tracking-widest">Batch 1</span>
-                <div id="total-b1" class="text-3xl font-black text-enterprise-900 dark:text-white mt-1">0</div>
+        <section class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8 text-center">
+            <div class="stat-card-gradient p-4 rounded-2xl border border-enterprise-200 dark:border-enterprise-800 shadow-sm">
+                <span class="text-[9px] font-black text-enterprise-500 uppercase tracking-widest">Total Batch 1</span>
+                <div id="total-b1" class="text-2xl font-black text-enterprise-900 dark:text-white mt-1">0</div>
             </div>
-            <div class="stat-card-gradient p-5 rounded-2xl border border-enterprise-200 dark:border-enterprise-800 shadow-sm">
-                <span class="text-[10px] font-black text-enterprise-500 uppercase tracking-widest">Batch 2</span>
-                <div id="total-b2" class="text-3xl font-black text-enterprise-900 dark:text-white mt-1">0</div>
+            <div class="stat-card-gradient p-4 rounded-2xl border border-enterprise-200 dark:border-enterprise-800 shadow-sm">
+                <span class="text-[9px] font-black text-enterprise-500 uppercase tracking-widest">Total Batch 2</span>
+                <div id="total-b2" class="text-2xl font-black text-enterprise-900 dark:text-white mt-1">0</div>
             </div>
-            <div class="stat-card-gradient p-5 rounded-2xl border border-enterprise-200 dark:border-enterprise-800 shadow-sm">
-                <span class="text-[10px] font-black text-enterprise-500 uppercase tracking-widest">Soluciones</span>
-                <div id="total-sols" class="text-2xl font-black text-enterprise-900 dark:text-white mt-1">0</div>
+            <div class="stat-card-gradient p-4 rounded-2xl border border-enterprise-200 dark:border-enterprise-800 shadow-sm">
+                <span class="text-[9px] font-black text-orange-500 uppercase tracking-widest italic">Repro Global</span>
+                <div id="total-repro" class="text-2xl font-black text-orange-600 mt-1">0</div>
             </div>
-            <div class="bg-enterprise-900 dark:bg-accent-600 p-5 rounded-2xl border border-enterprise-800 shadow-lg">
-                <span class="text-[10px] font-black text-white/70 uppercase tracking-widest">Total General</span>
-                <div id="gran-total" class="text-3xl font-black text-white mt-1">0</div>
+            <div class="stat-card-gradient p-4 rounded-2xl border border-enterprise-200 dark:border-enterprise-800 shadow-sm">
+                <span class="text-[9px] font-black text-indigo-500 uppercase tracking-widest italic">Sols Global</span>
+                <div id="total-sols" class="text-2xl font-black text-indigo-600 mt-1">0</div>
+            </div>
+            <div class="bg-enterprise-900 dark:bg-accent-600 p-4 rounded-2xl border border-enterprise-800 shadow-lg">
+                <span class="text-[9px] font-black text-white/70 uppercase tracking-widest">Total General</span>
+                <div id="gran-total" class="text-2xl font-black text-white mt-1">0</div>
             </div>
         </section>
 
         <section id="panel-analitica" class="collapsed grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="glass-card p-6 rounded-[2rem] shadow-xl flex flex-col justify-center border-accent-500/30">
+            <div class="glass-card p-6 rounded-[2rem] shadow-xl border-accent-500/30">
                 <h3 class="text-[10px] font-black uppercase tracking-widest text-accent-500 mb-3 italic underline">Consulta Histórica</h3>
                 <div class="flex items-center gap-3">
-                    <input type="date" id="fecha-historico" class="bg-white dark:bg-enterprise-800 border-enterprise-200 dark:border-enterprise-700 rounded-xl text-xs font-bold p-3 outline-none w-full text-enterprise-900 dark:text-white">
-                    <button onclick="cargarDiaEspecifico()" class="p-3 bg-accent-500 text-white rounded-xl hover:bg-accent-600 transition-all flex items-center justify-center">
+                    <input type="date" id="fecha-historico" class="bg-white dark:bg-enterprise-800 border-enterprise-200 dark:border-enterprise-700 rounded-xl text-xs font-bold p-3 w-full text-enterprise-900 dark:text-white outline-none">
+                    <button onclick="cargarDiaEspecifico()" class="p-3 bg-accent-500 text-white rounded-xl hover:bg-accent-600 shadow-lg transition-all">
                         <span class="material-symbols-outlined text-sm">search</span>
                     </button>
                 </div>
             </div>
-
             <div class="glass-card p-6 rounded-[2rem] shadow-xl border-red-500/20">
-                <h3 class="text-[10px] font-black uppercase tracking-widest text-red-500 mb-3 italic">Limpieza Masiva Master (PIN Requerido)</h3>
+                <h3 class="text-[10px] font-black uppercase tracking-widest text-red-500 mb-3 italic">Limpieza Master (Borradores)</h3>
                 <div class="flex flex-col gap-2">
                     <div class="flex gap-2">
                         <input type="date" id="delete-start" class="bg-white dark:bg-enterprise-800 border-enterprise-200 dark:border-enterprise-700 rounded-lg text-[10px] p-2 w-full">
                         <input type="date" id="delete-end" class="bg-white dark:bg-enterprise-800 border-enterprise-200 dark:border-enterprise-700 rounded-lg text-[10px] p-2 w-full">
                     </div>
-                    <button onclick="limpiezaMasterRango()" class="w-full py-2 bg-red-600 text-white rounded-lg font-black text-[10px] uppercase tracking-widest hover:bg-red-700 transition-all shadow-md">
-                        Ejecutar Borrado Masivo
-                    </button>
+                    <button onclick="limpiezaMasterRango()" class="w-full py-2 bg-red-600 text-white rounded-lg font-black text-[10px] uppercase tracking-widest hover:bg-red-700 transition-all shadow-md">Ejecutar Borrado</button>
                 </div>
             </div>
-
             <div class="glass-card p-6 rounded-[2rem] shadow-xl border-enterprise-300 dark:border-enterprise-700 text-center">
                 <h3 class="text-[10px] font-black uppercase tracking-widest text-enterprise-500 italic mb-4">Comparativa Mensual</h3>
                 <div class="grid grid-cols-2 gap-4">
@@ -137,7 +124,7 @@
                         <div id="val-mes-ant" class="text-2xl font-black">---</div>
                     </div>
                     <div class="bg-accent-500/5 p-4 rounded-xl">
-                        <p class="text-[9px] font-bold text-accent-500 uppercase">Diferencia neta</p>
+                        <p class="text-[9px] font-bold text-accent-500 uppercase">Diferencia</p>
                         <div id="val-dif" class="text-2xl font-black text-accent-500">---</div>
                     </div>
                 </div>
@@ -151,23 +138,32 @@
                         <option value="1">S1</option><option value="2">S2</option><option value="3">S3</option><option value="4">S4</option>
                         <option value="5">S5</option><option value="6">S6</option><option value="7">S7</option><option value="8">S8</option>
                     </select>
-                    <button onclick="document.getElementById('input-slot').click()" class="px-6 py-3 bg-accent-500 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-accent-600 transition-all shadow-lg">Subir Slot</button>
+                    <button onclick="document.getElementById('input-slot').click()" class="px-6 py-3 bg-accent-500 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-accent-600 transition-all shadow-lg">Subir Slot Diario</button>
                 </div>
                 <div class="flex gap-3">
-                    <button onclick="document.getElementById('input-soluciones').click()" class="px-4 py-3 bg-white dark:bg-enterprise-800 text-enterprise-700 dark:text-enterprise-200 border border-enterprise-200 rounded-xl font-black text-[10px] uppercase underline">Cargar Soluciones</button>
-                    <button onclick="document.getElementById('input-inyectar').click()" class="px-4 py-3 bg-enterprise-800 dark:bg-enterprise-700 text-white rounded-xl font-black text-[10px] uppercase">Manual: Turno Anterior</button>
+                    <button onclick="document.getElementById('input-soluciones').click()" class="px-4 py-3 bg-white dark:bg-enterprise-800 text-enterprise-700 dark:text-white border border-enterprise-200 dark:border-enterprise-700 rounded-xl font-black text-[10px] uppercase underline">Cargar Soluciones</button>
+                    <button onclick="document.getElementById('input-inyectar').click()" class="px-4 py-3 bg-enterprise-800 dark:bg-enterprise-700 text-white rounded-xl font-black text-[10px] uppercase italic">Inyectar Turno Anterior</button>
                 </div>
             </div>
             <div class="mt-4 pt-4 border-t border-enterprise-100 dark:border-enterprise-700 flex justify-between items-center">
-                <p class="text-[10px] font-black text-enterprise-400 uppercase tracking-widest italic">Sincronización en tiempo real activa</p>
+                <p class="text-[10px] font-black text-enterprise-400 dark:text-enterprise-500 uppercase tracking-widest italic">Motor Turbo Híbrido: Sincronización de Slot Activa</p>
                 <div class="flex gap-4">
-                    <button onclick="exportarExcel()" class="px-4 py-2 bg-emerald-600 text-white rounded-xl font-black text-[10px] uppercase tracking-wider hover:bg-emerald-700 transition-all shadow-md">Exportar Reporte</button>
-                    <button onclick="limpiarTodo()" class="text-red-500 font-black text-[10px] uppercase hover:underline">Reiniciar Hoy (Acceso Rápido)</button>
+                    <button onclick="exportarExcel()" class="px-4 py-2 bg-emerald-600 text-white rounded-xl font-black text-[10px] uppercase shadow-md">Exportar Excel</button>
+                    <button onclick="limpiarTodo()" class="text-red-500 font-black text-[10px] uppercase hover:underline">Reiniciar Dashboard (Hoy)</button>
                 </div>
             </div>
         </section>
 
-        <div id="tiendas-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+        <div class="space-y-12">
+            <div>
+                <div class="flex items-center gap-4 mb-6"><div class="h-px flex-1 bg-enterprise-200 dark:bg-enterprise-800"></div><span class="text-[10px] font-black uppercase tracking-[0.3em] text-accent-500 italic">Batch 1</span><div class="h-px flex-1 bg-enterprise-200 dark:bg-enterprise-800"></div></div>
+                <div id="container-b1" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+            </div>
+            <div>
+                <div class="flex items-center gap-4 mb-6"><div class="h-px flex-1 bg-enterprise-200 dark:bg-enterprise-800"></div><span class="text-[10px] font-black uppercase tracking-[0.3em] text-enterprise-400 italic">Batch 2</span><div class="h-px flex-1 bg-enterprise-200 dark:bg-enterprise-800"></div></div>
+                <div id="container-b2" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+            </div>
+        </div>
     </main>
 
     <script>
@@ -177,70 +173,47 @@
 
         const allStores = ["Wm Alajuela", "Wm Heredia", "Wm Heredia Este", "Wm Tibas", "Wm Escazu", "Wm Santa Ana", "Wm Guadalupe", "Wm Desamparados"];
         const batch1Stores = ["Wm Alajuela", "Wm Heredia", "Wm Heredia Este", "Wm Tibas"];
+        const batch2Stores = ["Wm Escazu", "Wm Santa Ana", "Wm Guadalupe", "Wm Desamparados"];
+        
         let db = {};
-        let fechaActualVista = obtenerFechaHoy();
+        let idsProcesadosLocal = new Set();
+        let fechaVistaActual = obtenerFechaHoy();
 
         function obtenerFechaHoy() { return new Date().toISOString().split('T')[0]; }
 
-        function setCargando(estado) {
-            const spinner = document.getElementById('loading-spinner');
-            const dot = document.getElementById('sync-dot');
-            const text = document.getElementById('sync-text');
-            if(estado) {
-                spinner.classList.remove('hidden');
-                dot.classList.add('hidden');
-                text.innerText = "Sincronizando...";
-                text.classList.add('animate-pulse');
-            } else {
-                spinner.classList.add('hidden');
-                dot.classList.remove('hidden');
-                text.innerText = "Sincronizado";
-                text.classList.remove('animate-pulse');
-            }
-        }
-
-        async function initApp() {
-            const savedTheme = localStorage.getItem('zubale_theme');
-            if(savedTheme === 'dark') document.documentElement.classList.add('dark');
-            allStores.forEach(name => db[name] = { slots: Array(8).fill(0), sol: 0, editor: '---' });
-            
-            setCargando(true);
-            await cargarDatosDesdeNube();
-            escucharCambiosRealtime();
-            ejecutarComparativa();
-            setCargando(false);
-            document.getElementById('label-hoy').innerText = "Operando: " + obtenerFechaHoy();
-        }
-
-        document.getElementById('themeToggle').addEventListener('click', () => {
+        function toggleTheme() {
             const isDark = document.documentElement.classList.toggle('dark');
             localStorage.setItem('zubale_theme', isDark ? 'dark' : 'light');
-        });
+        }
 
         function toggleAnalitica() {
             const p = document.getElementById('panel-analitica');
             p.classList.toggle('collapsed'); p.classList.toggle('expanded');
         }
 
-        function escucharCambiosRealtime() {
-            _supabase.channel('cambios-logistica')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'ZCR_LOGISTICS' }, () => {
-                if(fechaActualVista === obtenerFechaHoy()) cargarDatosDesdeNube();
-            }).subscribe();
+        async function initApp() {
+            if (localStorage.getItem('zubale_theme') === 'dark') document.documentElement.classList.add('dark');
+            allStores.forEach(name => db[name] = { slots: Array(8).fill(0), sol: 0, repro: 0, editor: '---' });
+            await cargarDatosDesdeNube();
+            escucharCambiosRealtime();
+            ejecutarComparativa();
         }
 
         async function cargarDatosDesdeNube() {
-            const { data } = await _supabase.from('ZCR_LOGISTICS').select('*').eq('fecha_reporte', obtenerFechaHoy());
+            const { data } = await _supabase.from('ZCR_LOGISTICS').select('*').eq('fecha_reporte', fechaVistaActual);
             if (data) {
                 data.forEach(row => {
                     if (db[row.tienda]) {
                         db[row.tienda].slots = [row.slot_1, row.slot_2, row.slot_3, row.slot_4, row.slot_5, row.slot_6, row.slot_7, row.slot_8];
-                        db[row.tienda].sol = row.soluciones;
                         db[row.tienda].editor = row.ultimo_editor || '---';
                     }
                 });
                 actualizarUI();
             }
+        }
+
+        function escucharCambiosRealtime() {
+            _supabase.channel('sync').on('postgres_changes', { event: '*', schema: 'public', table: 'ZCR_LOGISTICS' }, cargarDatosDesdeNube).subscribe();
         }
 
         async function ejecutarComparativa() {
@@ -255,115 +228,53 @@
             }
         }
 
-        async function cargarDiaEspecifico() {
-            const fecha = document.getElementById('fecha-historico').value;
-            if (!fecha) return mostrarToast("Selecciona fecha", "error");
-            setCargando(true);
-            fechaActualVista = fecha;
-            const { data } = await _supabase.from('ZCR_LOGISTICS').select('*').eq('fecha_reporte', fecha);
-            allStores.forEach(name => db[name] = { slots: Array(8).fill(0), sol: 0, editor: '---' });
-            if (data && data.length > 0) {
-                data.forEach(row => {
-                    if (db[row.tienda]) {
-                        db[row.tienda].slots = [row.slot_1, row.slot_2, row.slot_3, row.slot_4, row.slot_5, row.slot_6, row.slot_7, row.slot_8];
-                        db[row.tienda].sol = row.soluciones;
-                        db[row.tienda].editor = 'Histórico';
-                    }
-                });
-                mostrarToast(`Historial ${fecha} cargado`, "success");
-            } else { mostrarToast("Sin registros", "error"); }
-            actualizarUI();
-            setCargando(false);
-        }
-
-        async function limpiezaMasterRango() {
-            const start = document.getElementById('delete-start').value;
-            const end = document.getElementById('delete-end').value;
-            if (!start || !end) return mostrarToast("Selecciona el rango masivo", "error");
-
-            const pin = prompt("🔐 SEGURIDAD MASTER: Ingrese el PIN para borrar el histórico seleccionado:");
-            if (pin !== "2026") {
-                return mostrarToast("❌ PIN Incorrecto. Borrado masivo cancelado.", "error");
-            }
-
-            if (confirm(`🔥 ¿ESTÁ SEGURO? 🔥\nSe eliminarán TODOS los registros entre ${start} y ${end}. Esta acción no se puede deshacer.`)) {
-                setCargando(true);
-                try {
-                    await _supabase.from('ZCR_LOGISTICS').delete().gte('fecha_reporte', start).lte('fecha_reporte', end);
-                    await _supabase.from('ZCR_PEDIDOS_PROCESADOS').delete().gte('fecha', start).lte('fecha', end);
-                    mostrarToast("🔥 Limpieza Master Exitosa", "success");
-                    if (obtenerFechaHoy() >= start && obtenerFechaHoy() <= end) location.reload();
-                    else ejecutarComparativa();
-                } catch (e) { mostrarToast("Error en limpieza masiva", "error"); }
-                setCargando(false);
-            }
-        }
-
-        // --- FUNCIÓN MODIFICADA PARA SOPORTAR MÚLTIPLES ARCHIVOS ---
-        async function procesarMultiplesArchivos(input, tipo, slotIdx = null) {
+        async function procesarMultiplesArchivos(input, source, slotIdx = null) {
             const files = input.files;
             if (files.length === 0) return;
-            
-            setCargando(true);
-            let totalGeneralNuevos = 0;
+            document.getElementById('loading-spinner').classList.remove('hidden');
             let tiendasImpactadas = new Set();
+            let pedidosNube = [];
 
-            // Procesar cada archivo seleccionado
             for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                
-                // Usamos una promesa para leer el archivo de forma síncrona en el bucle
                 const data = await new Promise((resolve) => {
                     const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
-                        resolve(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]));
-                    };
-                    reader.readAsArrayBuffer(file);
+                    reader.onload = (e) => resolve(XLSX.utils.sheet_to_json(XLSX.read(new Uint8Array(e.target.result), {type: 'array'}).Sheets[XLSX.read(new Uint8Array(e.target.result), {type: 'array'}).SheetNames[0]]));
+                    reader.readAsArrayBuffer(files[i]);
                 });
 
-                let nuevosPedidosDelArchivo = [];
-
-                for (const fila of data) {
+                data.forEach(fila => {
                     const tienda = buscarTienda(fila);
-                    const idPedido = fila.ID || fila.id || fila.Pedido || fila.PEDIDO;
-                    
-                    if (tienda && idPedido) {
-                        const { data: existe } = await _supabase.from('ZCR_PEDIDOS_PROCESADOS').select('id_pedido').eq('id_pedido', idPedido).single();
-                        if (!existe) {
-                            tiendasImpactadas.add(tienda);
-                            if (tipo === 'slots') db[tienda].slots[slotIdx]++; else db[tienda].sol++;
-                            nuevosPedidosDelArchivo.push({ id_pedido: idPedido, tienda: tienda, fecha: obtenerFechaHoy() });
+                    let idRaw = fila.ID || fila.id || fila.Pedido || fila.PEDIDO;
+                    if (!idRaw && fila.Titulo) idRaw = fila.Titulo.split('-')[0].trim();
+                    const id = String(idRaw);
+                    const texto = Object.values(fila).join("|").toUpperCase();
+
+                    if (tienda && idRaw && !idsProcesadosLocal.has(id)) {
+                        idsProcesadosLocal.add(id);
+                        tiendasImpactadas.add(tienda);
+                        if (texto.includes("REPRO")) db[tienda].repro++;
+                        else if (texto.includes("SOLUCION")) db[tienda].sol++;
+                        else {
+                            db[tienda].slots[slotIdx || 0]++;
+                            if (source === 'slot') pedidosNube.push({ id_pedido: id, tienda, fecha: obtenerFechaHoy() });
                         }
                     }
-                }
-
-                if (nuevosPedidosDelArchivo.length > 0) {
-                    await _supabase.from('ZCR_PEDIDOS_PROCESADOS').insert(nuevosPedidosDelArchivo);
-                    totalGeneralNuevos += nuevosPedidosDelArchivo.length;
-                }
+                });
             }
 
-            // Actualizar la base de datos solo para las tiendas que cambiaron
-            if (tiendasImpactadas.size > 0) {
+            if (source === 'slot' && pedidosNube.length > 0) {
+                for (let i = 0; i < pedidosNube.length; i += 200) await _supabase.from('ZCR_PEDIDOS_PROCESADOS').upsert(pedidosNube.slice(i, i + 200));
                 for (let t of tiendasImpactadas) {
-                    const storeTotal = db[t].slots.reduce((a,b)=>a+b, 0) + db[t].sol;
                     await _supabase.from('ZCR_LOGISTICS').upsert({
                         tienda: t, fecha_reporte: obtenerFechaHoy(),
                         slot_1: db[t].slots[0], slot_2: db[t].slots[1], slot_3: db[t].slots[2], slot_4: db[t].slots[3],
                         slot_5: db[t].slots[4], slot_6: db[t].slots[5], slot_7: db[t].slots[6], slot_8: db[t].slots[7],
-                        soluciones: db[t].sol, total: storeTotal, ultimo_editor: "Control Web"
+                        total: db[t].slots.reduce((a,b)=>a+b, 0), ultimo_editor: "Auditoría V2"
                     }, { onConflict: 'tienda, fecha_reporte' });
                 }
-                mostrarToast(`${totalGeneralNuevos} pedidos totales sincronizados`, 'success');
-            } else {
-                mostrarToast("No se encontraron pedidos nuevos en los archivos", 'error');
             }
-
-            input.value = ""; // Limpiar input para permitir re-subida
-            actualizarUI();
-            ejecutarComparativa();
-            setCargando(false);
+            input.value = ""; actualizarUI();
+            document.getElementById('loading-spinner').classList.add('hidden');
         }
 
         function buscarTienda(fila) {
@@ -379,82 +290,88 @@
             return null;
         }
 
+        function generarCardHTML(name) {
+            const s = db[name];
+            const total = s.slots.reduce((a,b)=>a+b, 0) + s.sol + s.repro;
+            return `
+            <div class="bg-white dark:bg-enterprise-800 p-5 rounded-2xl border border-enterprise-200 dark:border-enterprise-700 shadow-sm text-center">
+                <div class="flex justify-between items-center mb-4 italic font-black text-[11px] uppercase dark:text-white">${name} <span class="text-accent-500 font-black">${total}</span></div>
+                <div class="grid grid-cols-4 gap-2 mb-3">
+                    ${s.slots.map((v, i) => {
+                        const limite = (i < 6) ? 18 : 15;
+                        const alerta = (v > limite) ? 'alerta-exceso' : (v > 0 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-gray-50 text-gray-400 dark:bg-enterprise-900/50');
+                        return `<div class="text-[9px] p-2 rounded-lg font-black transition-all ${alerta}">S${i+1}: ${v}</div>`;
+                    }).join('')}
+                </div>
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <div class="px-2 py-1 bg-orange-50 dark:bg-orange-900/20 text-orange-600 text-[8px] font-black rounded border border-orange-100 dark:border-orange-800 italic uppercase">R: ${s.repro}</div>
+                    <div class="px-2 py-1 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 text-[8px] font-black rounded border border-indigo-100 dark:border-indigo-800 italic uppercase">S: ${s.sol}</div>
+                </div>
+                <p class="text-[8px] text-enterprise-400 uppercase font-black tracking-widest italic mt-2">Audit: ${s.editor}</p>
+            </div>`;
+        }
+
         function actualizarUI() {
-            const container = document.getElementById('tiendas-container');
-            container.innerHTML = allStores.map(name => {
-                const s = db[name];
-                const total = s.slots.reduce((a,b)=>a+b, 0) + s.sol;
-                return `
-                <div class="bg-white dark:bg-enterprise-800 p-5 rounded-2xl border border-enterprise-200 dark:border-enterprise-700 shadow-sm text-center">
-                    <div class="flex justify-between items-center mb-4 italic font-black text-[11px] uppercase tracking-tighter">${name} <span class="text-accent-500 font-black">${total}</span></div>
-                    <div class="grid grid-cols-4 gap-2 mb-4">
-                        ${s.slots.map((v, i) => {
-                            const limite = (i < 6) ? 18 : 15;
-                            const alerta = (v > limite) ? 'alerta-exceso' : (v > 0 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-gray-50 text-gray-400 dark:bg-enterprise-900/50');
-                            return `<div class="text-[9px] p-2 rounded-lg font-black transition-all ${alerta}">S${i+1}: ${v}</div>`;
-                        }).join('')}
-                    </div>
-                    <p class="text-[8px] text-enterprise-400 uppercase font-black">Editor: ${s.editor}</p>
-                </div>`;
-            }).join('');
-            
-            let b1 = 0, b2 = 0, solTotal = 0;
+            document.getElementById('container-b1').innerHTML = batch1Stores.map(n => generarCardHTML(n)).join('');
+            document.getElementById('container-b2').innerHTML = batch2Stores.map(n => generarCardHTML(n)).join('');
+            let b1 = 0, b2 = 0, solT = 0, reproT = 0;
             allStores.forEach(name => {
                 const sum = db[name].slots.reduce((a,b)=>a+b, 0);
                 if (batch1Stores.includes(name)) b1 += sum; else b2 += sum;
-                solTotal += db[name].sol;
+                solT += db[name].sol; reproT += db[name].repro;
             });
-            document.getElementById('total-b1').innerText = b1.toLocaleString();
-            document.getElementById('total-b2').innerText = b2.toLocaleString();
-            document.getElementById('total-sols').innerText = solTotal.toLocaleString();
-            document.getElementById('gran-total').innerText = (b1 + b2 + solTotal).toLocaleString();
+            document.getElementById('total-b1').innerText = b1; document.getElementById('total-b2').innerText = b2;
+            document.getElementById('total-repro').innerText = reproT; document.getElementById('total-sols').innerText = solT;
+            document.getElementById('gran-total').innerText = b1 + b2 + solT + reproT;
         }
 
-        function mostrarToast(m, t) {
-            const c = document.getElementById('toast-container');
-            const d = document.createElement('div');
-            d.className = `toast px-5 py-3 rounded-xl text-[10px] font-black uppercase text-white shadow-xl ${t==='success'?'bg-emerald-600':'bg-red-600'}`;
-            d.innerText = m;
-            c.appendChild(d);
-            setTimeout(() => d.remove(), 3000);
+        async function cargarDiaEspecifico() {
+            const fecha = document.getElementById('fecha-historico').value;
+            if (!fecha) return;
+            fechaVistaActual = fecha;
+            allStores.forEach(name => db[name] = { slots: Array(8).fill(0), sol: 0, repro: 0, editor: '---' });
+            await cargarDatosDesdeNube();
+        }
+
+        async function limpiezaMasterRango() {
+            const start = document.getElementById('delete-start').value;
+            const end = document.getElementById('delete-end').value;
+            const pin = prompt("PIN:");
+            if (pin !== "2026") return;
+            await _supabase.from('ZCR_LOGISTICS').delete().gte('fecha_reporte', start).lte('fecha_reporte', end);
+            location.reload();
         }
 
         async function limpiarTodo() {
-            if(confirm("¿Seguro que desea reiniciar los datos del día de hoy? Esta acción limpiará el dashboard actual.")) {
-                setCargando(true);
-                await _supabase.from('ZCR_LOGISTICS').delete().eq('fecha_reporte', obtenerFechaHoy());
-                await _supabase.from('ZCR_PEDIDOS_PROCESADOS').delete().eq('fecha', obtenerFechaHoy());
-                location.reload();
+            if(confirm("¿Reiniciar Dashboard? Se perderán conteos locales.")) {
+                idsProcesadosLocal.clear();
+                allStores.forEach(name => db[name] = { slots: Array(8).fill(0), sol: 0, repro: 0, editor: '---' });
+                actualizarUI();
             }
         }
 
         function exportarExcel() {
             const dataExport = allStores.map(name => {
                 const s = db[name];
-                const total = s.slots.reduce((a, b) => a + b, 0) + s.sol;
-                return {
-                    "Tienda": name,
-                    "Slot 1": s.slots[0], "Slot 2": s.slots[1], "Slot 3": s.slots[2], "Slot 4": s.slots[3],
-                    "Slot 5": s.slots[4], "Slot 6": s.slots[5], "Slot 7": s.slots[6], "Slot 8": s.slots[7],
-                    "Soluciones": s.sol,
-                    "Total General": total,
-                    "Editor": s.editor,
-                    "Fecha Reporte": fechaActualVista
-                };
+                return { "Batch": batch1Stores.includes(name) ? "B1" : "B2", "Tienda": name, "R": s.repro, "S": s.sol, "Total": s.slots.reduce((a,b)=>a+b,0)+s.sol+s.repro };
             });
             const ws = XLSX.utils.json_to_sheet(dataExport);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Logistics Report");
-            XLSX.writeFile(wb, `Zubale_CR_Reporte_${fechaActualVista}.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, "Dashboard");
+            XLSX.writeFile(wb, `Logistica_CR.xlsx`);
         }
 
-        // --- LISTENERS ACTUALIZADOS PARA LA CARGA MÚLTIPLE ---
-        document.getElementById('input-slot').addEventListener('change', function() { 
-            const idx = parseInt(document.getElementById('slot-selector').value) - 1;
-            procesarMultiplesArchivos(this, 'slots', idx); 
-        });
+        function mostrarToast(m, t) {
+            const c = document.getElementById('toast-container');
+            const d = document.createElement('div');
+            d.className = `toast px-5 py-3 rounded-xl text-[10px] font-black uppercase text-white shadow-xl ${t==='success'?'bg-emerald-600':'bg-red-600'}`;
+            d.innerText = m; c.appendChild(d);
+            setTimeout(() => d.remove(), 4000);
+        }
+
+        document.getElementById('input-slot').addEventListener('change', function() { procesarMultiplesArchivos(this, 'slot', parseInt(document.getElementById('slot-selector').value) - 1); });
         document.getElementById('input-soluciones').addEventListener('change', function() { procesarMultiplesArchivos(this, 'sol'); });
-        document.getElementById('input-inyectar').addEventListener('change', function() { procesarMultiplesArchivos(this, 'inyectar'); });
+        document.getElementById('input-inyectar').addEventListener('change', function() { procesarMultiplesArchivos(this, 'inyectar', 0); });
     </script>
 </body>
 </html>
