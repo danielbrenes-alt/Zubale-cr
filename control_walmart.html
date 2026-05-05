@@ -148,7 +148,9 @@
             <div class="mt-4 pt-4 border-t border-enterprise-100 dark:border-enterprise-700 flex justify-between items-center">
                 <p class="text-[10px] font-black text-enterprise-400 dark:text-enterprise-500 uppercase tracking-widest italic">Motor Turbo Híbrido: Sincronización de Slot Activa</p>
                 <div class="flex gap-4">
-                    <button onclick="exportarExcel()" class="px-4 py-2 bg-emerald-600 text-white rounded-xl font-black text-[10px] uppercase shadow-md">Exportar Excel</button>
+                    <button onclick="exportarExcel()" class="px-4 py-2 bg-emerald-600 text-white rounded-xl font-black text-[10px] uppercase shadow-md flex items-center gap-2">
+                        <span class="material-symbols-outlined text-xs">download</span> Exportar Excel Detallado
+                    </button>
                     <button onclick="limpiarTodo()" class="text-red-500 font-black text-[10px] uppercase hover:underline">Reiniciar Dashboard (Hoy)</button>
                 </div>
             </div>
@@ -353,12 +355,39 @@
         function exportarExcel() {
             const dataExport = allStores.map(name => {
                 const s = db[name];
-                return { "Batch": batch1Stores.includes(name) ? "B1" : "B2", "Tienda": name, "R": s.repro, "S": s.sol, "Total": s.slots.reduce((a,b)=>a+b,0)+s.sol+s.repro };
+                const sumaSlots = s.slots.reduce((a, b) => a + b, 0);
+                return {
+                    "Batch": batch1Stores.includes(name) ? "B1" : "B2",
+                    "Tienda": name,
+                    "Slot 1": s.slots[0],
+                    "Slot 2": s.slots[1],
+                    "Slot 3": s.slots[2],
+                    "Slot 4": s.slots[3],
+                    "Slot 5": s.slots[4],
+                    "Slot 6": s.slots[5],
+                    "Slot 7": s.slots[6],
+                    "Slot 8": s.slots[7],
+                    "Repro (R)": s.repro,
+                    "Soluciones (S)": s.sol,
+                    "TOTAL GENERAL": sumaSlots + s.sol + s.repro,
+                    "Último Editor": s.editor
+                };
             });
+
             const ws = XLSX.utils.json_to_sheet(dataExport);
+            
+            // Estilización de columnas
+            const wscols = [
+                {wch: 8}, {wch: 20}, {wch: 6}, {wch: 6}, {wch: 6}, {wch: 6}, 
+                {wch: 6}, {wch: 6}, {wch: 6}, {wch: 6}, {wch: 10}, {wch: 12}, 
+                {wch: 15}, {wch: 20}
+            ];
+            ws['!cols'] = wscols;
+
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Dashboard");
-            XLSX.writeFile(wb, `Logistica_CR.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, "Logistica Detallada");
+            const fecha = new Date().toISOString().split('T')[0];
+            XLSX.writeFile(wb, `ZubaleCR_Logistica_${fecha}.xlsx`);
         }
 
         function mostrarToast(m, t) {
